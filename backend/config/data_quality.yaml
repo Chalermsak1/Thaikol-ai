@@ -1,0 +1,28 @@
+# Data quality completeness configuration
+# Evaluates candidate profile data availability without rewarding artificially high numbers.
+
+expected_fields:
+  profile_url:
+    weight: 0.15
+    description: "Public TikTok profile link presence"
+  bio:
+    weight: 0.10
+    description: "Creator profile bio text presence"
+  follower_count:
+    weight: 0.15
+    description: "Observed follower count availability"
+  sample_videos:
+    weight: 0.15
+    description: "Sample video records collected (at least 1)"
+  sample_captions:
+    weight: 0.15
+    description: "Sample video caption text availability"
+  hashtags:
+    weight: 0.10
+    description: "Observed hashtag list presence"
+  engagement_metrics:
+    weight: 0.10
+    description: "Average views, likes, comments, or shares presence"
+  local_signals:
+    weight: 0.10
+    description: "Language ratio or Thailand local content signal availability"

@@ -1,0 +1,444 @@
+[
+  {
+    "id": "kol-th-001",
+    "tiktok_handle": "mookda_skincare",
+    "display_name": "Mookda รีวิวผิวสวย",
+    "profile_url": "https://www.tiktok.com/@mookda_skincare",
+    "bio": "รีวิวสกินแคร์กู้ผิวแพ้ง่าย | สมุนไพรไทย & ออร์แกนิก | แชร์ทริคผมหนาไม่ร่วง 🌿✨",
+    "category": "Beauty & Personal Care",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["สกินแคร์", "ผิวแพ้ง่าย", "แชมพูสมุนไพร", "ออร์แกนิก", "บำรุงผม"],
+    "metrics": {
+      "followers": 145000,
+      "avg_views": 38000,
+      "engagement_rate": 0.048,
+      "estimated_thai_audience_ratio": 0.94
+    },
+    "recent_captions": [
+      "กู้ผมร่วงฉบับคนแพ้ง่าย! แชมพูอัญชันสมุนไพรแท้ไม่ผสมซิลิโคน ใช้แล้วลูกผมขึ้นจริง 💜🌿 #ผมร่วง #สมุนไพร #รีวิวบิวตี้",
+      "ใครผิวแห้งแสบแดง ต้องลองเจลว่านหางออร์แกนิกตัวนี้ ปลอบประโลมผิวดีมากกก 🍃 #กู้ผิว #ผิวแพ้ง่าย #beautyreview",
+      "เปิดกรุไอเทมลดผมมัน คุมรังแคจากธรรมชาติ 100% สระแล้วเบาสบายหัวสุดๆ ✨"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_mookda_01",
+        "video_url": "https://www.tiktok.com/@mookda_skincare/video/7100000000001",
+        "caption": "กู้ผมร่วงฉบับคนแพ้ง่าย! แชมพูอัญชันสมุนไพรแท้ไม่ผสมซิลิโคน ใช้แล้วลูกผมขึ้นจริง 💜🌿 #ผมร่วง #สมุนไพร #รีวิวบิวตี้",
+        "views": 42000,
+        "likes": 2100,
+        "comments": 145,
+        "shares": 92,
+        "saves": 380,
+        "hashtags": ["ผมร่วง", "สมุนไพร", "รีวิวบิวตี้"],
+        "created_at": "2026-09-10T10:00:00Z"
+      },
+      {
+        "video_id": "vid_mookda_02",
+        "video_url": "https://www.tiktok.com/@mookda_skincare/video/7100000000002",
+        "caption": "ใครผิวแห้งแสบแดง ต้องลองเจลว่านหางออร์แกนิกตัวนี้ ปลอบประโลมผิวดีมากกก 🍃 #กู้ผิว #ผิวแพ้ง่าย #beautyreview",
+        "views": 34000,
+        "likes": 1850,
+        "comments": 98,
+        "shares": 65,
+        "saves": 290,
+        "hashtags": ["กู้ผิว", "ผิวแพ้ง่าย", "beautyreview"],
+        "created_at": "2026-09-03T14:30:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-002",
+    "tiktok_handle": "cleanlife_pat",
+    "display_name": "Pat | Green & Clean Living",
+    "profile_url": "https://www.tiktok.com/@cleanlife_pat",
+    "bio": "Sustainable Living in BKK 🍃 Eco-friendly | Holistic Health & Herbal Care | Zero-waste tips",
+    "category": "Lifestyle & Wellness",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["ecofriendly", "lifestyle", "herbalcare", "wellness", "สายสุขภาพ"],
+    "metrics": {
+      "followers": 82000,
+      "avg_views": 22000,
+      "engagement_rate": 0.052,
+      "estimated_thai_audience_ratio": 0.91
+    },
+    "recent_captions": [
+      "วิถีชีวิตกรีนๆ สระผมด้วยสมุนไพรไทย ปราศจากสารเคมีทำลายสิ่งแวดล้อม 🌏🌱 #zerowaste #sustainableliving #thaiherb",
+      "Morning Routine ฉบับคนรักสุขภาพ กรีนที + ผลิตภัณฑ์จากธรรมชาติ 100% ☀️"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_pat_01",
+        "video_url": "https://www.tiktok.com/@cleanlife_pat/video/7100000000003",
+        "caption": "วิถีชีวิตกรีนๆ สระผมด้วยสมุนไพรไทย ปราศจากสารเคมีทำลายสิ่งแวดล้อม 🌏🌱 #zerowaste #sustainableliving #thaiherb",
+        "views": 25000,
+        "likes": 1400,
+        "comments": 78,
+        "shares": 52,
+        "saves": 180,
+        "hashtags": ["zerowaste", "sustainableliving", "thaiherb"],
+        "created_at": "2026-09-08T09:15:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-003",
+    "tiktok_handle": "gam_tech_bkk",
+    "display_name": "Gam Tech Gadget",
+    "profile_url": "https://www.tiktok.com/@gam_tech_bkk",
+    "bio": "รีวิวมือถือ ไอที แกดเจ็ต อุปกรณ์โต๊ะคอม 🎮📱 อัพเดตเทคโนโลยีใหม่ทุกวัน กรุงเทพ",
+    "category": "Tech & Gadgets",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["tech", "gadget", "สมาร์ทโฟน", "เกม", "ไอที"],
+    "metrics": {
+      "followers": 310000,
+      "avg_views": 95000,
+      "engagement_rate": 0.035,
+      "estimated_thai_audience_ratio": 0.88
+    },
+    "recent_captions": [
+      "เปิดตัวหูฟังตัดเสียงรบกวนรุ่นใหม่ เบสแน่น ไมค์ชัด 🎧🔥 #techreview #หูฟังบลูทูธ",
+      "จัดโต๊ะคอมฉบับสายทำงาน มีไฟ RGB มินิมอล 🖥️✨ กรุงเทพ"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_gam_01",
+        "video_url": "https://www.tiktok.com/@gam_tech_bkk/video/7100000000004",
+        "caption": "เปิดตัวหูฟังตัดเสียงรบกวนรุ่นใหม่ เบสแน่น ไมค์ชัด 🎧🔥 #techreview #หูฟังบลูทูธ",
+        "views": 95000,
+        "likes": 3200,
+        "comments": 140,
+        "shares": 85,
+        "saves": 410,
+        "hashtags": ["techreview", "หูฟังบลูทูธ"],
+        "created_at": "2026-09-12T16:00:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations (control negative sample for beauty matching)."
+  },
+  {
+    "id": "kol-th-004",
+    "tiktok_handle": "bkk_cafehopper",
+    "display_name": "Kin Cafe BKK | เช็คอินคาเฟ่",
+    "profile_url": "https://www.tiktok.com/@bkk_cafehopper",
+    "bio": "พิกัดคาเฟ่เปิดใหม่ กรุงเทพ & เชียงใหม่ ☕️🥐 Specialty coffee reviewer | ถ่ายรูปสวย แสงดี",
+    "category": "Food & Beverage",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["cafehopping", "คาเฟ่กรุงเทพ", "รีวิวคาเฟ่", "specialtycoffee", "กาแฟ"],
+    "metrics": {
+      "followers": 185000,
+      "avg_views": 52000,
+      "engagement_rate": 0.058,
+      "estimated_thai_audience_ratio": 0.95
+    },
+    "recent_captions": [
+      "คาเฟ่เปิดใหม่ย่านสยาม กรุงเทพ! มินิมอลเกาหลี แสงบ่ายคือปังมากกก ☕️✨ #คาเฟ่กรุงเทพ #รีวิวคาเฟ่ #cafehoppingbkk",
+      "Specialty coffee ซ่อนตัวในซอยลับ อารีย์ กาแฟดริปเมล็ดเชียงรายหอมละมุน 🌿 #specialtycoffee #กาแฟดริป"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_cafe_01",
+        "video_url": "https://www.tiktok.com/@bkk_cafehopper/video/7100000000005",
+        "caption": "คาเฟ่เปิดใหม่ย่านสยาม กรุงเทพ! มินิมอลเกาหลี แสงบ่ายคือปังมากกก ☕️✨ #คาเฟ่กรุงเทพ #รีวิวคาเฟ่ #cafehoppingbkk",
+        "views": 58000,
+        "likes": 3200,
+        "comments": 120,
+        "shares": 450,
+        "saves": 1800,
+        "hashtags": ["คาเฟ่กรุงเทพ", "รีวิวคาเฟ่", "cafehoppingbkk"],
+        "created_at": "2026-09-11T11:00:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-005",
+    "tiktok_handle": "coffeewithpim",
+    "display_name": "Pimmy Barista Diary",
+    "profile_url": "https://www.tiktok.com/@coffeewithpim",
+    "bio": "โฮมคาเฟ่ & บาริสต้าฝึกหัด ☕️ แจกสูตรเครื่องดื่ม กาแฟนม ชาไทย ทำง่ายอร่อยจริง",
+    "category": "Food & Beverage",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["โฮมคาเฟ่", "สูตรกาแฟ", "ชาไทย", "barista", "homecafe"],
+    "metrics": {
+      "followers": 96000,
+      "avg_views": 31000,
+      "engagement_rate": 0.061,
+      "estimated_thai_audience_ratio": 0.96
+    },
+    "recent_captions": [
+      "สูตรชาไทยสกัดเข้มข้น หวานน้อยกลมกล่อม ทำเองที่บ้านได้ไม่ง้อร้านดัง 🧋🧡 #ชาไทย #โฮมคาเฟ่ #แจกสูตร",
+      "สอนชง Dirty Coffee ดริปเข้มข้นตัดกับนมเย็นเฉียบ อร่อยฟินสุด ☕️🥛 #dirtycoffee #กาแฟ"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_pim_01",
+        "video_url": "https://www.tiktok.com/@coffeewithpim/video/7100000000006",
+        "caption": "สูตรชาไทยสกัดเข้มข้น หวานน้อยกลมกล่อม ทำเองที่บ้านได้ไม่ง้อร้านดัง 🧋🧡 #ชาไทย #โฮมคาเฟ่ #แจกสูตร",
+        "views": 36000,
+        "likes": 2100,
+        "comments": 95,
+        "shares": 310,
+        "saves": 980,
+        "hashtags": ["ชาไทย", "โฮมคาเฟ่", "แจกสูตร"],
+        "created_at": "2026-09-09T15:20:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-006",
+    "tiktok_handle": "belle_thaiherb",
+    "display_name": "Belle สมุนไพรเพื่อสุขภาพ",
+    "profile_url": "https://www.tiktok.com/@belle_thaiherb",
+    "bio": "แชร์ภูมิปัญญาสมุนไพรไทยเพื่อผิวและสุขภาพ 🌿 ขิง อัญชัน มะขาม สารพัดประโยชน์ เขาค้อ เพชรบูรณ์",
+    "category": "Beauty & Personal Care",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["สมุนไพรไทย", "บำรุงผม", "มะขามขัดผิว", "เขาค้อ", "สมุนไพร"],
+    "metrics": {
+      "followers": 118000,
+      "avg_views": 39000,
+      "engagement_rate": 0.055,
+      "estimated_thai_audience_ratio": 0.97
+    },
+    "recent_captions": [
+      "มาถึงเขาค้อต้องพกไอเทมนี้! แชมพูมะกรูดอัญชันสดแท้ ลดคันหนังศีรษะได้ดีมาก 💜🍃 #เขาค้อ #สมุนไพรไทย #ลดผมร่วง",
+      "สครับมะขามแท้ผสมน้ำผึ้ง ขัดแล้วผิวเนียนนุ่ม ขาวกระจ่างใสแบบธรรมชาติ 🍯✨ #ขัดผิว #สมุนไพร"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_belle_01",
+        "video_url": "https://www.tiktok.com/@belle_thaiherb/video/7100000000007",
+        "caption": "มาถึงเขาค้อต้องพกไอเทมนี้! แชมพูมะกรูดอัญชันสดแท้ ลดคันหนังศีรษะได้ดีมาก 💜🍃 #เขาค้อ #สมุนไพรไทย #ลดผมร่วง",
+        "views": 41000,
+        "likes": 2400,
+        "comments": 115,
+        "shares": 130,
+        "saves": 520,
+        "hashtags": ["เขาค้อ", "สมุนไพรไทย", "ลดผมร่วง"],
+        "created_at": "2026-09-07T13:40:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-007",
+    "tiktok_handle": "aroi_bkk_guide",
+    "display_name": "แอดมินพากิน BKK",
+    "profile_url": "https://www.tiktok.com/@aroi_bkk_guide",
+    "bio": "ชวนกินสตรีทฟู้ด & ร้านเด็ดทั่วกรุงเทพ 🍜🔥 เมนูเด็ด ร้านลับ เช็คอินความอร่อย",
+    "category": "Food & Beverage",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["อาหารไทย", "สตรีทฟู้ด", "อร่อยบอกต่อ", "กรุงเทพ", "tiktokพากิน"],
+    "metrics": {
+      "followers": 420000,
+      "avg_views": 140000,
+      "engagement_rate": 0.042,
+      "estimated_thai_audience_ratio": 0.98
+    },
+    "recent_captions": [
+      "ร้านลับเยาวราช กรุงเทพ บะหมี่เกี๊ยวปูชิ้นโต น้ำซุปกลมกล่อมเปิดมากว่า 50 ปี! 🥢🦀 #tiktokพากิน #อร่อยบอกต่อ #เยาวราช",
+      "ก๋วยเตี๋ยวต้มยำหมูกรอบรสแซ่บ เปรี้ยวเผ็ดจี๊ดถึงใจ ย่านลาดพร้าว 🔥🍜 #ก๋วยเตี๋ยวต้มยำ #กรุงเทพ"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_aroi_01",
+        "video_url": "https://www.tiktok.com/@aroi_bkk_guide/video/7100000000008",
+        "caption": "ร้านลับเยาวราช กรุงเทพ บะหมี่เกี๊ยวปูชิ้นโต น้ำซุปกลมกล่อมเปิดมากว่า 50 ปี! 🥢🦀 #tiktokพากิน #อร่อยบอกต่อ #เยาวราช",
+        "views": 165000,
+        "likes": 7500,
+        "comments": 340,
+        "shares": 890,
+        "saves": 3200,
+        "hashtags": ["tiktokพากิน", "อร่อยบอกต่อ", "เยาวราช"],
+        "created_at": "2026-09-12T18:30:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-008",
+    "tiktok_handle": "thai_organic_life",
+    "display_name": "หมอฝน สุขภาพองค์รวม",
+    "profile_url": "https://www.tiktok.com/@thai_organic_life",
+    "bio": "Holistic Wellness & Thai Herb 🌿 วิธีชะลอวัย ป้องกันผมร่วง ปรับสมดุลลำไส้ด้วยวิถีธรรมชาติ",
+    "category": "Lifestyle & Wellness",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["ชะลอวัย", "สมุนไพร", "สุขภาพ", "ผมร่วง", "wellness"],
+    "metrics": {
+      "followers": 215000,
+      "avg_views": 68000,
+      "engagement_rate": 0.051,
+      "estimated_thai_audience_ratio": 0.93
+    },
+    "recent_captions": [
+      "3 สาเหตุที่ผมร่วงหนักในคนวัย 30+ และวิธีบำรุงรากผมด้วยสมุนไพรธรรมชาติ 🌿🧴 #ผมร่วง #รักสุขภาพ #ชะลอวัย",
+      "น้ำขิงต้มสดลดไขมันและเสริมภูมิคุ้มกัน ดื่มอุ่นๆ ทุกเช้าดีต่อร่างกายอย่างไร 🍵 #น้ำขิง #สมุนไพรไทย"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_organic_01",
+        "video_url": "https://www.tiktok.com/@thai_organic_life/video/7100000000009",
+        "caption": "3 สาเหตุที่ผมร่วงหนักในคนวัย 30+ และวิธีบำรุงรากผมด้วยสมุนไพรธรรมชาติ 🌿🧴 #ผมร่วง #รักสุขภาพ #ชะลอวัย",
+        "views": 72000,
+        "likes": 3600,
+        "comments": 210,
+        "shares": 480,
+        "saves": 1400,
+        "hashtags": ["ผมร่วง", "รักสุขภาพ", "ชะลอวัย"],
+        "created_at": "2026-09-06T10:00:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-009",
+    "tiktok_handle": "roast_master_th",
+    "display_name": "Coach Ton กาแฟไทย",
+    "profile_url": "https://www.tiktok.com/@roast_master_th",
+    "bio": "Roaster & Q-Grader เชียงใหม่ ⛰️ แนะนำเมล็ดกาแฟไทย ดอยช้าง ดอยแม่สลอง ชงยังไงให้หวานฉ่ำ",
+    "category": "Food & Beverage",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["เมล็ดกาแฟ", "ดอยช้าง", "กาแฟดริป", "เชียงใหม่", "coffee"],
+    "metrics": {
+      "followers": 74000,
+      "avg_views": 26000,
+      "engagement_rate": 0.059,
+      "estimated_thai_audience_ratio": 0.94
+    },
+    "recent_captions": [
+      "เมล็ดกาแฟไทยไม่ได้มีดีแค่ขม! รีวิวเมล็ดดอยช้าง Anaerobic หอมพีชผลไม้สุกฉ่ำ 🍑☕️ #กาแฟพิเศษ #เชียงใหม่",
+      "บดกาแฟเบอร์ไหนเหมาะกับกาต้ม Moka pot ชงแล้วไม่ไหม้ ขมน้อย หวานนำ ☕️✨"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_ton_01",
+        "video_url": "https://www.tiktok.com/@roast_master_th/video/7100000000010",
+        "caption": "เมล็ดกาแฟไทยไม่ได้มีดีแค่ขม! รีวิวเมล็ดดอยช้าง Anaerobic หอมพีชผลไม้สุกฉ่ำ 🍑☕️ #กาแฟพิเศษ #เชียงใหม่",
+        "views": 28000,
+        "likes": 1600,
+        "comments": 74,
+        "shares": 98,
+        "saves": 450,
+        "hashtags": ["กาแฟพิเศษ", "เชียงใหม่"],
+        "created_at": "2026-09-04T08:30:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-010",
+    "tiktok_handle": "ploy_bkk_diary",
+    "display_name": "Ploy | Vlogger กรุงเทพ",
+    "profile_url": "https://www.tiktok.com/@ploy_bkk_diary",
+    "bio": "Life in Bangkok 🌸 แต่งหน้า คาเฟ่ ช้อปปิ้ง แฟชั่นมินิมอล | Work Life Balance 🎀",
+    "category": "Lifestyle & Wellness",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["vlog", "bangkok", "แต่งหน้า", "คาเฟ่", "ไลฟ์สไตล์"],
+    "metrics": {
+      "followers": 160000,
+      "avg_views": 48000,
+      "engagement_rate": 0.046,
+      "estimated_thai_audience_ratio": 0.92
+    },
+    "recent_captions": [
+      "One day with me ย่านสุขุมวิท กรุงเทพ แวะคาเฟ่ใหม่ + ช้อปสกินแคร์แบรนด์ไทย 💖🏙️ #vlog #กรุงเทพ #คาเฟ่",
+      "GRWM แต่งหน้างานผิวฉ่ำธรรมชาติด้วยสมุนไพรและเจลว่านหางจระเข้ 🌸✨ #grwm #งานผิว"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_ploy_01",
+        "video_url": "https://www.tiktok.com/@ploy_bkk_diary/video/7100000000011",
+        "caption": "One day with me ย่านสุขุมวิท กรุงเทพ แวะคาเฟ่ใหม่ + ช้อปสกินแคร์แบรนด์ไทย 💖🏙️ #vlog #กรุงเทพ #คาเฟ่",
+        "views": 52000,
+        "likes": 2400,
+        "comments": 88,
+        "shares": 110,
+        "saves": 390,
+        "hashtags": ["vlog", "กรุงเทพ", "คาเฟ่"],
+        "created_at": "2026-09-11T17:00:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  },
+  {
+    "id": "kol-th-011",
+    "tiktok_handle": "kinjubkajib",
+    "display_name": "กิ๋นจุ๊บกิ๋นจิ๊บ เชียงใหม่",
+    "profile_url": "https://www.tiktok.com/@kinjubkajib",
+    "bio": "พากินของกิ๋นลำเชียงใหม่ & ภาคเหนือ 🌿 ร้านบ้านๆ วิถีโลคอล อร่อยแต๊ๆ เจ้า",
+    "category": "Food & Beverage",
+    "primary_language": "th",
+    "country": "TH",
+    "content_tags": ["เชียงใหม่", "ของกินเชียงใหม่", "อาหารเหนือ", "เที่ยวเชียงใหม่"],
+    "metrics": {
+      "followers": 230000,
+      "avg_views": 75000,
+      "engagement_rate": 0.053,
+      "estimated_thai_audience_ratio": 0.96
+    },
+    "recent_captions": [
+      "ข้าวซอยร้านเด็ดเชียงใหม่ น้ำแกงเข้มข้น ไก่ตุ๋นเปื่อยนุ่มละลายในปาก 🍗🍜 #เชียงใหม่ #ข้าวซอย #ของกินเชียงใหม่",
+      "กาดหลวงเชียงใหม่ ไส้อั่วสมุนไพรเตาถ่าน หอมเครื่องเทศถึงใจเจ้า 🌶️🌿 #อาหารเหนือ"
+    ],
+    "sample_videos": [
+      {
+        "video_id": "vid_kin_01",
+        "video_url": "https://www.tiktok.com/@kinjubkajib/video/7100000000012",
+        "caption": "ข้าวซอยร้านเด็ดเชียงใหม่ น้ำแกงเข้มข้น ไก่ตุ๋นเปื่อยนุ่มละลายในปาก 🍗🍜 #เชียงใหม่ #ข้าวซอย #ของกินเชียงใหม่",
+        "views": 78000,
+        "likes": 4200,
+        "comments": 190,
+        "shares": 380,
+        "saves": 1100,
+        "hashtags": ["เชียงใหม่", "ข้าวซอย", "ของกินเชียงใหม่"],
+        "created_at": "2026-09-08T12:00:00Z"
+      }
+    ],
+    "is_demo_fixture": true,
+    "data_source": "demo_fixture",
+    "provenance": "curated_demo_fixture",
+    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+  }
+]

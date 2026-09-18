@@ -1,0 +1,30 @@
+[
+  {
+    "id": "brand-khaokho-01",
+    "name": "Khaokho Talaypu (เขาค้อทะเลภู)",
+    "category": "Natural Beauty & Herbal Personal Care",
+    "country": "TH",
+    "website_url": "https://www.khaokhotalaypu.com",
+    "facebook_url": "https://www.facebook.com/KhaokhoTalaypu",
+    "brand_summary": "Pioneer Thai natural and herbal personal care brand established in Phetchabun, Thailand. Specializes in 100% natural butterfly pea, aloe vera, and ginger shampoos, hair treatments, and organic skincare free from silicones, parabens, and harsh synthetic chemicals.",
+    "target_audience": "Eco-conscious Thai consumers, urban working professionals aged 22-45, clean beauty advocates, and people experiencing sensitive scalp or chemical hair damage.",
+    "key_products": [
+      "Butterfly Pea & False Daisy Herbal Hair Shampoo",
+      "Organic Aloe Vera Soothing Gel",
+      "Ginger & Ginseng Scalp Tonic",
+      "Tamarind Body Polish"
+    ],
+    "content_style": "Authentic, wholesome, nature-inspired, educational on herbal benefits, clean aesthetic with earth tones (green, white, herbal shades).",
+    "keywords": [
+      "แชมพูสมุนไพร",
+      "อัญชัน",
+      "เขาค้อทะเลภู",
+      "clean beauty",
+      "organic thai herbs",
+      "ลดผมร่วง",
+      "ผิวแพ้ง่าย"
+    ],
+    "is_demo_fixture": true,
+    "provenance": "curated_demo_fixture"
+  }
+]

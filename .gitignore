@@ -1,0 +1,47 @@
+# ==============================================================================
+# ThaiKOL AI — .gitignore
+# ==============================================================================
+
+# Secrets & Environment
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+
+# Node.js / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+postgres_data/
+
+# Model cache (large, downloaded at runtime)
+.cache/

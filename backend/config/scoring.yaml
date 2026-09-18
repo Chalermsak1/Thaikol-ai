@@ -1,0 +1,27 @@
+# Scoring weights configuration for ThaiKOL AI Multi-Factor Recommendation Engine
+# Weights must be between 0.0 and 1.0, and their sum must equal exactly 1.0.
+
+weights:
+  semantic_relevance: 0.45
+  engagement_quality: 0.25
+  local_content_relevance: 0.15
+  brand_safety: 0.10
+  data_quality: 0.05
+
+# Thresholds for deterministic explainability engine
+explainability_thresholds:
+  semantic_relevance:
+    strong: 85.0
+    good: 70.0
+    moderate: 50.0
+  engagement_quality:
+    strong: 80.0
+    moderate: 50.0
+  local_content_relevance:
+    strong: 80.0
+    moderate: 50.0
+  brand_safety:
+    review_cutoff: 90.0
+    high_risk_cutoff: 70.0
+  data_quality:
+    incomplete_cutoff: 70.0

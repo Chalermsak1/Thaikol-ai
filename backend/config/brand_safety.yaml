@@ -1,0 +1,75 @@
+# Brand safety content-level screening configuration
+# DISCLAIMER: This is a content-level heuristic for campaign risk screening only.
+# It does NOT evaluate or judge personal character or off-platform actions.
+
+default_score: 100.0
+
+risk_levels:
+  safe:
+    min_score: 90.0
+  review:
+    min_score: 70.0
+  high_risk:
+    max_score: 69.9
+
+categories:
+  explicit_sexual_content:
+    description: "Explicit adult or sexually suggestive references in public text"
+    deduction_per_match: 25.0
+    keywords:
+      - "18+"
+      - "xxx"
+      - "onlyfans"
+      - "sex"
+      - "เซ็กส์"
+      - "คลิปหลุด"
+      - "ขายบริการ"
+      - "งานอย่างว่า"
+      - "รับงาน"
+
+  illegal_drugs_and_gambling:
+    description: "Illegal narcotics, substance abuse, or unlicensed gambling promotion"
+    deduction_per_match: 30.0
+    keywords:
+      - "ยาบ้า"
+      - "ไอซ์"
+      - "คาสิโน"
+      - "บาคาร่า"
+      - "สล็อตเว็บตรง"
+      - "พนันออนไลน์"
+      - "แทงบอล"
+      - "เว็บพนัน"
+      - "casino"
+      - "gambling"
+      - "baccarat"
+
+  violent_graphic_content:
+    description: "Graphic violence, weapon glorification, or self-harm references"
+    deduction_per_match: 25.0
+    keywords:
+      - "ทำร้ายร่างกาย"
+      - "คลิปเลือดสาด"
+      - "อาวุธเถื่อน"
+      - "ปืนเถื่อน"
+      - "ฆ่าตัวตาย"
+      - "กรีดแขน"
+
+  hateful_harassing_language:
+    description: "Harassment, hate speech, or defamatory attacks"
+    deduction_per_match: 20.0
+    keywords:
+      - "ด่ากราด"
+      - "เหยียดเพศ"
+      - "เหยียดเชื้อชาติ"
+      - "สลิ่มส้นตีน"
+      - "ควายล้ม"
+
+  dangerous_activities:
+    description: "Dangerous stunts, illegal street racing, or hazardous health claims"
+    deduction_per_match: 15.0
+    keywords:
+      - "แข่งรถเถื่อน"
+      - "แว้นมอไซค์"
+      - "ยาลดความอ้วนอันตราย"
+      - "สารหนู"
+      - "ปรอท"
