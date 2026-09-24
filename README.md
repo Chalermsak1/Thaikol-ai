@@ -1,4 +1,4 @@
-# ThaiKOL AI — AI-Powered TikTok KOL Matcher 🇹🇭✨
+# ThaiKOL AI — AI-Powered TikTok KOL Matcher 
 
 > **AI Engineer Internship Assessment Portfolio Project**  
 > An end-to-end, explainable TikTok influencer discovery, semantic matching, and multi-factor ranking system tailored for the Thai market.
