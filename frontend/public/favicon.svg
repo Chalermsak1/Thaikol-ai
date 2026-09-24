@@ -1,12 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#25f4ee" />
-      <stop offset="50%" stop-color="#4862f4" />
-      <stop offset="100%" stop-color="#fe2c55" />
+    <!-- Brand Glow Gradient (Rose-500 -> Purple-500 -> Cyan-400) matching Header -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+
+    <!-- Sparkles Gradient (Vibrant Rose) -->
+    <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2e63" />
+      <stop offset="100%" stop-color="#f43f5e" />
     </linearGradient>
   </defs>
-  <rect width="100" height="100" rx="24" fill="#0f172a" />
-  <circle cx="50" cy="50" r="32" fill="none" stroke="url(#g)" stroke-width="8" />
-  <polygon points="44,36 64,50 44,64" fill="url(#g)" />
+
+  <!-- Outer Gradient Border (matching header gradient glow) -->
+  <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#headerGrad)" />
+
+  <!-- Inner Badge (matching header bg-white with subtle border) -->
+  <rect x="7" y="7" width="86" height="86" rx="21" fill="#ffffff" />
+
+  <!-- Lucide Sparkles Icon (matching Header <Sparkles className="text-rose-500" />) -->
+  <g transform="translate(11.6, 11.6) scale(3.2)">
+    <!-- Main Center Sparkle (filled & stroked for crisp high-DPI and low-DPI clarity) -->
+    <path
+      d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+      fill="url(#sparkleGrad)"
+      stroke="url(#sparkleGrad)"
+      stroke-width="0.8"
+      stroke-linejoin="round"
+    />
+    <!-- Top-Right Secondary Sparkle -->
+    <path d="M20 3v4" stroke="url(#sparkleGrad)" stroke-width="2.6" stroke-linecap="round" fill="none" />
+    <path d="M22 5h-4" stroke="url(#sparkleGrad)" stroke-width="2.6" stroke-linecap="round" fill="none" />
+    <!-- Bottom-Left Secondary Sparkle -->
+    <path d="M4 17v2" stroke="url(#sparkleGrad)" stroke-width="2.2" stroke-linecap="round" fill="none" />
+    <path d="M5 18H3" stroke="url(#sparkleGrad)" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  </g>
 </svg>

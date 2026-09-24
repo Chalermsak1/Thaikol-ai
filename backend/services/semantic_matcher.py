@@ -108,6 +108,8 @@ class SemanticKOLMatcher(KOLMatcher):
                     username=cand.username,
                     display_name=cand.display_name,
                     profile_url=cand.profile_url,
+                    is_profile_verified=getattr(cand, "is_profile_verified", False),
+                    profile_status=getattr(cand, "profile_status", "unavailable"),
                     semantic_relevance_score=score,
                     cosine_similarity=sim,
                     matching_topics=topics,

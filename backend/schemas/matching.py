@@ -16,7 +16,9 @@ class SemanticMatchResult(BaseModel):
     """Pairwise semantic matching result between brand and a creator candidate."""
     username: str = Field(..., description="Creator TikTok username")
     display_name: str = Field(..., description="Creator display name")
-    profile_url: str = Field(..., description="Public TikTok profile URL")
+    profile_url: Optional[str] = Field(None, description="Public TikTok profile URL if available and verified")
+    is_profile_verified: bool = Field(default=False, description="True if profile URL is a verified live account")
+    profile_status: str = Field(default="unavailable", description="Profile status: verified | unverified | unavailable")
     semantic_relevance_score: float = Field(
         ...,
         ge=0.0,

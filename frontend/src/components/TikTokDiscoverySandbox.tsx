@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Search, Sparkles, ExternalLink, ShieldCheck, MapPin, Tag } from 'lucide-react';
+import { getProfileLinkStatus } from './kol/TikTokProfileCTA';
 
 interface KOLCandidate {
   username: string;
   normalized_username: string;
   display_name: string;
-  profile_url: string;
+  profile_url?: string | null;
+  is_profile_verified?: boolean;
+  profile_status?: string;
   bio?: string;
   follower_count?: number;
   sample_video_count: number;
@@ -157,15 +160,29 @@ export const TikTokDiscoverySandbox: React.FC = () => {
                         <span className="font-bold text-white text-sm">{cand.display_name}</span>
                         <span className="text-xs text-slate-400">@{cand.username}</span>
                       </div>
-                      <a
-                        href={cand.profile_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] text-tiktok-cyan hover:underline mt-0.5"
-                      >
-                        <span>{cand.profile_url}</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                      {(() => {
+                        const linkStatus = getProfileLinkStatus(cand);
+                        if (linkStatus.isClickable && linkStatus.url) {
+                          return (
+                            <a
+                              href={linkStatus.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] text-tiktok-cyan hover:underline mt-0.5"
+                            >
+                              <span>{cand.profile_url}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          );
+                        }
+                        return (
+                          <div className="text-[11px] text-slate-500 mt-0.5 inline-flex items-center gap-1.5">
+                            <span className="text-amber-400 bg-amber-950/40 border border-amber-800/60 px-1.5 py-0.2 rounded text-[10px]">
+                              Profile unavailable ({linkStatus.label})
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                     <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
                       {cand.data_source}

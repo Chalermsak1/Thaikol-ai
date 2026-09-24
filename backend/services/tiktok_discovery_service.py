@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set
+import re
 import uuid
 from sqlalchemy.orm import Session
 
@@ -40,7 +41,30 @@ def normalize_tiktok_video(
     """Normalizes a raw video record into a structured TikTokVideo schema with safe nulls."""
     now_iso = collected_at or datetime.now(timezone.utc).isoformat()
     raw_user = (raw.get("creator_username") or raw.get("author") or "unknown_user").strip().lstrip("@")
-    profile_url = raw.get("creator_profile_url") or f"https://www.tiktok.com/@{raw_user}"
+
+    # Do NOT generate a new profile URL from username merely because the username exists.
+    # Only accept explicit creator_profile_url / profile_url, or extract from verified TikTok video URL if scraped.
+    raw_profile = raw.get("creator_profile_url") or raw.get("profile_url")
+    if not raw_profile:
+        vid_url = str(raw.get("video_url") or raw.get("webVideoUrl") or "")
+        m = re.match(r"(https?://(?:www\.)?tiktok\.com/@[a-zA-Z0-9_.-]+)", vid_url)
+        if m:
+            raw_profile = m.group(1)
+
+    profile_url = str(raw_profile).strip() if raw_profile and str(raw_profile).strip() else None
+
+    is_demo = bool(raw.get("is_demo_fixture", False)) or raw.get("provenance") == "curated_demo_fixture"
+
+    # Audit: demo fixture profiles are synthetic and unverified; live profiles are verified if trusted
+    if is_demo:
+        is_profile_verified = False
+        profile_status = "unavailable"
+    elif profile_url and ("tiktok.com/@" in profile_url):
+        is_profile_verified = bool(raw.get("is_profile_verified", True))
+        profile_status = "verified" if is_profile_verified else "unavailable"
+    else:
+        is_profile_verified = False
+        profile_status = "unavailable"
 
     hashtags = raw.get("hashtags") or []
     cleaned_hashtags: List[str] = []
@@ -50,13 +74,17 @@ def normalize_tiktok_video(
         elif isinstance(h, dict) and "name" in h:
             cleaned_hashtags.append(str(h["name"]).strip().lstrip("#"))
 
+    default_video_url = f"{profile_url}/video/unknown" if profile_url else f"https://www.tiktok.com/video/{raw.get('id', 'unknown')}"
+
     return TikTokVideo(
         video_id=str(raw.get("video_id") or raw.get("id") or str(uuid.uuid4())),
-        video_url=str(raw.get("video_url") or raw.get("webVideoUrl") or f"{profile_url}/video/unknown"),
+        video_url=str(raw.get("video_url") or raw.get("webVideoUrl") or default_video_url),
         creator_username=raw_user,
         creator_display_name=raw.get("creator_display_name") or raw_user,
         creator_bio=raw.get("creator_bio"),
         creator_profile_url=profile_url,
+        is_profile_verified=is_profile_verified,
+        profile_status=profile_status,
         follower_count=_safe_int(raw.get("follower_count")),
         views=_safe_int(raw.get("views")),
         likes=_safe_int(raw.get("likes")),
@@ -149,7 +177,9 @@ class TikTokDiscoveryService:
                     "username": raw_handle,
                     "normalized_username": norm_handle,
                     "display_name": vid.creator_display_name or raw_handle,
-                    "profile_url": vid.creator_profile_url or f"https://www.tiktok.com/@{raw_handle}",
+                    "profile_url": vid.creator_profile_url,
+                    "is_profile_verified": vid.is_profile_verified,
+                    "profile_status": vid.profile_status,
                     "bio": vid.creator_bio,
                     "follower_count": vid.follower_count,
                     "sample_videos": {},
@@ -247,6 +277,8 @@ class TikTokDiscoveryService:
                 normalized_username=data["normalized_username"],
                 display_name=data["display_name"],
                 profile_url=data["profile_url"],
+                is_profile_verified=data["is_profile_verified"],
+                profile_status=data["profile_status"],
                 bio=data["bio"],
                 follower_count=followers,
                 sample_video_count=sample_video_count,
@@ -296,6 +328,8 @@ class TikTokDiscoveryService:
                         target_model.username = cand.username
                         target_model.display_name = cand.display_name
                         target_model.profile_url = cand.profile_url
+                        target_model.is_profile_verified = cand.is_profile_verified
+                        target_model.profile_status = cand.profile_status
                         target_model.bio = cand.bio
                         target_model.follower_count = cand.follower_count
                         target_model.sample_video_count = cand.sample_video_count
@@ -331,6 +365,8 @@ class TikTokDiscoveryService:
                             normalized_username=cand.normalized_username,
                             display_name=cand.display_name,
                             profile_url=cand.profile_url,
+                            is_profile_verified=cand.is_profile_verified,
+                            profile_status=cand.profile_status,
                             bio=cand.bio,
                             follower_count=cand.follower_count,
                             sample_video_count=cand.sample_video_count,

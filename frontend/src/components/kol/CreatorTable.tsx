@@ -1,6 +1,7 @@
 import React from 'react';
 import { KOLRecommendation } from '../../types';
-import { ExternalLink, ShieldCheck } from 'lucide-react';
+import { TikTokProfileCTA } from './TikTokProfileCTA';
+import { ShieldCheck } from 'lucide-react';
 
 interface CreatorTableProps {
   creators: KOLRecommendation[];
@@ -103,16 +104,7 @@ export const CreatorTable: React.FC<CreatorTableProps> = ({
 
                 {/* Action */}
                 <td className="text-right" onClick={(e) => e.stopPropagation()}>
-                  <a
-                    href={creator.profile_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-secondary px-2.5 py-1 text-[11px] gap-1 whitespace-nowrap"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    TikTok
-                    <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
-                  </a>
+                  <TikTokProfileCTA creator={creator} variant="table" />
                 </td>
               </tr>
             ))}

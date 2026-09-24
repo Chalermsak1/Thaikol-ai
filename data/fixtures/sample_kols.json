@@ -8,7 +8,13 @@
     "category": "Beauty & Personal Care",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["สกินแคร์", "ผิวแพ้ง่าย", "แชมพูสมุนไพร", "ออร์แกนิก", "บำรุงผม"],
+    "content_tags": [
+      "สกินแคร์",
+      "ผิวแพ้ง่าย",
+      "แชมพูสมุนไพร",
+      "ออร์แกนิก",
+      "บำรุงผม"
+    ],
     "metrics": {
       "followers": 145000,
       "avg_views": 38000,
@@ -30,7 +36,11 @@
         "comments": 145,
         "shares": 92,
         "saves": 380,
-        "hashtags": ["ผมร่วง", "สมุนไพร", "รีวิวบิวตี้"],
+        "hashtags": [
+          "ผมร่วง",
+          "สมุนไพร",
+          "รีวิวบิวตี้"
+        ],
         "created_at": "2026-09-10T10:00:00Z"
       },
       {
@@ -42,14 +52,20 @@
         "comments": 98,
         "shares": 65,
         "saves": 290,
-        "hashtags": ["กู้ผิว", "ผิวแพ้ง่าย", "beautyreview"],
+        "hashtags": [
+          "กู้ผิว",
+          "ผิวแพ้ง่าย",
+          "beautyreview"
+        ],
         "created_at": "2026-09-03T14:30:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-002",
@@ -60,7 +76,13 @@
     "category": "Lifestyle & Wellness",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["ecofriendly", "lifestyle", "herbalcare", "wellness", "สายสุขภาพ"],
+    "content_tags": [
+      "ecofriendly",
+      "lifestyle",
+      "herbalcare",
+      "wellness",
+      "สายสุขภาพ"
+    ],
     "metrics": {
       "followers": 82000,
       "avg_views": 22000,
@@ -81,14 +103,20 @@
         "comments": 78,
         "shares": 52,
         "saves": 180,
-        "hashtags": ["zerowaste", "sustainableliving", "thaiherb"],
+        "hashtags": [
+          "zerowaste",
+          "sustainableliving",
+          "thaiherb"
+        ],
         "created_at": "2026-09-08T09:15:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-003",
@@ -99,7 +127,13 @@
     "category": "Tech & Gadgets",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["tech", "gadget", "สมาร์ทโฟน", "เกม", "ไอที"],
+    "content_tags": [
+      "tech",
+      "gadget",
+      "สมาร์ทโฟน",
+      "เกม",
+      "ไอที"
+    ],
     "metrics": {
       "followers": 310000,
       "avg_views": 95000,
@@ -120,14 +154,19 @@
         "comments": 140,
         "shares": 85,
         "saves": 410,
-        "hashtags": ["techreview", "หูฟังบลูทูธ"],
+        "hashtags": [
+          "techreview",
+          "หูฟังบลูทูธ"
+        ],
         "created_at": "2026-09-12T16:00:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations (control negative sample for beauty matching)."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-004",
@@ -138,7 +177,13 @@
     "category": "Food & Beverage",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["cafehopping", "คาเฟ่กรุงเทพ", "รีวิวคาเฟ่", "specialtycoffee", "กาแฟ"],
+    "content_tags": [
+      "cafehopping",
+      "คาเฟ่กรุงเทพ",
+      "รีวิวคาเฟ่",
+      "specialtycoffee",
+      "กาแฟ"
+    ],
     "metrics": {
       "followers": 185000,
       "avg_views": 52000,
@@ -159,14 +204,20 @@
         "comments": 120,
         "shares": 450,
         "saves": 1800,
-        "hashtags": ["คาเฟ่กรุงเทพ", "รีวิวคาเฟ่", "cafehoppingbkk"],
+        "hashtags": [
+          "คาเฟ่กรุงเทพ",
+          "รีวิวคาเฟ่",
+          "cafehoppingbkk"
+        ],
         "created_at": "2026-09-11T11:00:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-005",
@@ -177,7 +228,13 @@
     "category": "Food & Beverage",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["โฮมคาเฟ่", "สูตรกาแฟ", "ชาไทย", "barista", "homecafe"],
+    "content_tags": [
+      "โฮมคาเฟ่",
+      "สูตรกาแฟ",
+      "ชาไทย",
+      "barista",
+      "homecafe"
+    ],
     "metrics": {
       "followers": 96000,
       "avg_views": 31000,
@@ -198,14 +255,20 @@
         "comments": 95,
         "shares": 310,
         "saves": 980,
-        "hashtags": ["ชาไทย", "โฮมคาเฟ่", "แจกสูตร"],
+        "hashtags": [
+          "ชาไทย",
+          "โฮมคาเฟ่",
+          "แจกสูตร"
+        ],
         "created_at": "2026-09-09T15:20:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-006",
@@ -216,7 +279,13 @@
     "category": "Beauty & Personal Care",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["สมุนไพรไทย", "บำรุงผม", "มะขามขัดผิว", "เขาค้อ", "สมุนไพร"],
+    "content_tags": [
+      "สมุนไพรไทย",
+      "บำรุงผม",
+      "มะขามขัดผิว",
+      "เขาค้อ",
+      "สมุนไพร"
+    ],
     "metrics": {
       "followers": 118000,
       "avg_views": 39000,
@@ -237,14 +306,20 @@
         "comments": 115,
         "shares": 130,
         "saves": 520,
-        "hashtags": ["เขาค้อ", "สมุนไพรไทย", "ลดผมร่วง"],
+        "hashtags": [
+          "เขาค้อ",
+          "สมุนไพรไทย",
+          "ลดผมร่วง"
+        ],
         "created_at": "2026-09-07T13:40:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-007",
@@ -255,7 +330,13 @@
     "category": "Food & Beverage",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["อาหารไทย", "สตรีทฟู้ด", "อร่อยบอกต่อ", "กรุงเทพ", "tiktokพากิน"],
+    "content_tags": [
+      "อาหารไทย",
+      "สตรีทฟู้ด",
+      "อร่อยบอกต่อ",
+      "กรุงเทพ",
+      "tiktokพากิน"
+    ],
     "metrics": {
       "followers": 420000,
       "avg_views": 140000,
@@ -276,14 +357,20 @@
         "comments": 340,
         "shares": 890,
         "saves": 3200,
-        "hashtags": ["tiktokพากิน", "อร่อยบอกต่อ", "เยาวราช"],
+        "hashtags": [
+          "tiktokพากิน",
+          "อร่อยบอกต่อ",
+          "เยาวราช"
+        ],
         "created_at": "2026-09-12T18:30:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-008",
@@ -294,7 +381,13 @@
     "category": "Lifestyle & Wellness",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["ชะลอวัย", "สมุนไพร", "สุขภาพ", "ผมร่วง", "wellness"],
+    "content_tags": [
+      "ชะลอวัย",
+      "สมุนไพร",
+      "สุขภาพ",
+      "ผมร่วง",
+      "wellness"
+    ],
     "metrics": {
       "followers": 215000,
       "avg_views": 68000,
@@ -315,14 +408,20 @@
         "comments": 210,
         "shares": 480,
         "saves": 1400,
-        "hashtags": ["ผมร่วง", "รักสุขภาพ", "ชะลอวัย"],
+        "hashtags": [
+          "ผมร่วง",
+          "รักสุขภาพ",
+          "ชะลอวัย"
+        ],
         "created_at": "2026-09-06T10:00:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-009",
@@ -333,7 +432,13 @@
     "category": "Food & Beverage",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["เมล็ดกาแฟ", "ดอยช้าง", "กาแฟดริป", "เชียงใหม่", "coffee"],
+    "content_tags": [
+      "เมล็ดกาแฟ",
+      "ดอยช้าง",
+      "กาแฟดริป",
+      "เชียงใหม่",
+      "coffee"
+    ],
     "metrics": {
       "followers": 74000,
       "avg_views": 26000,
@@ -354,14 +459,19 @@
         "comments": 74,
         "shares": 98,
         "saves": 450,
-        "hashtags": ["กาแฟพิเศษ", "เชียงใหม่"],
+        "hashtags": [
+          "กาแฟพิเศษ",
+          "เชียงใหม่"
+        ],
         "created_at": "2026-09-04T08:30:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-010",
@@ -372,7 +482,13 @@
     "category": "Lifestyle & Wellness",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["vlog", "bangkok", "แต่งหน้า", "คาเฟ่", "ไลฟ์สไตล์"],
+    "content_tags": [
+      "vlog",
+      "bangkok",
+      "แต่งหน้า",
+      "คาเฟ่",
+      "ไลฟ์สไตล์"
+    ],
     "metrics": {
       "followers": 160000,
       "avg_views": 48000,
@@ -393,14 +509,20 @@
         "comments": 88,
         "shares": 110,
         "saves": 390,
-        "hashtags": ["vlog", "กรุงเทพ", "คาเฟ่"],
+        "hashtags": [
+          "vlog",
+          "กรุงเทพ",
+          "คาเฟ่"
+        ],
         "created_at": "2026-09-11T17:00:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   },
   {
     "id": "kol-th-011",
@@ -411,7 +533,12 @@
     "category": "Food & Beverage",
     "primary_language": "th",
     "country": "TH",
-    "content_tags": ["เชียงใหม่", "ของกินเชียงใหม่", "อาหารเหนือ", "เที่ยวเชียงใหม่"],
+    "content_tags": [
+      "เชียงใหม่",
+      "ของกินเชียงใหม่",
+      "อาหารเหนือ",
+      "เที่ยวเชียงใหม่"
+    ],
     "metrics": {
       "followers": 230000,
       "avg_views": 75000,
@@ -432,13 +559,19 @@
         "comments": 190,
         "shares": 380,
         "saves": 1100,
-        "hashtags": ["เชียงใหม่", "ข้าวซอย", "ของกินเชียงใหม่"],
+        "hashtags": [
+          "เชียงใหม่",
+          "ข้าวซอย",
+          "ของกินเชียงใหม่"
+        ],
         "created_at": "2026-09-08T12:00:00Z"
       }
     ],
     "is_demo_fixture": true,
     "data_source": "demo_fixture",
     "provenance": "curated_demo_fixture",
-    "disclaimer": "Metrics are standardized synthetic demo fixtures for offline internship assessment evaluations."
+    "disclaimer": "Metrics and profiles are standardized synthetic demo fixtures for offline internship assessment evaluations; profile is unverified.",
+    "is_profile_verified": false,
+    "profile_status": "unavailable"
   }
 ]

@@ -1,5 +1,6 @@
 import React from 'react';
 import { KOLRecommendation } from '../../types';
+import { getProfileLinkStatus } from './TikTokProfileCTA';
 import { X, ExternalLink, SlidersHorizontal } from 'lucide-react';
 
 interface CompareCreatorsProps {
@@ -62,15 +63,30 @@ export const CompareCreators: React.FC<CompareCreatorsProps> = ({
                         <X className="w-3 h-3" />
                       </button>
                     </div>
-                    <a
-                      href={c.profile_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[11px] text-slate-500 hover:text-slate-900 font-mono inline-flex items-center gap-0.5"
-                    >
-                      <span>@{c.username}</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
+                    {(() => {
+                      const linkStatus = getProfileLinkStatus(c);
+                      if (linkStatus.isClickable && linkStatus.url) {
+                        return (
+                          <a
+                            href={linkStatus.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[11px] text-indigo-600 hover:underline font-mono inline-flex items-center gap-0.5"
+                          >
+                            <span>@{c.username}</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        );
+                      }
+                      return (
+                        <span
+                          title={linkStatus.tooltip}
+                          className="text-[11px] text-slate-500 font-mono inline-flex items-center gap-0.5 cursor-default"
+                        >
+                          <span>@{c.username}</span>
+                        </span>
+                      );
+                    })()}
                   </div>
                 </th>
               ))}
@@ -173,6 +189,7 @@ export const CompareCreators: React.FC<CompareCreatorsProps> = ({
                 </td>
               ))}
             </tr>
+
 
             {/* Audience Fit Proxy */}
             <tr className="bg-slate-50/30">

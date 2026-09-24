@@ -163,6 +163,8 @@ class MultiFactorKOLScorer(KOLScorer):
                 username=cand.username,
                 display_name=cand.display_name,
                 profile_url=cand.profile_url,
+                is_profile_verified=getattr(cand, "is_profile_verified", False),
+                profile_status=getattr(cand, "profile_status", "unavailable"),
                 final_score=final_score,
                 semantic_relevance_score=sem_score,
                 engagement_quality_score=eng_score,

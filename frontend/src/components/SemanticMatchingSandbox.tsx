@@ -17,11 +17,14 @@ import {
   MapPin,
   FileCheck,
 } from 'lucide-react';
+import { getProfileLinkStatus } from './kol/TikTokProfileCTA';
 
 interface SemanticMatch {
   username: string;
   display_name: string;
-  profile_url: string;
+  profile_url?: string | null;
+  is_profile_verified?: boolean;
+  profile_status?: string;
   semantic_relevance_score: number;
   cosine_similarity: number;
   matching_topics: string[];
@@ -57,7 +60,9 @@ interface KOLRecommendation {
   rank: number;
   username: string;
   display_name: string;
-  profile_url: string;
+  profile_url?: string | null;
+  is_profile_verified?: boolean;
+  profile_status?: string;
   final_score: number;
   semantic_relevance_score: number;
   engagement_quality_score: number;
@@ -268,15 +273,30 @@ export const SemanticMatchingSandbox: React.FC = () => {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-white text-base">{rec.display_name}</span>
-                            <a
-                              href={rec.profile_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-tiktok-cyan hover:underline"
-                            >
-                              <span>@{rec.username}</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
+                            {(() => {
+                              const linkStatus = getProfileLinkStatus(rec);
+                              if (linkStatus.isClickable && linkStatus.url) {
+                                return (
+                                  <a
+                                    href={linkStatus.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs text-tiktok-cyan hover:underline"
+                                  >
+                                    <span>@{rec.username}</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                );
+                              }
+                              return (
+                                <span className="text-xs text-slate-400 font-mono inline-flex items-center gap-1">
+                                  @{rec.username}
+                                  <span className="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-800/60 px-1 py-0.2 rounded">
+                                    Profile unavailable
+                                  </span>
+                                </span>
+                              );
+                            })()}
                             {rec.rank === 1 && (
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                                 Top Match
@@ -483,15 +503,30 @@ export const SemanticMatchingSandbox: React.FC = () => {
                       </div>
                       <div>
                         <div className="font-bold text-white text-sm">{m.display_name}</div>
-                        <a
-                          href={m.profile_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] text-tiktok-cyan hover:underline"
-                        >
-                          <span>@{m.username}</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                        {(() => {
+                          const linkStatus = getProfileLinkStatus(m);
+                          if (linkStatus.isClickable && linkStatus.url) {
+                            return (
+                              <a
+                                href={linkStatus.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] text-tiktok-cyan hover:underline"
+                              >
+                                <span>@{m.username}</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            );
+                          }
+                          return (
+                            <span className="text-[11px] text-slate-500 font-mono inline-flex items-center gap-1">
+                              @{m.username}
+                              <span className="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-800/60 px-1 py-0.2 rounded">
+                                Profile unavailable
+                              </span>
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
 

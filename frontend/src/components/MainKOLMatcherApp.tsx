@@ -31,6 +31,7 @@ import {
   Filter,
   X,
 } from 'lucide-react';
+import { TikTokProfileCTA, getProfileLinkStatus } from './kol/TikTokProfileCTA';
 
 interface EvidenceItem {
   field: string;
@@ -75,7 +76,9 @@ interface KOLRecommendation {
   rank: number;
   username: string;
   display_name: string;
-  profile_url: string;
+  profile_url?: string | null;
+  is_profile_verified?: boolean;
+  profile_status?: string;
   final_score: number;
   semantic_relevance_score: number;
   engagement_quality_score: number;
@@ -104,6 +107,7 @@ interface RecommendationResponse {
   search_queries?: string[];
   candidate_pool_count?: number | null;
   data_source?: string | null;
+  provenance?: string | null;
 }
 
 interface DemoPreset {
@@ -277,15 +281,19 @@ export const MainKOLMatcherApp: React.FC = () => {
     if (!result) return;
     const brandName = result.brand_profile?.brand_name || 'Brand';
     const topRecs = filteredRecs
-      .map(
-        (r) =>
-          `#${r.rank} ${r.display_name} (@${r.username}) — Final Score: ${r.final_score.toFixed(
-            1
-          )}/100\n   TikTok: ${r.profile_url}\n   เหตุผล: ${r.reasons.join('; ')}`
-      )
+      .slice(0, 5)
+      .map((r) => {
+        const linkStatus = getProfileLinkStatus(r);
+        const tiktokLine = linkStatus.isClickable
+          ? `   TikTok: ${linkStatus.url}`
+          : `   TikTok: Profile unavailable (${linkStatus.label})`;
+        return `#${r.rank} ${r.display_name} (@${r.username}) — Final Score: ${r.final_score.toFixed(
+          1
+        )}/100\n${tiktokLine}\n   เหตุผล: ${r.reasons.join('; ')}`;
+      })
       .join('\n\n');
 
-    const summaryText = `🎯 ThaiKOL AI Recommendation Summary for ${brandName}\nWeights: Semantic 45% · Engagement 25% · Local Fit 15% · Safety 10% · Data 5%\n\n${topRecs}\n\n* ข้อมูล Audience Fit Proxy เป็นสัญญาณเสริมจากเนื้อหาสาธารณะ ไม่ใช่ข้อมูล Demographics เชิงลึกของผู้ติดตาม`;
+    const summaryText = `🎯 ThaiKOL AI Recommendation Summary for ${brandName}\nProvenance: ${result?.provenance || 'curated_demo_fixture'}\nWeights: Semantic 45% · Engagement 25% · Local Fit 15% · Safety 10% · Data 5%\n\n${topRecs}\n\n* ข้อมูล Audience Fit Proxy เป็นสัญญาณเสริมจากเนื้อหาสาธารณะ ไม่ใช่ข้อมูล Demographics เชิงลึกของผู้ติดตาม. บัญชีใน Demo Mode เป็น Fixture สังเคราะห์`;
 
     navigator.clipboard.writeText(summaryText).then(() => {
       setCopied(true);
@@ -301,6 +309,7 @@ export const MainKOLMatcherApp: React.FC = () => {
       'username',
       'display_name',
       'profile_url',
+      'profile_status',
       'final_score',
       'semantic_relevance_score',
       'engagement_quality_score',
@@ -309,18 +318,23 @@ export const MainKOLMatcherApp: React.FC = () => {
       'data_quality_score',
     ];
 
-    const rows = filteredRecs.map((r) => [
-      r.rank,
-      `"${r.username}"`,
-      `"${r.display_name.replace(/"/g, '""')}"`,
-      `"${r.profile_url}"`,
-      r.final_score.toFixed(1),
-      r.semantic_relevance_score.toFixed(1),
-      r.engagement_quality_score.toFixed(1),
-      r.local_content_relevance_score.toFixed(1),
-      r.brand_safety_score.toFixed(0),
-      r.data_quality_score.toFixed(1),
-    ]);
+    const rows = filteredRecs.map((r) => {
+      const linkStatus = getProfileLinkStatus(r);
+      const urlCol = linkStatus.isClickable ? (r.profile_url ?? '') : 'Profile unavailable';
+      return [
+        r.rank,
+        `"${r.username}"`,
+        `"${r.display_name.replace(/"/g, '""')}"`,
+        `"${urlCol}"`,
+        `"${linkStatus.label}"`,
+        r.final_score.toFixed(1),
+        r.semantic_relevance_score.toFixed(1),
+        r.engagement_quality_score.toFixed(1),
+        r.local_content_relevance_score.toFixed(1),
+        r.brand_safety_score.toFixed(0),
+        r.data_quality_score.toFixed(1),
+      ];
+    });
 
     const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -984,15 +998,30 @@ export const MainKOLMatcherApp: React.FC = () => {
                               <h4 className="font-black text-slate-900 text-lg leading-snug">
                                 {rec.display_name}
                               </h4>
-                              <a
-                                href={rec.profile_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-black text-rose-600 hover:text-rose-700 transition"
-                              >
-                                <span>@{rec.username}</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
+                              {(() => {
+                                const linkStatus = getProfileLinkStatus(rec);
+                                if (linkStatus.isClickable && linkStatus.url) {
+                                  return (
+                                    <a
+                                      href={linkStatus.url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs font-black text-rose-600 hover:text-rose-700 transition"
+                                    >
+                                      <span>@{rec.username}</span>
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  );
+                                }
+                                return (
+                                  <span className="text-xs text-slate-400 font-mono inline-flex items-center gap-1">
+                                    @{rec.username}
+                                    <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                                      Profile unavailable
+                                    </span>
+                                  </span>
+                                );
+                              })()}
                             </div>
 
                             {/* Component Score Pills */}
@@ -1032,16 +1061,7 @@ export const MainKOLMatcherApp: React.FC = () => {
 
                           {/* Action Buttons */}
                           <div className="flex items-center gap-2.5">
-                            <a
-                              href={rec.profile_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition-all flex items-center gap-1.5 shadow-md group cursor-pointer"
-                            >
-                              <span className="w-2 h-2 rounded-full bg-rose-500 group-hover:bg-cyan-400 transition-colors" />
-                              <span>ดู TikTok</span>
-                              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" />
-                            </a>
+                            <TikTokProfileCTA creator={rec} variant="inline" />
 
                             <button
                               onClick={() => toggleExpand(rec.username)}
@@ -1305,7 +1325,7 @@ export const MainKOLMatcherApp: React.FC = () => {
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs">
             <div className="text-[10px] text-indigo-600 font-black uppercase">4. AI เวกเตอร์</div>
             <div className="font-black text-slate-900 mt-1">MiniLM Vectors</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">Cosine similarity</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">Semantic Match</div>
           </div>
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs">
             <div className="text-[10px] text-indigo-600 font-black uppercase">5. ให้คะแนน 5 มิติ</div>

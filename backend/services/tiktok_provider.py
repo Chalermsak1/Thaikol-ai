@@ -114,17 +114,21 @@ class MockTikTokProvider(TikTokProvider):
             for creator in target_creators:
                 handle = creator.get("tiktok_handle") or "unknown_user"
                 display_name = creator.get("display_name") or handle
-                profile_url = creator.get("profile_url") or f"https://www.tiktok.com/@{handle}"
+                # Do NOT generate a profile URL merely because username exists
+                profile_url = creator.get("profile_url")
+                is_profile_verified = bool(creator.get("is_profile_verified", False))
+                profile_status = creator.get("profile_status", "unavailable")
                 bio = creator.get("bio")
                 followers = (creator.get("metrics") or {}).get("followers") or creator.get("follower_count")
 
                 sample_videos = creator.get("sample_videos") or []
+                default_vid_url = f"{profile_url}/video/7000000000001" if profile_url else f"https://www.tiktok.com/video/{handle}_01"
                 if not sample_videos:
                     # Synthesize sample video if none exists in fixture
                     sample_videos = [
                         {
                             "video_id": f"vid_{handle}_01",
-                            "video_url": f"{profile_url}/video/7000000000001",
+                            "video_url": default_vid_url,
                             "caption": creator.get("recent_captions", [""])[0] if creator.get("recent_captions") else bio,
                             "views": (creator.get("metrics") or {}).get("avg_views", 10000),
                             "likes": int(((creator.get("metrics") or {}).get("avg_views", 10000)) * 0.05),
@@ -137,14 +141,17 @@ class MockTikTokProvider(TikTokProvider):
                     ]
 
                 for vid in sample_videos:
+                    vid_url = vid.get("video_url") or (f"{profile_url}/video/default" if profile_url else f"https://www.tiktok.com/video/{handle}_default")
                     results.append(
                         {
                             "video_id": vid.get("video_id") or f"vid_{handle}_{hash(vid.get('caption', '')) % 10000}",
-                            "video_url": vid.get("video_url") or f"{profile_url}/video/default",
+                            "video_url": vid_url,
                             "creator_username": handle,
                             "creator_display_name": display_name,
                             "creator_bio": bio,
                             "creator_profile_url": profile_url,
+                            "is_profile_verified": is_profile_verified,
+                            "profile_status": profile_status,
                             "follower_count": followers,
                             "views": vid.get("views"),
                             "likes": vid.get("likes"),
@@ -227,7 +234,10 @@ class ApifyTikTokProvider(TikTokProvider):
                 author = item.get("authorMeta") or {}
                 username = author.get("name") or item.get("author") or "unknown_user"
                 display_name = author.get("nickName") or username
-                profile_url = author.get("profileUrl") or f"https://www.tiktok.com/@{username}"
+                # Do NOT generate a profile URL merely because username exists
+                profile_url = author.get("profileUrl")
+                is_profile_verified = bool(profile_url and "tiktok.com/@" in profile_url)
+                profile_status = "verified" if is_profile_verified else "unavailable"
                 followers = author.get("fans")
 
                 hashtags_raw = item.get("hashtags") or []
@@ -241,13 +251,16 @@ class ApifyTikTokProvider(TikTokProvider):
                 # Tag matched query if available in result
                 matched_query = item.get("query") or clean_keywords[0]
 
+                default_vid_url = f"{profile_url}/video/{item.get('id', '')}" if profile_url else f"https://www.tiktok.com/video/{item.get('id', '')}"
                 video_dict = {
                     "video_id": str(item.get("id") or item.get("videoId") or ""),
-                    "video_url": item.get("webVideoUrl") or f"{profile_url}/video/{item.get('id', '')}",
+                    "video_url": item.get("webVideoUrl") or default_vid_url,
                     "creator_username": username,
                     "creator_display_name": display_name,
                     "creator_bio": author.get("signature"),
                     "creator_profile_url": profile_url,
+                    "is_profile_verified": is_profile_verified,
+                    "profile_status": profile_status,
                     "follower_count": int(followers) if followers is not None else None,
                     "views": item.get("playCount"),
                     "likes": item.get("diggCount"),

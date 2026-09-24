@@ -43,7 +43,9 @@ class KOLRecommendation(BaseModel):
     rank: int = Field(..., ge=1, description="Rank position (1-indexed)")
     username: str = Field(..., description="TikTok username handle")
     display_name: str = Field(..., description="Creator display name")
-    profile_url: str = Field(..., description="Public TikTok profile URL")
+    profile_url: Optional[str] = Field(None, description="Public TikTok profile URL if available and verified")
+    is_profile_verified: bool = Field(default=False, description="True if profile URL is a verified live account")
+    profile_status: str = Field(default="unavailable", description="Profile status: verified | unverified | unavailable")
     final_score: float = Field(..., ge=0.0, le=100.0, description="Composite recommendation score (0.0 - 100.0)")
 
     # Component scores

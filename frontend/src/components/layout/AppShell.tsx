@@ -9,9 +9,11 @@ interface AppShellProps {
   onSelectPage: (page: ActiveNavPage) => void;
   hasAnalyzedBrand: boolean;
   comparisonCount: number;
+  shortlistCount?: number;
   onRunDemo: () => void;
   isLoading: boolean;
   demoModeActive: boolean;
+  onResetSession?: () => void;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -20,9 +22,11 @@ export const AppShell: React.FC<AppShellProps> = ({
   onSelectPage,
   hasAnalyzedBrand,
   comparisonCount,
+  shortlistCount = 0,
   onRunDemo,
   isLoading,
   demoModeActive,
+  onResetSession,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -36,8 +40,10 @@ export const AppShell: React.FC<AppShellProps> = ({
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         hasAnalyzedBrand={hasAnalyzedBrand}
         comparisonCount={comparisonCount}
+        shortlistCount={shortlistCount}
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
+        demoModeActive={demoModeActive}
       />
 
       {/* Main area */}
@@ -48,6 +54,8 @@ export const AppShell: React.FC<AppShellProps> = ({
           onRunDemo={onRunDemo}
           isLoading={isLoading}
           demoModeActive={demoModeActive}
+          hasAnalyzedBrand={hasAnalyzedBrand}
+          onResetSession={onResetSession}
         />
 
         <main

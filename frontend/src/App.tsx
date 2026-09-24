@@ -4,33 +4,57 @@ import {
   RecommendationResponse,
   KOLRecommendation,
   HealthData,
+  ShortlistItem,
+  OutreachStatus,
 } from './types';
 import { recommendFromBrand, getHealthStatus } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardView } from './pages/DashboardView';
+import { AnalyzeBrandView } from './pages/AnalyzeBrandView';
 import { BrandAnalysisView } from './pages/BrandAnalysisView';
 import { DiscoveryView } from './pages/DiscoveryView';
 import { RecommendationsView } from './pages/RecommendationsView';
 import { CompareView } from './pages/CompareView';
+import { ShortlistView } from './pages/ShortlistView';
+import { ReportsView } from './pages/ReportsView';
 import { DataSourcesView } from './pages/DataSourcesView';
 import { TechnicalView } from './pages/TechnicalView';
 import { EvidenceDrawer } from './components/brand/EvidenceDrawer';
 import { CreatorDetailDrawer } from './components/kol/CreatorDetailDrawer';
 
+const STORAGE_KEY = 'thaikol_active_session_v1';
+
+function getInitialSession() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.warn('Could not read saved session:', e);
+  }
+  return null;
+}
+
 export const App: React.FC = () => {
+  const saved = getInitialSession();
+
   // Navigation State
-  const [activePage, setActivePage] = useState<ActiveNavPage>('dashboard');
+  const [activePage, setActivePage] = useState<ActiveNavPage>(
+    saved?.activePage && saved.activePage !== 'analyze' ? saved.activePage : 'dashboard'
+  );
 
   // Input & Execution State
-  const [websiteUrl, setWebsiteUrl] = useState('https://khaokhotalaypu.com');
-  const [facebookUrl, setFacebookUrl] = useState('https://facebook.com/KhaokhoTalaypu');
+  const [websiteUrl, setWebsiteUrl] = useState(saved?.websiteUrl ?? 'https://khaokhotalaypu.com');
+  const [facebookUrl, setFacebookUrl] = useState(saved?.facebookUrl ?? 'https://facebook.com/KhaokhoTalaypu');
   const [isLoading, setIsLoading] = useState(false);
   const [pipelineStage, setPipelineStage] = useState(0);
-  const [result, setResult] = useState<RecommendationResponse | null>(null);
+  const [result, setResult] = useState<RecommendationResponse | null>(saved?.result ?? null);
   const [error, setError] = useState<string | null>(null);
 
   // Compare List State
-  const [comparisonList, setComparisonList] = useState<string[]>([]);
+  const [comparisonList, setComparisonList] = useState<string[]>(saved?.comparisonList ?? []);
+
+  // Shortlist State
+  const [shortlist, setShortlist] = useState<Record<string, ShortlistItem>>(saved?.shortlist ?? {});
 
   // Drawer Inspection States
   const [selectedCreatorForDrawer, setSelectedCreatorForDrawer] = useState<KOLRecommendation | null>(null);
@@ -83,12 +107,15 @@ export const App: React.FC = () => {
       setResult(data);
 
       // Pre-populate comparison list with top 2 creators for immediate usability
-      if (data.recommendations.length >= 2) {
+      if (data.recommendations && data.recommendations.length >= 2) {
         setComparisonList([
           data.recommendations[0].username,
           data.recommendations[1].username,
         ]);
       }
+
+      // Automatically transition to recommendations view to see results
+      setActivePage('recommendations');
     } catch (err: any) {
       const detail = err.response?.data?.detail;
       let errMsg = 'Failed to execute recommendation engine. Please verify the URL inputs.';
@@ -112,6 +139,43 @@ export const App: React.FC = () => {
     handleAnalyze('https://khaokhotalaypu.com', 'https://facebook.com/KhaokhoTalaypu');
   };
 
+  // Reset Session
+  const handleResetSession = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      console.warn('Could not clear saved session:', e);
+    }
+    setResult(null);
+    setWebsiteUrl('https://khaokhotalaypu.com');
+    setFacebookUrl('https://facebook.com/KhaokhoTalaypu');
+    setComparisonList([]);
+    setShortlist({});
+    setError(null);
+    setActivePage('dashboard');
+  };
+
+  // LocalStorage Persistence
+  useEffect(() => {
+    try {
+      if (!result) {
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+      const sessionData = {
+        activePage,
+        websiteUrl,
+        facebookUrl,
+        result,
+        comparisonList,
+        shortlist,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+    } catch (e) {
+      console.warn('Could not save session to localStorage:', e);
+    }
+  }, [activePage, websiteUrl, facebookUrl, result, comparisonList, shortlist]);
+
   // Compare Toggle
   const handleToggleCompare = (username: string) => {
     setComparisonList((prev) =>
@@ -123,19 +187,85 @@ export const App: React.FC = () => {
     );
   };
 
+  // Shortlist Handlers
+  const handleToggleShortlist = (creator: KOLRecommendation) => {
+    setShortlist((prev) => {
+      const next = { ...prev };
+      if (next[creator.username]) {
+        delete next[creator.username];
+      } else {
+        next[creator.username] = {
+          username: creator.username,
+          creator,
+          status: 'shortlisted',
+          addedAt: new Date().toISOString(),
+          notes: '',
+        };
+      }
+      return next;
+    });
+  };
+
+  const handleUpdateShortlistStatus = (username: string, status: OutreachStatus) => {
+    setShortlist((prev) => {
+      if (!prev[username]) return prev;
+      return {
+        ...prev,
+        [username]: {
+          ...prev[username],
+          status,
+        },
+      };
+    });
+  };
+
+  const handleUpdateShortlistNotes = (username: string, notes: string) => {
+    setShortlist((prev) => {
+      if (!prev[username]) return prev;
+      return {
+        ...prev,
+        [username]: {
+          ...prev[username],
+          notes,
+        },
+      };
+    });
+  };
+
+  const handleRemoveFromShortlist = (username: string) => {
+    setShortlist((prev) => {
+      const next = { ...prev };
+      delete next[username];
+      return next;
+    });
+  };
+
   return (
     <AppShell
       activePage={activePage}
       onSelectPage={setActivePage}
       hasAnalyzedBrand={!!result}
       comparisonCount={comparisonList.length}
+      shortlistCount={Object.keys(shortlist).length}
       onRunDemo={handleRunDemo}
       isLoading={isLoading}
       demoModeActive={health?.demo_mode ?? true}
+      onResetSession={handleResetSession}
     >
       {/* View Routing */}
       {activePage === 'dashboard' && (
         <DashboardView
+          result={result}
+          onSelectPage={setActivePage}
+          onRunDemo={handleRunDemo}
+          isLoading={isLoading}
+          onOpenEvidence={() => setIsEvidenceDrawerOpen(true)}
+          onResetSession={handleResetSession}
+        />
+      )}
+
+      {activePage === 'analyze' && (
+        <AnalyzeBrandView
           websiteUrl={websiteUrl}
           setWebsiteUrl={setWebsiteUrl}
           facebookUrl={facebookUrl}
@@ -154,6 +284,7 @@ export const App: React.FC = () => {
           result={result}
           onOpenEvidence={() => setIsEvidenceDrawerOpen(true)}
           onGoToDashboard={() => setActivePage('dashboard')}
+          onGoToAnalyze={() => setActivePage('analyze')}
         />
       )}
 
@@ -162,6 +293,7 @@ export const App: React.FC = () => {
           result={result}
           onSelectCreator={(c) => setSelectedCreatorForDrawer(c)}
           onGoToDashboard={() => setActivePage('dashboard')}
+          onGoToAnalyze={() => setActivePage('analyze')}
         />
       )}
 
@@ -169,9 +301,13 @@ export const App: React.FC = () => {
         <RecommendationsView
           result={result}
           comparisonList={comparisonList}
+          shortlist={shortlist}
           onToggleCompare={handleToggleCompare}
+          onToggleShortlist={handleToggleShortlist}
+          onGoToShortlist={() => setActivePage('shortlist')}
           onOpenCreatorDetail={(c) => setSelectedCreatorForDrawer(c)}
           onGoToDashboard={() => setActivePage('dashboard')}
+          onGoToAnalyze={() => setActivePage('analyze')}
         />
       )}
 
@@ -182,6 +318,26 @@ export const App: React.FC = () => {
           onRemoveCreator={(u) => setComparisonList((prev) => prev.filter((x) => x !== u))}
           onClearAll={() => setComparisonList([])}
           onGoToRecommendations={() => setActivePage('recommendations')}
+        />
+      )}
+
+      {activePage === 'shortlist' && (
+        <ShortlistView
+          shortlist={shortlist}
+          onUpdateStatus={handleUpdateShortlistStatus}
+          onUpdateNotes={handleUpdateShortlistNotes}
+          onRemoveFromShortlist={handleRemoveFromShortlist}
+          onOpenCreatorDetail={(c) => setSelectedCreatorForDrawer(c)}
+          onGoToRecommendations={() => setActivePage('recommendations')}
+          brandName={result?.brand_profile?.brand_name || 'Campaign'}
+        />
+      )}
+
+      {activePage === 'reports' && (
+        <ReportsView
+          result={result}
+          onGoToDashboard={() => setActivePage('dashboard')}
+          onGoToAnalyze={() => setActivePage('analyze')}
         />
       )}
 
@@ -210,3 +366,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

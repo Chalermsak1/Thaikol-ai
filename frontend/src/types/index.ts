@@ -43,7 +43,9 @@ export interface KOLRecommendation {
   rank: number;
   username: string;
   display_name: string;
-  profile_url: string;
+  profile_url?: string | null;
+  is_profile_verified?: boolean;
+  profile_status?: 'verified' | 'unverified' | 'unavailable' | string;
   final_score: number;
   semantic_relevance_score: number;
   engagement_quality_score: number;
@@ -72,6 +74,7 @@ export interface RecommendationResponse {
   search_queries?: string[];
   candidate_pool_count?: number | null;
   data_source?: string | null;
+  provenance?: string | null;
 }
 
 export interface HealthData {
@@ -96,9 +99,23 @@ export interface DemoPreset {
 
 export type ActiveNavPage = 
   | 'dashboard'
+  | 'analyze'
   | 'brand'
   | 'discovery'
   | 'recommendations'
   | 'compare'
+  | 'shortlist'
+  | 'reports'
   | 'sources'
   | 'technical';
+
+export type OutreachStatus = 'shortlisted' | 'contacted' | 'negotiating' | 'confirmed' | 'declined';
+
+export interface ShortlistItem {
+  username: string;
+  creator: KOLRecommendation;
+  status: OutreachStatus;
+  addedAt: string;
+  notes?: string;
+}
+

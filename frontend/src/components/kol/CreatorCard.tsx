@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { KOLRecommendation } from '../../types';
 import { ScoreBreakdown } from './ScoreBreakdown';
 import { WhyThisCreator } from './WhyThisCreator';
+import { TikTokProfileCTA, getProfileLinkStatus } from './TikTokProfileCTA';
 import { ExternalLink, ChevronDown, ChevronUp, Check, Plus, ShieldCheck } from 'lucide-react';
 
 interface CreatorCardProps {
@@ -49,16 +50,31 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
               >
                 {recommendation.display_name}
               </button>
-              <a
-                href={recommendation.profile_url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-0.5 text-xs text-slate-400 hover:text-slate-700 transition font-mono"
-                title="Open TikTok Profile"
-              >
-                @{recommendation.username}
-                <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
-              </a>
+              {(() => {
+                const linkStatus = getProfileLinkStatus(recommendation);
+                if (linkStatus.isClickable && linkStatus.url) {
+                  return (
+                    <a
+                      href={linkStatus.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 text-xs text-slate-400 hover:text-slate-700 transition font-mono"
+                      title="Open TikTok Profile"
+                    >
+                      @{recommendation.username}
+                      <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
+                    </a>
+                  );
+                }
+                return (
+                  <span className="text-xs text-slate-400 font-mono inline-flex items-center gap-1">
+                    @{recommendation.username}
+                    <span className="text-[10px] text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
+                      Profile unavailable
+                    </span>
+                  </span>
+                );
+              })()}
             </div>
 
             {/* Tags row */}
@@ -128,15 +144,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
             )}
           </div>
 
-          <a
-            href={recommendation.profile_url}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-primary px-4 py-1.5 text-[11px] gap-1.5"
-          >
-            View TikTok
-            <ExternalLink className="w-3 h-3 text-slate-400" />
-          </a>
+          <TikTokProfileCTA creator={recommendation} variant="inline" />
         </div>
 
         {/* ── Expandable Rationale ── */}
