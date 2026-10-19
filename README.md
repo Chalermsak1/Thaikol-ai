@@ -9,6 +9,16 @@ ThaiKOL AI is an AI-powered creator discovery and recommendation system designed
 Live-Data First • Real-World Apify Integration • Async Job Engine • Snapshot Freshness • Multilingual NLP • React 18 • TypeScript • FastAPI • Python 3.12 • PostgreSQL
 ```
 
+<p align="center">
+  <img src="docs/screenshots/mobile-homepage-brand-overview.png" alt="ThaiKOL AI Mobile Brand & Discovery Overview" width="350" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/screenshots/mobile-creator-cards-carousel.png" alt="ThaiKOL AI Mobile Creator Cards & Top Matches Carousel" width="350" />
+</p>
+<p align="center">
+  <strong>ThaiKOL AI Mobile-First Interface</strong><br />
+  <em>Left: Active Brand Context, Dynamic Categories & Search • Right: Top Matches Creator Portrait Deck (snap-x), Micro-Metrics & Video Previews</em>
+</p>
+
 ---
 
 ## 1. The Problem
@@ -151,6 +161,9 @@ Each recommendation provides full decision transparency:
 
 | Feature | Description |
 |---|---|
+| **Mobile-First Experience** | Responsive 390px iPhone layout with swipeable creator portrait deck (`snap-x`), mobile bottom nav, and 44px+ touch targets |
+| **Image-Rich Discovery** | Full-bleed creator portraits, authentic Apify avatars, designated sample portraits (`รูปตัวอย่างจำลอง`), and vertical video thumbnails |
+| **Resilient Media Fallback** | Automatic `onError` graceful degradation to brand-styled initial avatars with verified TikTok badges |
 | **Dual-Source Brand Profiling** | Extracts industry, products, audience, and tone from website HTML and Facebook page data |
 | **Evidence & Provenance Audit** | Tags extracted brand facts as `OBSERVED`, `INFERRED`, or `ESTIMATED` with source URLs |
 | **Autonomous Query Generation** | Produces targeted Thai and English search keywords from brand characteristics |
@@ -168,15 +181,18 @@ Each recommendation provides full decision transparency:
 
 ---
 
-## 6. Product Walkthrough
+## 6. Product Walkthrough & Mobile Experience
 
-The web application provides an intuitive five-stage workflow:
+The application is architected mobile-first for rapid on-the-go influencer evaluation on iOS/Android smartphones, while adapting cleanly to desktop displays:
 
-1. **Dashboard & Quick Actions**: View recent brand analyses, platform status indicators, and one-click quick start actions for demo workflows.
-2. **Brand Analysis**: Enter a client website URL and Facebook page URL. The engine extracts the brand profile, displays the provenance-backed evidence table, and suggests generated TikTok search queries.
+1. **Mobile Homepage & Top Matches Carousel**:
+   - **Active Brand Context**: Highlights active brand identity (`เขาค้อทะเลภู`), product verticals, fast brand switcher, and category pills.
+   - **Horizontal Portrait Deck (`snap-x`)**: Marketers swipe through top-matched creators featuring high-res vertical portrait cards, `#1 Top Match` rank badges, frosted-glass Fit Score pills (`96.4 Fit`), follower metrics, and instant detail drawer CTAs.
+   - **Ranked Creator Feed**: Lists prioritized candidates with 9:16 vertical video thumbnails, views overlays, content tags, and shortlist bookmarks.
+2. **Brand Analysis & Evidence Audit**: Enter a client website URL and Facebook page URL. The engine extracts the brand profile, displays the provenance-backed evidence table, and suggests generated TikTok search queries.
 3. **Creator Discovery & Sandboxes**: Review discovered TikTok creator candidates, inspect aggregated metrics (average views, likes, shares, estimated engagement rate), and test queries in dedicated exploration sandboxes.
 4. **Ranked Recommendations & Weight Tuning**: Explore ranked creators with composite scores. Adjust factor weight sliders in the interactive tuner to align recommendations with specific campaign priorities.
-5. **Creator Deep Dive & Comparison**: Open the creator drawer to inspect sample video captions, compare shortlisted creators side-by-side, and export candidates to CSV.
+5. **Creator Deep Dive & Comparison**: Open the creator drawer to inspect sample video clips, compare shortlisted creators side-by-side, and export candidates to CSV.
 
 ---
 
@@ -406,7 +422,7 @@ source .venv/bin/activate
 pytest -v
 ```
 
-* **Backend Test Suite**: **111 tests passing** across 32 test suites (covering live provider adapters, rate-limit retries, unconfigured provider handling, snapshot persistence, freshness calculations, async job execution, brand profiling, cosine similarity, creator deduplication, engagement percentiles, brand safety, data quality, explainability, API routes, and SSRF security controls).
+* **Backend Test Suite**: **117 tests passing** across 33 test suites (covering live provider adapters, rate-limit retries, unconfigured provider handling, snapshot persistence, freshness calculations, async job execution, brand profiling, cosine similarity, creator deduplication, engagement percentiles, brand safety, data quality, explainability, API routes, and SSRF security controls).
 * **Test Isolation**: All automated tests run **100% offline** without calling external Apify endpoints or consuming actor credits (verified via automatic monkeypatched fixtures in `conftest.py`).
 
 ```bash
@@ -419,7 +435,7 @@ npm run build
 
 ---
 
-## 12. Security & Reliability
+## 14. Security & Reliability
 
 The application implements defensive engineering practices across its ingestion and processing layers:
 
@@ -434,7 +450,7 @@ The application implements defensive engineering practices across its ingestion 
 
 ---
 
-## 13. Limitations
+## 15. Limitations
 
 * **Public Data Snapshots**: Ingestion captures point-in-time public videos and captions; it does not capture temporary stories or private live streams.
 * **Text-Based Brand Safety**: Content screening evaluates video captions, bios, and hashtags; it does not perform computer vision scanning of raw video pixel frames or audio transcripts.
@@ -445,7 +461,7 @@ The application implements defensive engineering practices across its ingestion 
 
 ---
 
-## 14. Future Improvements
+## 16. Future Improvements
 
 * **Official Creator Marketplace API**: Integrate certified TikTok Creator Marketplace APIs to access officially sanctioned metrics and authorized creator data.
 * **Multimodal Embeddings**: Incorporate visual video frame embeddings (CLIP/SigLIP) and audio transcripts (Whisper) for holistic video understanding.
@@ -456,7 +472,7 @@ The application implements defensive engineering practices across its ingestion 
 
 ---
 
-## 15. Assessment Coverage
+## 17. Assessment Coverage
 
 This project was built to address the technical and business requirements of the **Convert Cake AI Engineer Assessment**:
 
@@ -473,20 +489,21 @@ This project was built to address the technical and business requirements of the
 | **Display Public Profile Information** | Structured creator profiles with verified profile links (`https://www.tiktok.com/@username`) and performance stats | `KOLRecommendation`, `TikTokProfileCTA.tsx`, `CreatorDetailDrawer.tsx` |
 | **Explainable Recommendations** | Granular point contribution breakdown, deterministic rationale ("Why this KOL?"), and caution notices | `ScoreBreakdown`, `explanation_service.py`, `WhyThisCreator.tsx` |
 | **Ethical & Privacy Considerations** | Strict anti-fabrication stance on demographics, public-data boundary, and SSRF security controls | `security.py`, `ethics.md`, `external_data_sources.md` |
-| **Working Prototype** | Decoupled full-stack monorepo with React frontend, FastAPI backend, Docker setup, and 98 passing tests | Verified end-to-end workflow with Khaokho Talaypu benchmark |
+| **Working Prototype** | Decoupled full-stack monorepo with React frontend, FastAPI backend, Docker setup, and 117 passing tests | Verified end-to-end workflow with Khaokho Talaypu benchmark |
 
 ---
 
-## 16. Project Structure
+## 18. Project Structure
 
 ```
 thaikol-ai/
 ├── backend/
+│   ├── alembic/                # Database migrations (KOL snapshots, matching runs, freshness)
 │   ├── api/v1/endpoints/       # REST API endpoints (brands, tiktok, matching, health)
 │   ├── config/                 # Declarative YAML configurations (scoring, brand safety, data quality)
 │   ├── core/                   # Application settings, database session, structured logging
-│   ├── models/                 # SQLAlchemy 2.0 ORM models (Brand, TikTokCandidate, Recommendation)
-│   ├── schemas/                # Strict Pydantic v2 data validation schemas
+│   ├── models/                 # SQLAlchemy 2.0 ORM models (Brand, TikTokCandidate, Snapshots, Runs)
+│   ├── schemas/                # Strict Pydantic v2 data validation schemas (with avatar_url & thumbnails)
 │   ├── services/               # Business logic, embedding matcher, scoring, providers, and security
 │   │   ├── website_provider.py         # Web extraction with SSRF and size defenses
 │   │   ├── facebook_provider.py        # Facebook extraction (Mock & Apify)
@@ -497,26 +514,35 @@ thaikol-ai/
 │   │   ├── brand_safety_service.py     # Content-level keyword screening
 │   │   ├── audience_fit_service.py     # Informational audience fit proxy
 │   │   ├── explainability_service.py   # Deterministic rationale and cautions
+│   │   ├── matching_run_manager.py     # Asynchronous background job engine
+│   │   ├── freshness.py                # Data freshness state evaluator
 │   │   └── kol_scorer.py               # 5-factor weighted recommendation engine
-│   └── tests/                  # 98 automated unit, integration, and E2E regression tests
+│   └── tests/                  # 117 automated unit, integration, and E2E regression tests
 ├── frontend/
+│   ├── public/                 # Static assets, favicon, and PWA manifest.json
 │   ├── src/
 │   │   ├── components/         # Modular UI components (KOL cards, score breakdown, comparison)
+│   │   │   ├── brand/          # Evidence drawer, brand search strategy
+│   │   │   ├── kol/            # CreatorCard, MobileCreatorCard, CreatorDetailDrawer, Deck
+│   │   │   └── layout/         # AppShell, Topbar, Sidebar, MobileBottomNav
+│   │   ├── lib/                # API client, creatorMedia (avatars & covers), format helpers
 │   │   ├── pages/              # View pages (Dashboard, BrandAnalysis, Discovery, Recommendations)
-│   │   ├── App.tsx             # Main React application shell and navigation
-│   │   └── index.css           # Tailwind CSS styles and glassmorphism design tokens
+│   │   ├── App.tsx             # Main React application shell and routing
+│   │   └── index.css           # Tailwind CSS styles and design tokens
 │   └── vite.config.ts          # Vite configuration with backend API proxy
 ├── data/
 │   └── fixtures/               # Curated evaluation benchmarks (sample_brands.json, sample_kols.json)
 ├── docs/                       # Architectural specifications, ethics guidelines, and API references
+│   └── screenshots/            # High-resolution mobile screenshots and showcase assets
 ├── docker-compose.yml          # Containerized multi-service deployment definition
 └── README.md                   # Project documentation
 ```
 
 ---
 
-## 17. Author
+## 19. Author
 
 **Chalermsak Sinsok**  
 GitHub: [@Chalermsak1](https://github.com/Chalermsak1)  
 Repository: [https://github.com/Chalermsak1/Thaikol-ai](https://github.com/Chalermsak1/Thaikol-ai)
+
