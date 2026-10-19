@@ -139,3 +139,11 @@ class BrandResponse(BrandBase):
     provenance: str = "live"
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class GeneratedSearchQuery(BaseModel):
+    """Structured search query derived from brand traits with priority and audit reason."""
+    query: str = Field(..., description="Target search query string")
+    reason: str = Field(..., description="Source fields and heuristic reason used")
+    priority: int = Field(..., description="Priority tier (1 = highest)")
+    generated_at: str = Field(..., description="ISO UTC timestamp of query generation")

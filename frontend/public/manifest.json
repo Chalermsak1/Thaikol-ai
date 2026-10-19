@@ -1,0 +1,17 @@
+{
+  "name": "ThaiKOL AI — TikTok Creator Intelligence",
+  "short_name": "ThaiKOL AI",
+  "description": "AI-Powered TikTok KOL Discovery & Brand Matching Platform for Thailand",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafbfd",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

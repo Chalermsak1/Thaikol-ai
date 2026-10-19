@@ -1,6 +1,5 @@
 import React from 'react';
 import { RecommendationResponse } from '../types';
-import { SearchStrategy } from '../components/brand/SearchStrategy';
 import { EmptyState } from '../components/common/EmptyState';
 import {
   Building2,
@@ -8,9 +7,15 @@ import {
   MapPin,
   Globe,
   Facebook,
-  ShieldCheck,
   Tag,
   Layers,
+  ArrowRight,
+  Users,
+  Compass,
+  MessageSquare,
+  CheckCircle2,
+  Sparkles,
+  Search,
 } from 'lucide-react';
 
 interface BrandAnalysisViewProps {
@@ -18,6 +23,8 @@ interface BrandAnalysisViewProps {
   onOpenEvidence: () => void;
   onGoToDashboard: () => void;
   onGoToAnalyze?: () => void;
+  onGoToRecommendations?: () => void;
+  onSearchKOL?: (query: string) => void;
 }
 
 export const BrandAnalysisView: React.FC<BrandAnalysisViewProps> = ({
@@ -25,13 +32,15 @@ export const BrandAnalysisView: React.FC<BrandAnalysisViewProps> = ({
   onOpenEvidence,
   onGoToDashboard,
   onGoToAnalyze,
+  onGoToRecommendations,
+  onSearchKOL,
 }) => {
   if (!result || !result.brand_profile) {
     return (
       <EmptyState
-        title="No brand analyzed yet"
-        description="Run brand analysis to extract comprehensive brand signals, audience themes, and public evidence."
-        actionLabel="Analyze a Brand"
+        title="ยังไม่มีการวิเคราะห์โปรไฟล์แบรนด์ (No Brand Analyzed)"
+        description="เริ่มการวิเคราะห์แบรนด์ผ่านเว็บไซต์และหน้าเพจสาธารณะ เพื่อสกัดเอกลักษณ์ กลุ่มเป้าหมาย และหัวข้อค้นหาครีเอเตอร์"
+        actionLabel="เริ่มวิเคราะห์แบรนด์ (Analyze Brand)"
         onAction={onGoToAnalyze || onGoToDashboard}
         icon={<Building2 className="w-5 h-5 text-slate-400" />}
       />
@@ -42,209 +51,235 @@ export const BrandAnalysisView: React.FC<BrandAnalysisViewProps> = ({
   const confidencePct = Math.round((brand.confidence ?? 0) * 100);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="saas-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Brand Intelligence Profile
-          </div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              {brand.brand_name}
-            </h1>
-            {brand.is_demo_fixture && (
-              <span className="badge badge-demo text-[10px]">Demo Benchmark</span>
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 font-thai">
+      {/* ─── Hero Brand Header ───────────────────────────────────────────── */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100/40 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+
+        <div className="relative space-y-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5A1F] flex items-center gap-1 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200/80">
+              <Sparkles className="w-3 h-3 text-[#FF5A1F]" />
+              <span>Brand Intelligence Profile</span>
+            </span>
+            {brand.is_demo_fixture ? (
+              <span className="badge badge-demo text-[10px]">ชุดทดสอบมาตรฐาน (Benchmark)</span>
+            ) : (
+              <span className="badge badge-safe text-[10px]">ข้อมูลสาธารณะสด (Live Data)</span>
             )}
           </div>
-          <p className="text-xs text-slate-500 font-medium">
-            {brand.industry}
-          </p>
+
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/70 border border-orange-200/90 text-[#FF5A1F] flex items-center justify-center font-black text-2xl shadow-2xs shrink-0">
+              {brand.brand_name.charAt(0)}
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                {brand.brand_name}
+              </h1>
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
+                <span className="text-slate-700 font-semibold">{brand.industry}</span>
+                <span>•</span>
+                <span>ความแม่นยำโมเดล {confidencePct}%</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="relative flex items-center gap-2.5 shrink-0 flex-wrap">
           <button
             onClick={onOpenEvidence}
-            className="btn-primary text-xs px-4 py-2 gap-2"
+            className="btn-secondary text-xs px-4 py-2.5 gap-1.5 min-h-[44px] cursor-pointer"
           >
-            <FileText className="w-4 h-4" />
-            <span>View Evidence ({brand.evidence?.length ?? 0})</span>
+            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            <span>หลักฐานข้อมูล ({brand.evidence?.length ?? 0})</span>
           </button>
+
+          {result.recommendations && result.recommendations.length > 0 && (
+            <button
+              onClick={onGoToRecommendations || onGoToDashboard}
+              className="btn-orange text-xs px-4 py-2.5 gap-1.5 shadow-2xs min-h-[44px] cursor-pointer"
+            >
+              <span>ดูครีเอเตอร์ ({result.recommendation_count})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* 2-Column Layout as Specified */}
+      {/* ─── Grid: Brand Overview, Persona & Content Themes ────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* LEFT COLUMN: Brand Overview (Summary, Audience, Themes, Tone) */}
-        <div className="lg:col-span-7 space-y-5">
-          <div className="saas-card p-5 sm:p-6 space-y-5">
-            <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900">
-                Brand Overview
+        {/* Left Column (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Executive Summary Quote */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                <span>สรุปภาพรวมจุดยืนของแบรนด์ (Executive Summary)</span>
               </h2>
-              <span className="text-[11px] text-slate-400 font-medium">Synthesized Profile</span>
+              <span className="text-[11px] font-mono text-slate-400 font-semibold">
+                ความเชื่อมั่น: {confidencePct}%
+              </span>
             </div>
 
-            {/* 1. Summary */}
-            <div className="space-y-1.5">
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Executive Summary
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/70 p-3.5 rounded-lg border border-slate-200/60 italic">
-                "{brand.summary || 'No summary available.'}"
-              </p>
-            </div>
+            <p className="text-sm text-slate-800 leading-relaxed bg-orange-50/40 p-4 rounded-2xl border border-orange-100/80 italic font-thai">
+              "{brand.summary || 'ไม่มีข้อมูลสรุปจุดยืนแบรนด์'}"
+            </p>
 
-            {/* 2. Audience */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                  Target Audience Signals
-                </span>
-                <span className="text-[10px] text-slate-400">Contextual Inferences</span>
+            {/* Products & Catalog */}
+            <div className="space-y-2 pt-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-slate-400" />
+                <span>สินค้าและบริการหลัก (Extracted Products)</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {brand.target_audience && brand.target_audience.length > 0 ? (
-                  brand.target_audience.map((item, idx) => (
-                    <div
+                {brand.products_services && brand.products_services.length > 0 ? (
+                  brand.products_services.map((item, idx) => (
+                    <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-2xs text-xs font-medium text-slate-800"
+                      className="px-3 py-1.5 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200/80 shadow-2xs"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>{item}</span>
-                    </div>
+                      {item}
+                    </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not specified</span>
+                  <span className="text-xs text-slate-400">ไม่พบรายการสินค้าเฉพาะเจาะจง</span>
                 )}
               </div>
             </div>
+          </div>
 
-            {/* 3. Content Themes */}
+          {/* Target Audience Signals */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Users className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                <span>กลุ่มเป้าหมายเชิงบริบท (Target Audience Signals)</span>
+              </h2>
+              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Contextual Match
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {brand.target_audience && brand.target_audience.length > 0 ? (
+                brand.target_audience.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 flex items-start gap-2.5"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span className="text-xs font-semibold text-slate-800 leading-snug">
+                      {item}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <span className="text-xs text-slate-400">ไม่พบสัญญาณกลุ่มเป้าหมาย</span>
+              )}
+            </div>
+
+            <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+              💡 <strong>ข้อสังเกต:</strong> ข้อมูลประชากรศาสตร์ (Audience Demographics) วิเคราะห์จากสัญญาณบริบทเนื้อหาและคีย์เวิร์ดสาธารณะ ไม่มีการเข้าถึงข้อมูลส่วนตัวของผู้ติดตาม
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Content Themes & Brand Tone */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Tag className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                <span>ธีมเนื้อหาและสไตล์การสื่อสาร (Themes & Tone)</span>
+              </h2>
+            </div>
+
+            {/* Content Themes */}
             <div className="space-y-2">
               <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Content Themes
+                ธีมเนื้อหาหลัก (Content Pillars)
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {brand.content_themes && brand.content_themes.length > 0 ? (
                   brand.content_themes.map((theme, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-900 text-xs font-medium"
+                      className="px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200/80 text-[#C93B07] text-xs font-bold"
                     >
                       #{theme}
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not specified</span>
+                  <span className="text-xs text-slate-400">ไม่ได้ระบุ</span>
                 )}
               </div>
             </div>
 
-            {/* 4. Brand Tone */}
-            <div className="space-y-2">
+            {/* Brand Tone */}
+            <div className="space-y-2 pt-2 border-t border-slate-100">
               <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Brand Tone & Persona
+                โทนและบุคลิกแบรนด์ (Tone & Style)
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {brand.brand_tone && brand.brand_tone.length > 0 ? (
                   brand.brand_tone.map((tone, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200/70"
                     >
                       {tone}
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not specified</span>
+                  <span className="text-xs text-slate-400">ไม่ได้ระบุ</span>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* RIGHT COLUMN: Analysis Information (Sources, Confidence, Location, Status) */}
-        <div className="lg:col-span-5 space-y-5">
-          <div className="saas-card p-5 sm:p-6 space-y-5">
-            <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900">
-                Analysis Information
+          {/* Sources & Geographic Signals */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                <span>แหล่งข้อมูลและพื้นที่เป้าหมาย (Sources & Signals)</span>
               </h2>
-              <span className="text-[11px] text-slate-400 font-medium">Audit Metadata</span>
             </div>
 
-            {/* 1. Sources */}
+            {/* Sources list */}
             <div className="space-y-2">
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Sources Analyzed
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <Globe className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span className="text-slate-600 font-medium truncate flex-1">
-                    https://khaokhotalaypu.com
-                  </span>
-                  <span className="badge badge-neutral text-[10px]">Crawled</span>
+                  <span className="text-slate-700 font-semibold truncate">Official Website</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 text-xs">
-                  <Facebook className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span className="text-slate-600 font-medium truncate flex-1">
-                    facebook.com/KhaokhoTalaypu
-                  </span>
-                  <span className="badge badge-neutral text-[10px]">Extracted</span>
+                <span className="badge badge-neutral text-[10px]">สแกนแล้ว</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Facebook className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="text-slate-700 font-semibold truncate">Facebook Page</span>
                 </div>
+                <span className="badge badge-neutral text-[10px]">ดึงข้อมูลแล้ว</span>
               </div>
             </div>
 
-            {/* 2. Confidence */}
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                  Model Confidence
-                </span>
-                <span className="text-xs font-mono font-bold text-emerald-700">
-                  {confidencePct}%
-                </span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${confidencePct}%` }}
-                />
-              </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Confidence score synthesized from direct lexical overlap and multi-signal corroboration.
-              </p>
-            </div>
-
-            {/* 3. Location */}
-            <div className="space-y-1.5">
+            {/* Geographic Signals */}
+            <div className="pt-2 border-t border-slate-100 space-y-1.5">
               <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Geographic Signals
+                ตลาดเป้าหมายและสัญญาณพื้นที่ (Target Market)
               </div>
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-700">
-                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                <MapPin className="w-4 h-4 text-[#FF5A1F] shrink-0" />
                 <span>
                   {brand.location_signals && brand.location_signals.length > 0
                     ? brand.location_signals.join(', ')
-                    : 'Thailand (National / Bangkok)'}
-                </span>
-              </div>
-            </div>
-
-            {/* 4. Status */}
-            <div className="space-y-1.5">
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Pipeline Status
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs font-semibold text-emerald-900">
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Analysis Complete</span>
-                </div>
-                <span className="text-[10px] font-mono text-emerald-700">
-                  {brand.is_demo_fixture ? 'DEMO FIXTURE' : 'LIVE EXTRACT'}
+                    : 'ประเทศไทย (Thailand / National)'}
                 </span>
               </div>
             </div>
@@ -252,60 +287,58 @@ export const BrandAnalysisView: React.FC<BrandAnalysisViewProps> = ({
         </div>
       </div>
 
-      {/* Below 2-Column: Products / Services, Keywords, and Search Strategy */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Products / Services */}
-        <div className="saas-card p-5 space-y-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
-            <Layers className="w-4 h-4 text-slate-400" />
-            <span>Products & Services Identified</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {brand.products_services && brand.products_services.length > 0 ? (
-              brand.products_services.map((item, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 text-xs font-medium"
-                >
-                  {item}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-slate-400">Not specified</span>
-            )}
-          </div>
-        </div>
-
-        {/* Keywords */}
-        <div className="saas-card p-5 space-y-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
-            <Tag className="w-4 h-4 text-slate-400" />
-            <span>Extracted Brand Keywords</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {brand.keywords && brand.keywords.length > 0 ? (
-              brand.keywords.map((kw, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-0.5 rounded-md bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono"
-                >
-                  {kw}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-slate-400">Not specified</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Search Strategy */}
+      {/* ─── Generated Search Topics for TikTok Discovery ───────────── */}
       {result.search_queries && result.search_queries.length > 0 && (
-        <SearchStrategy
-          queries={result.search_queries}
-          candidateCount={result.candidate_pool_count}
-        />
+        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Compass className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                <span>หัวข้อค้นหาบน TikTok ที่ระบบสร้างขึ้น ({result.search_queries.length} หัวข้อ)</span>
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                AI สังเคราะห์คีย์เวิร์ดจากเอกลักษณ์แบรนด์ เพื่อใช้ค้นหาและคัดเลือกครีเอเตอร์ที่เกี่ยวข้องบน TikTok
+              </p>
+            </div>
+            {result.candidate_pool_count && (
+              <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto">
+                {result.candidate_pool_count} ครีเอเตอร์ในระบบ
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            {result.search_queries.map((q, idx) => (
+              <button
+                key={idx}
+                onClick={() => onSearchKOL?.(q)}
+                className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-800 flex items-center justify-between gap-2 shadow-2xs hover:bg-orange-50/50 hover:border-orange-300 transition text-left cursor-pointer group"
+                title="แตะเพื่อค้นหาครีเอเตอร์ด้วยหัวข้อนี้ใน Discovery"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A1F] shrink-0" />
+                  <span className="truncate group-hover:text-[#FF5A1F] font-semibold">{q}</span>
+                </div>
+                <Search className="w-3 h-3 text-slate-400 group-hover:text-[#FF5A1F] shrink-0 transition" />
+              </button>
+            ))}
+          </div>
+
+          {result.recommendations && result.recommendations.length > 0 && (
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
+              <button
+                onClick={onGoToRecommendations || onGoToDashboard}
+                className="btn-orange text-xs px-4 py-2.5 gap-1.5 shadow-2xs cursor-pointer min-h-[44px]"
+              >
+                <span>ดูอันดับครีเอเตอร์ที่แมตช์สูงสุด ({result.recommendation_count} คน)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 };
+
+export default BrandAnalysisView;

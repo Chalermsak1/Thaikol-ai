@@ -1,11 +1,12 @@
 # ThaiKOL AI
 
 ## AI-Powered TikTok KOL Matcher for the Thai Market
+### Live-Data First Architecture • Transparent Multi-Factor Scoring • Deterministic Demo Mode
 
-ThaiKOL AI is an AI-powered creator discovery and recommendation system designed to help brand marketing teams and digital agencies systematically identify, evaluate, and rank relevant TikTok creators in Thailand. The system analyzes public brand signals, discovers creator candidates, performs multilingual semantic matching, and ranks candidates using transparent multi-factor scoring with deterministic explanations.
+ThaiKOL AI is an AI-powered creator discovery and recommendation system designed to help brand marketing teams and digital agencies systematically identify, evaluate, and rank relevant TikTok creators in Thailand. The system analyzes real public brand websites and Facebook pages, discovers real public TikTok creators via legitimate external scraping providers (Apify), normalizes and persists creator data with point-in-time snapshots, evaluates content relevance in a multilingual dense vector space, and ranks candidates using transparent 5-factor scoring with deterministic explanations.
 
 ```
-Working Prototype • Multilingual NLP • React 18 • TypeScript • FastAPI • Python 3.12 • PostgreSQL • Docker Compose
+Live-Data First • Real-World Apify Integration • Async Job Engine • Snapshot Freshness • Multilingual NLP • React 18 • TypeScript • FastAPI • Python 3.12 • PostgreSQL
 ```
 
 ---
@@ -17,34 +18,40 @@ Influencer discovery on TikTok in Thailand is typically a manual, time-intensive
 * **Brand Context Disconnect**: Marketers must repeatedly define brand identity, product nuances, and positioning across ad-hoc searches.
 * **Keyword Fragility**: Relying on generic hashtags (such as `#รีวิว` or `#ใช้ดีบอกต่อ`) fails to identify creators who discuss products using colloquial Thai, regional dialects, or natural conversational styles.
 * **Opaque Scoring & Demographic Fabrication**: Many commercial influencer databases calculate proprietary scores without justification or fabricate unverifiable follower demographics (such as age, gender, or income) that cannot be retrieved from public APIs.
+* **Opaque Data Sourcing & Silent Fallbacks**: Typical prototypes either use static mock fixtures or fail without explanation when external APIs time out. Marketers cannot tell what is observed data versus estimated guesses.
 * **Screening Inefficiency**: Comparing multiple creators across engagement, content style, brand safety, and local relevance requires manually reviewing dozens of individual profiles.
 
-ThaiKOL AI automates and structures this initial discovery and screening workflow into a transparent, repeatable decision-support system.
+ThaiKOL AI automates and structures this discovery and screening workflow into a transparent, repeatable, and live-data-backed decision-support system.
 
 ---
 
-## 2. The Solution
+## 2. The Solution: Live-Data First Pipeline
 
-ThaiKOL AI connects brand intelligence directly to creator discovery and recommendation through an automated pipeline:
+ThaiKOL AI connects live brand intelligence directly to creator discovery and recommendation through an automated pipeline:
 
 ```mermaid
 flowchart TD
-    A[Brand Website + Facebook] --> B[Brand Analysis & Corpus Builder]
-    B --> C[Structured Brand Profile & Provenance]
-    C --> D[Search Query Generation]
-    D --> E[TikTok Creator Discovery & Metric Aggregation]
-    E --> F[Multilingual Dense Vector Matching]
-    F --> G[Multi-Factor Weighted Scoring]
-    G --> H[Explainable Recommendations with Rationale]
-    H --> I[Creator Comparison & Shortlist Export]
+    A[Public Brand Website] -->|SSRF-Protected HTTP| B[Brand Ingestion & Web Extractor]
+    A2[Public Facebook Page] -->|Apify Facebook Provider| B
+    B --> C[Brand Corpus & Rule-Based Profiler]
+    C --> D[Targeted Query Generation Engine]
+    D -->|Prioritized Thai/EN Queries| E[Apify TikTok Provider]
+    E -->|Raw Video & Profile Data| F[Deduplication & Identity Normalizer]
+    F --> G[Point-in-Time Metric Snapshots & Freshness]
+    G --> H[Multilingual Dense Vector Matching]
+    H --> I[Multi-Factor Weighted Scoring]
+    I --> J[Deterministic Explainability Rationale]
+    J --> K[Interactive Dashboard, Compare & Export]
 ```
 
-1. **Brand Ingestion**: Extracts public text and metadata from a client's website and Facebook page, tracking observed versus inferred evidence.
-2. **Autonomous Query Formulation**: Generates targeted Thai and English search terms based on products, themes, and industry keywords.
-3. **Candidate Ingestion**: Discovers active creator candidates, deduplicating profiles and aggregating engagement metrics across sample videos.
-4. **Semantic Matching**: Measures topical relevance between brand identity and creator content in a shared multilingual vector space.
-5. **Multi-Factor Ranking**: Ranks candidates using an audited, configurable formula balancing semantic relevance, engagement quality, local content signals, brand safety, and data completeness.
-6. **Transparent Review**: Delivers ranked recommendation cards with granular point contributions, deterministic rationale ("Why this KOL?"), caution notices, and direct links to public TikTok profiles.
+1. **Brand Ingestion**: Extracts public text and metadata from a client's website (with strict SSRF defenses) and Facebook page (via Apify), tracking observed versus inferred evidence.
+2. **Autonomous Query Formulation**: Generates prioritized, deduplicated Thai and English search queries based on brand products, content themes, and local cues.
+3. **Live TikTok Discovery**: Ingests public video and author metadata via Apify (`clockworks/tiktok-scraper`) with exponential backoff retries, rate-limit detection, and pagination bounds.
+4. **Creator Deduplication & URL Verification**: Merges creators discovered across multiple queries into a single normalized identity. Profile URLs are strictly validated; unverified profiles display as *"Profile unavailable"* rather than fabricating links.
+5. **Snapshot Persistence & Freshness**: Records immutable point-in-time metrics (`kol_candidate_snapshots`) and evaluates data freshness (`Fresh`, `Aging`, `Stale`, `Unknown`).
+6. **Semantic Matching**: Measures topical relevance between brand identity and creator content in a shared multilingual vector space (excluding numerical metrics to prevent popularity bias).
+7. **Multi-Factor Ranking**: Ranks candidates using an audited formula balancing semantic relevance (45%), engagement quality (25%), local content signals (15%), brand safety (10%), and data completeness (5%).
+8. **Transparent Review**: Delivers ranked recommendation cards with granular point contributions, deterministic rationale ("Why this KOL?"), caution notices, provenance badges (`OBSERVED`, `DERIVED`, `INFERRED`, `ESTIMATED / PROXY`), and direct links to public TikTok profiles.
 
 ---
 
@@ -66,14 +73,24 @@ The brand profiling service synthesizes public website HTML and Facebook page co
 
 The system uses a deterministic rule-based profiler as its default baseline, with optional local LLM profiling (via Ollama) and automatic fallback.
 
-### 3.2 TikTok Creator Discovery
+### 3.2 Live TikTok Creator Discovery & Snapshots
 
-Candidate discovery translates brand identity into creator search operations:
+Candidate discovery translates brand identity into live creator search operations:
 
-* **Query Formulation**: `generate_kol_search_queries` combines brand keywords, product review queries (e.g., `รีวิวแชมพู`), content themes, and industry terms.
-* **Provider Abstraction**: A unified `TikTokProvider` interface supports both live scraping via Apify (`clockworks/tiktok-scraper`) and offline deterministic execution via curated demo fixtures (`sample_kols.json`).
-* **Creator Deduplication**: Raw video authors are deduplicated by normalized lowercase username (`@handle`).
-* **Metric Aggregation**: Performance metrics are aggregated across sampled public videos (average views, likes, comments, and shares).
+* **Query Formulation**: `generate_structured_search_queries` derives prioritized, deduplicated Thai and English search terms (e.g., `แชมพูสมุนไพร`, `ผมร่วง`, `รีวิวดูแลเส้นผม`, `organic skincare thailand`), with origin tracking (`brand keyword + product concept`) and configurable caps (`TIKTOK_MAX_QUERIES=5`).
+* **Legitimate Third-Party Provider Strategy**:
+  * **Live Mode (`DEMO_MODE=false`)**: Invokes legitimate public scrapers on Apify (`clockworks/tiktok-scraper` and `apify/facebook-pages-scraper`).
+  * **Bounded Retries & Error Handling**: Implements exponential backoff (up to 3 attempts with 1.5x backoff), detects HTTP 429 rate limits, and cleanly maps network timeouts without crashing.
+  * **No Silent Fallback**: If `DEMO_MODE=false` and `APIFY_API_TOKEN` is unset, the system raises a clear `ProviderConfigurationError` (HTTP 503) explaining provider misconfiguration rather than silently faking live results with demo fixtures.
+  * **Demo Mode (`DEMO_MODE=true`)**: Uses curated offline fixtures (`sample_kols.json`) for deterministic unit tests and offline evaluation.
+* **Creator Identity & Deduplication**: Discovered creators across multiple search queries are deduplicated into a single unified record keyed by normalized username (`@handle`), preserving the list of originating queries.
+* **Profile URL Verification**: URLs are strictly checked against canonical hostname and profile patterns. If unverified by provider data, the profile displays as *"Profile unavailable"* rather than fabricating clickable links.
+* **Point-in-Time Snapshot Model**: Rather than overwriting historical numbers, each discovery run persists an immutable point-in-time snapshot (`KOLCandidateSnapshotModel`) capturing follower counts, sample video counts, aggregated views, likes, comments, shares, saves, and estimated engagement rates.
+* **Data Freshness State**: Every external record maintains an explicit `collected_at` timestamp. Freshness is evaluated dynamically against configurable thresholds:
+  * `Fresh`: Collected within $\le 6$ hours (`DATA_FRESHNESS_PROFILE_HOURS`).
+  * `Aging`: Collected between $6$ and $18$ hours.
+  * `Stale`: Collected $> 18$ hours ago.
+  * `Unknown`: Timestamp missing or unparseable.
 * **Estimated Engagement Rate ($\text{ER}$)**:
   $$\text{ER} = \frac{\overline{\text{likes}} + \overline{\text{comments}} + \overline{\text{shares}}}{\max(\text{followers}, 1)}$$
 * **Thailand Locality Cues**: Captions and hashtags are scanned for Thai Unicode character ratio, explicit Thailand location mentions (Bangkok, Chiang Mai, Khaokho, Phuket, etc.), and local hashtags to produce a `local_signal_score`.
@@ -229,19 +246,52 @@ graph TB
 
 ---
 
-## 9. Demo Mode
+## 9. Live Data vs. Demo Mode
 
-ThaiKOL AI includes a zero-fail, fully offline **Demo Mode** enabled by default (`DEMO_MODE=true`):
+ThaiKOL AI defaults to **LIVE MODE** (`DEMO_MODE=false`) for production and real-world evaluation, while preserving a deterministic, zero-fail **DEMO MODE** (`DEMO_MODE=true`) for automated tests, CI, and offline development.
 
-* **Zero External Dependencies**: Operates without external API keys, third-party subscriptions, or outbound scraping requests.
-* **Deterministic Benchmark**: Pre-configured with an authentic Thai personal care brand: **Khaokho Talaypu (เขาค้อทะเลภู)** from `data/fixtures/sample_brands.json`.
-* **Curated Creator Pool**: Ingests 11 curated Thai TikTok creator fixtures (`data/fixtures/sample_kols.json`) spanning beauty, organic living, wellness, lifestyle, and food.
-* **Real On-Device AI**: Runs genuine 384-dimensional vector embedding calculations locally on CPU via Sentence Transformers.
-* **Provenance Badging**: Demo recommendations and profile records are explicitly labeled with `data_source: "demo_fixture"` to maintain data integrity.
+```mermaid
+graph TD
+    User([User Request]) --> CheckMode{DEMO_MODE?}
+    CheckMode -- "false (LIVE DEFAULT)" --> CheckToken{APIFY_API_TOKEN configured?}
+    CheckToken -- "Yes" --> LiveApify[Apify TikTok & Facebook Scrapers]
+    CheckToken -- "No" --> UnconfiguredErr[HTTP 503 ProviderConfigurationError<br/>No Silent Fallback]
+    CheckMode -- "true (DEMO MODE)" --> MockFixtures[Curated Fixtures: sample_brands.json & sample_kols.json]
+```
+
+### Critical "No Silent Fallback" Principle
+* When running in Live Mode (`DEMO_MODE=false`), the system **never silently falls back** to mock fixtures if external scrapers fail or credentials are unset. Instead, it returns an explicit `ProviderConfigurationError` (HTTP 503) or `ProviderRateLimitError` so users and engineers always know exactly what data they are looking at.
+* In Demo Mode (`DEMO_MODE=true`), all candidate creators and brand profiles are clearly labeled with `is_demo_fixture: true` and `provenance: "demo_fixture"`.
+
+### Data Provenance Taxonomy
+Every metric and attribute exposed in the UI and API carries an audited data nature:
+* `OBSERVED`: Raw public platform metrics (follower count, video views, likes, comments, shares, verified URLs).
+* `DERIVED`: Computed analytical metrics (estimated engagement rate, reach efficiency, local content signal score).
+* `INFERRED`: Synthesized topical alignments (brand industry, target customer personas, content themes).
+* `ESTIMATED / PROXY`: Informational indicators outside scoring (e.g. `Audience Fit Proxy`, which carries **0% weight** in Final Score).
+* `DEMO`: Offline fixture data used for deterministic benchmarks.
+
+### Provider Health & Telemetry
+A dedicated provider health check endpoint allows instant verification of provider readiness without leaking credentials:
+* **Endpoint**: `GET /health/providers` and `GET /api/v1/health/providers`
+* **Response**: Reports real-time status (`configured`, `unconfigured`, `mock`, `error`) for Website, TikTok, and Facebook extractors.
 
 ---
 
-## 10. Quick Start
+## 10. Asynchronous Matching Job Pipeline
+
+For production workloads involving external scraping actors that may take 15–45 seconds, ThaiKOL AI provides an asynchronous background job pipeline:
+
+* **Enqueue Run**: `POST /api/v1/matching/runs` (Accepts `website_url`, `facebook_page_url`, `weights`, `limit`; returns `202 Accepted` with `run_id`).
+* **Poll Progress**: `GET /api/v1/matching/runs/{run_id}` (Returns progress percentage and current stage: `queued` → `brand_analysis` → `query_generation` → `tiktok_discovery` → `normalization` → `enrichment` → `embedding` → `scoring` → `completed`).
+* **Fetch Results**: `GET /api/v1/matching/runs/{run_id}/results` (Returns full recommendation payload once status is `completed`).
+* **List Runs**: `GET /api/v1/matching/runs` (Audit log of recent runs).
+
+*(Synchronous endpoints like `POST /api/v1/matching/recommend-from-brand` remain fully functional for lightweight or demo runs).*
+
+---
+
+## 11. Quick Start
 
 ### Prerequisites
 
@@ -265,6 +315,7 @@ uvicorn main:app --reload --port 8000
 
 * **Swagger API Documentation**: `http://localhost:8000/docs`
 * **Health Check**: `http://localhost:8000/health`
+* **Provider Health Telemetry**: `http://localhost:8000/health/providers`
 
 #### 2. Frontend
 
@@ -299,17 +350,54 @@ Configuration is managed via environment variables (`.env`):
 
 | Variable | Description | Default | Behavior |
 |---|---|---|---|
-| `DEMO_MODE` | Enable offline fixture mode | `true` | When `true`, runs offline using curated fixtures without external APIs |
+| `DEMO_MODE` | Live vs. Demo Mode toggle | `false` | When `false` (default), discovers real creators via Apify. When `true`, uses offline fixtures |
+| `APIFY_API_TOKEN` | Apify API token for live scraping | `""` | Required for LIVE TikTok discovery and Facebook extraction |
+| `APIFY_TIKTOK_ACTOR_ID` | Apify actor for TikTok discovery | `clockworks/tiktok-scraper` | Target Apify actor slug |
+| `APIFY_FACEBOOK_ACTOR_ID` | Apify actor for Facebook extraction | `apify/facebook-pages-scraper` | Target Apify actor slug |
+| `TIKTOK_MAX_QUERIES` | Max search queries per run | `5` | Controls API cost and query diversity |
+| `TIKTOK_MAX_RESULTS_PER_QUERY` | Max raw results per query | `20` | Caps discovery sample per query |
+| `TIKTOK_MAX_CANDIDATES` | Max aggregated candidate pool | `50` | Pool size sent to semantic matching |
+| `TIKTOK_RETRY_ATTEMPTS` | External API retry attempts | `3` | Bounded retries with exponential backoff |
+| `TIKTOK_RETRY_BACKOFF_BASE` | Retry multiplier | `1.5` | Exponential backoff growth factor |
+| `DATA_FRESHNESS_PROFILE_HOURS` | Profile freshness threshold | `6` | Hours before profile is considered Aging |
+| `DATA_FRESHNESS_VIDEO_HOURS` | Video freshness threshold | `24` | Hours before video metrics are considered Aging |
+| `DATA_FRESHNESS_BRAND_HOURS` | Brand freshness threshold | `24` | Hours before brand analysis is considered Aging |
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql+psycopg2://...` | Database connection string for persistence |
 | `EMBEDDING_MODEL_NAME` | SentenceTransformer model | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` | Hugging Face model identifier |
-| `APIFY_API_TOKEN` | Apify API token for live scraping | `""` | Optional; empty token defaults to mock providers |
 | `OLLAMA_BASE_URL` | Optional local Ollama endpoint | `http://localhost:11434` | Used for optional LLM brand profiling when live |
 
 ---
 
-## 11. Testing
+## 12. Manual Live Testing Guide
 
-The project includes an automated test suite verifying business logic, scoring formulas, API endpoints, security controls, and end-to-end user journeys:
+Follow this step-by-step verification protocol to validate Live Mode with real provider credentials:
+
+1. **Configure Credentials**: In `.env`, ensure `DEMO_MODE=false` and provide your real `APIFY_API_TOKEN=apify_api_...`.
+2. **Start Backend & Frontend**: Launch both servers locally.
+3. **Verify Provider Health**: Open `http://localhost:8000/health/providers` in your browser. Verify that `tiktok.status` is `"configured"` and `mode` is `"live"`.
+4. **Inspect Topbar Badge**: Open `http://localhost:5173`. The topbar displays a green badge: `LIVE DATA (Apify Connected)`.
+5. **Run Live Brand Analysis**:
+   * Navigate to Brand Analysis. Enter a real brand website URL (e.g., `https://khaokhotalaypu.com`).
+   * Optionally enter a real Facebook page URL.
+   * Click **"Analyze Brand & Match Creators"**.
+6. **Observe Real Live Progress**:
+   * Watch the asynchronous progress stages: *Brand Analysis (15%)* → *Query Generation (30%)* → *TikTok Discovery (50%)* → *Normalization (65%)* → *Enrichment (75%)* → *Embedding (85%)* → *Scoring (95%)* → *Completed (100%)*.
+7. **Verify Real Creator Candidates**:
+   * Ensure candidates originate from real TikTok search results matching brand queries.
+   * Verify that creators found across multiple queries are merged into single unified profiles.
+   * Check creator profile links: canonical URLs are verified by provider data; unverified profiles display *"Profile unavailable"*.
+   * Check provenance chips: `OBSERVED` on raw counts, `DERIVED` on engagement rates, `INFERRED` on brand topics.
+   * Check data freshness: Green `"Fresh"` indicator displaying collection age (`"Collected 2 minutes ago"`).
+8. **Test Provider Error Handling (No Silent Fallback)**:
+   * Temporarily clear `APIFY_API_TOKEN` in `.env` and restart the backend.
+   * Attempt discovery: Verify the application returns a clear, actionable error: *"TikTok live data provider is not configured. Set APIFY_API_TOKEN in environment or enable DEMO_MODE=true for offline testing."*
+   * Verify that no fake or demo data was silently substituted.
+
+---
+
+## 13. Testing
+
+The project includes an automated test suite verifying business logic, scoring formulas, API endpoints, security controls, live provider adapters, snapshot models, freshness calculations, and async job workflows:
 
 ```bash
 # Backend pytest suite
@@ -318,7 +406,8 @@ source .venv/bin/activate
 pytest -v
 ```
 
-* **Backend Test Suite**: **98 tests passing** (covering brand profiling, cosine similarity, creator deduplication, engagement percentiles, brand safety, data quality, explainability, API routes, and SSRF security controls).
+* **Backend Test Suite**: **111 tests passing** across 32 test suites (covering live provider adapters, rate-limit retries, unconfigured provider handling, snapshot persistence, freshness calculations, async job execution, brand profiling, cosine similarity, creator deduplication, engagement percentiles, brand safety, data quality, explainability, API routes, and SSRF security controls).
+* **Test Isolation**: All automated tests run **100% offline** without calling external Apify endpoints or consuming actor credits (verified via automatic monkeypatched fixtures in `conftest.py`).
 
 ```bash
 # Frontend TypeScript check and production build
@@ -326,7 +415,7 @@ cd frontend
 npm run build
 ```
 
-* **Frontend Build**: Verified production bundle compilation via `tsc && vite build` with 0 type errors.
+* **Frontend Build**: Verified production bundle compilation via `tsc && vite build` with **0 type errors**.
 
 ---
 

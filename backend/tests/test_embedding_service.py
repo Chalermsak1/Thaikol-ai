@@ -59,12 +59,16 @@ def test_embedding_service_caching_and_determinism(monkeypatch):
 def test_embedding_service_unavailable_handling(monkeypatch):
     """When sentence-transformers cannot be loaded, service raises clean RuntimeError."""
     service = LocalSentenceTransformerEmbeddingService(model_name="nonexistent/fake-model")
-    monkeypatch.setattr(service, "_model_instance", None)
+    monkeypatch.setattr(LocalSentenceTransformerEmbeddingService, "_model_instance", None)
 
     def failing_import():
         raise ImportError("No module named 'sentence_transformers'")
-
-    monkeypatch.setattr("builtins.__import__", lambda name, *args, **kwargs: (failing_import() if name == "sentence_transformers" else __import__(name, *args, **kwargs)))
+    monkeypatch.setattr(
+        "builtins.__import__",
+        lambda name, *args, **kwargs: (
+            failing_import() if name == "sentence_transformers" else orig_import(name, *args, **kwargs)
+        ),
+    )
 
     with pytest.raises(RuntimeError) as exc_info:
         service.get_text_embedding("Some text")

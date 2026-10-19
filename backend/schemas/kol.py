@@ -32,6 +32,8 @@ class TikTokVideo(BaseModel):
     creator_display_name: Optional[str] = Field(None, description="Creator display name")
     creator_bio: Optional[str] = Field(None, description="Public bio text if available")
     creator_profile_url: Optional[str] = Field(None, description="Public profile URL if available")
+    creator_avatar_url: Optional[str] = Field(None, description="Public profile avatar image URL if available")
+    video_thumbnail_url: Optional[str] = Field(None, description="Public video cover thumbnail URL if available")
     is_profile_verified: bool = Field(default=False, description="True if profile URL is a verified live account")
     profile_status: str = Field(default="unavailable", description="Profile status: verified | unverified | unavailable")
     follower_count: Optional[int] = Field(None, ge=0, description="Creator follower count if available")
@@ -61,6 +63,8 @@ class KOLCandidate(BaseModel):
     profile_status: str = Field(default="unavailable", description="Profile status: verified | unverified | unavailable")
     bio: Optional[str] = Field(None, description="Creator bio text")
     follower_count: Optional[int] = Field(None, ge=0, description="Public follower count")
+    avatar_url: Optional[str] = Field(None, description="Creator profile avatar URL if available")
+    video_thumbnail_url: Optional[str] = Field(None, description="Featured sample video thumbnail URL if available")
     sample_video_count: int = Field(default=0, ge=0, description="Number of sampled videos aggregated")
 
     # Aggregated metrics across sampled videos (Derived)

@@ -5,7 +5,7 @@ from core.config import settings
 from core.logging import logger
 from core.database import check_db_connection
 from api.v1 import api_router
-from api.v1.endpoints.health import get_health
+from api.v1.endpoints.health import get_health, get_providers_health
 
 
 @asynccontextmanager
@@ -15,6 +15,30 @@ async def lifespan(app: FastAPI):
     logger.info("Environment: %s | Demo Mode: %s", settings.ENVIRONMENT, settings.DEMO_MODE)
     db_connected = check_db_connection()
     logger.info("Database connectivity check: %s", "CONNECTED" if db_connected else "DISCONNECTED (demo fallback ready)")
+
+    # Ensure ORM tables exist on a fresh database (idempotent; never drops or alters existing tables)
+    if db_connected:
+        try:
+            import models  # noqa: F401  (registers all ORM models on Base.metadata)
+            from core.database import Base, engine
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database schema verified (create_all)")
+        except Exception as e:
+            logger.warning("Database schema auto-creation skipped: %s", e)
+
+    # Pre-warm multilingual embedding model in background thread
+    def _warmup_embeddings():
+        try:
+            from services.embedding_service import get_embedding_service
+            svc = get_embedding_service()
+            svc.get_text_embedding("warmup")
+            logger.info("Multilingual SentenceTransformer model pre-warmed and ready")
+        except Exception as e:
+            logger.warning("Embedding model pre-warmup notice: %s", e)
+
+    import threading
+    threading.Thread(target=_warmup_embeddings, daemon=True, name="embedding-warmup").start()
+
     yield
     # Shutdown
     logger.info("Shutting down %s", settings.PROJECT_NAME)
@@ -45,6 +69,13 @@ app.add_api_route(
     tags=["Health"],
     summary="Direct Root Healthcheck",
 )
+app.add_api_route(
+    "/health/providers",
+    get_providers_health,
+    methods=["GET"],
+    tags=["Health"],
+    summary="Direct Root Providers Healthcheck",
+)
 
 # API v1 routes
 app.include_router(api_router, prefix=settings.API_V1_STR)
@@ -58,6 +89,7 @@ def read_root():
         "demo_mode": settings.DEMO_MODE,
         "docs_url": "/docs",
         "health_url": "/health",
+        "providers_health_url": "/health/providers",
     }
 
 

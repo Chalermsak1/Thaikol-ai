@@ -12,9 +12,8 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "insecure-default-change-in-production-thaikol-ai-secret"
 
-    # Prototype Demo Mode Flag
-    # When True, the app operates reliably offline using curated fixtures
-    DEMO_MODE: bool = True
+    # Mode Flag: False = LIVE mode (default in production), True = deterministic DEMO mode
+    DEMO_MODE: bool = False
 
     # Database Configuration (PostgreSQL)
     POSTGRES_SERVER: str = "localhost"
@@ -51,25 +50,39 @@ class Settings(BaseSettings):
     APIFY_FACEBOOK_ACTOR_ID: str = "apify/facebook-pages-scraper"
     APIFY_TIKTOK_ACTOR_ID: str = "clockworks/tiktok-scraper"
 
-    # TikTok Discovery Limits
-    TIKTOK_MAX_RESULTS_PER_QUERY: int = 50
-    TIKTOK_MAX_CANDIDATES: int = 100
+    # TikTok Discovery Limits & Controls
+    TIKTOK_MAX_QUERIES: int = 5
+    TIKTOK_MAX_RESULTS_PER_QUERY: int = 20
+    TIKTOK_MAX_CANDIDATES: int = 50
     TIKTOK_TIMEOUT: float = 60.0
+    TIKTOK_RETRY_ATTEMPTS: int = 3
+    TIKTOK_RETRY_BACKOFF_BASE: float = 1.5
+
+    # Data Freshness Thresholds (Hours)
+    DATA_FRESHNESS_PROFILE_HOURS: int = 6
+    DATA_FRESHNESS_VIDEO_HOURS: int = 24
+    DATA_FRESHNESS_BRAND_HOURS: int = 24
 
     # Website Extraction Limits & Security
     WEBSITE_EXTRACT_TIMEOUT: float = 10.0
     WEBSITE_MAX_RESPONSE_SIZE: int = 2 * 1024 * 1024  # 2 MB max page download
     WEBSITE_MAX_TEXT_LENGTH: int = 15000  # truncate visible text to prevent token explosion
 
-    # Caching
+    # Caching & Distributed Cache
     ENABLE_CACHE: bool = True
     CACHE_TTL_SECONDS: int = 3600
+    REDIS_URL: Optional[str] = None
+    CACHE_MAX_MEMORY_ITEMS: int = 10000
 
     # CORS Origins
     CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

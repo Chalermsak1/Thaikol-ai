@@ -22,9 +22,9 @@ export const CompareView: React.FC<CompareViewProps> = ({
   if (!result || !result.recommendations || result.recommendations.length === 0) {
     return (
       <EmptyState
-        title="No creators to compare"
-        description="First run brand analysis and add creators to the comparison list from the Recommendations page."
-        actionLabel="Go to Recommendations"
+        title="ยังไม่มีครีเอเตอร์ให้เปรียบเทียบ (No Creators to Compare)"
+        description="เริ่มการวิเคราะห์แบรนด์ก่อน จากนั้นกดปุ่มเปรียบเทียบจากหน้ารายการแนะนำหรือการค้นหา"
+        actionLabel="ดูรายการแนะนำ (Recommendations)"
         onAction={onGoToRecommendations}
         icon={<SlidersHorizontal className="w-5 h-5 text-slate-400" />}
       />
@@ -36,49 +36,56 @@ export const CompareView: React.FC<CompareViewProps> = ({
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 font-thai">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Creator Comparison</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Objective side-by-side evaluation across 5 scoring dimensions
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5A1F] bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+              Side-by-Side Analysis
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            เปรียบเทียบครีเอเตอร์ (Creator Comparison)
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium">
+            ประเมินคะแนนเชิงลึก 5 มิติแบบคู่ขนานเพื่อประกอบการตัดสินใจของทีมการตลาด
           </p>
         </div>
 
         {comparisonList.length > 0 && (
           <button
             onClick={onClearAll}
-            className="btn-secondary text-xs self-start sm:self-auto"
+            className="btn-secondary text-xs px-4 py-2.5 self-start sm:self-auto min-h-[44px] cursor-pointer"
           >
-            Clear all ({comparisonList.length})
+            ล้างการเลือก ({comparisonList.length})
           </button>
         )}
       </div>
 
-      {/* Instruction callout */}
+      {/* Instruction callout when empty */}
       {comparisonList.length === 0 && (
-        <div className="saas-card p-4 flex items-start gap-3">
-          <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-          <div>
-            <div className="text-xs font-medium text-slate-700 mb-0.5">
-              No creators selected for comparison yet
+        <div className="p-5 rounded-3xl bg-orange-50/40 border border-orange-200/80 shadow-2xs flex items-start gap-3">
+          <Info className="w-4 h-4 text-[#FF5A1F] shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="text-xs font-bold text-slate-900">
+              ยังไม่ได้เลือกครีเอเตอร์เข้าสู่ตารางเปรียบเทียบ
             </div>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Go to{' '}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              ไปที่หน้า{' '}
               <button
                 onClick={onGoToRecommendations}
-                className="text-slate-800 font-semibold underline underline-offset-2 cursor-pointer"
+                className="text-[#FF5A1F] font-bold underline underline-offset-2 cursor-pointer hover:text-[#E24A12]"
               >
-                Recommendations
+                รายการแนะนำ (Recommendations)
               </button>
-              {' '}and click "Compare" on up to 3 creators.
+              {' '}หรือหน้าค้นหา แล้วแตะปุ่ม "เปรียบเทียบ" บนครีเอเตอร์ที่สนใจ (เลือกได้สูงสุด 3 ท่าน)
             </p>
           </div>
         </div>
       )}
 
-      {/* Comparison table */}
+      {/* Comparison table / Mobile cards */}
       {comparedCreators.length > 0 && (
         <CompareCreators
           creators={comparedCreators}
@@ -89,3 +96,5 @@ export const CompareView: React.FC<CompareViewProps> = ({
     </div>
   );
 };
+
+export default CompareView;

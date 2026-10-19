@@ -53,6 +53,32 @@ class KOLCandidateModel(Base):
     provenance = Column(String(50), default="live")
 
     sample_videos = relationship("KOLSampleVideoModel", back_populates="candidate", cascade="all, delete-orphan")
+    snapshots = relationship("KOLCandidateSnapshotModel", back_populates="candidate", cascade="all, delete-orphan")
+
+
+class KOLCandidateSnapshotModel(Base):
+    """Historical snapshot of public creator metrics at collection time."""
+    __tablename__ = "kol_candidate_snapshots"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    kol_candidate_id = Column(String(36), ForeignKey("kol_candidates.id", ondelete="CASCADE"), index=True, nullable=False)
+    provider = Column(String(50), nullable=False)
+    follower_count = Column(Integer, nullable=True)
+    sample_video_count = Column(Integer, default=0)
+    total_views = Column(Integer, nullable=True)
+    total_likes = Column(Integer, nullable=True)
+    total_comments = Column(Integer, nullable=True)
+    total_shares = Column(Integer, nullable=True)
+    total_saves = Column(Integer, nullable=True)
+    average_views = Column(Float, nullable=True)
+    average_likes = Column(Float, nullable=True)
+    average_comments = Column(Float, nullable=True)
+    average_shares = Column(Float, nullable=True)
+    average_saves = Column(Float, nullable=True)
+    estimated_engagement_rate = Column(Float, nullable=True)
+    collected_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    candidate = relationship("KOLCandidateModel", back_populates="snapshots")
 
 
 class KOLSampleVideoModel(Base):

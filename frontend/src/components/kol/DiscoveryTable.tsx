@@ -2,6 +2,7 @@ import React from 'react';
 import { KOLRecommendation } from '../../types';
 import { TikTokProfileCTA } from './TikTokProfileCTA';
 import { ShieldCheck, Eye } from 'lucide-react';
+import { formatCompactNumber } from '../../lib/format';
 
 interface DiscoveryTableProps {
   creators: KOLRecommendation[];
@@ -14,49 +15,49 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
 }) => {
   if (creators.length === 0) {
     return (
-      <div className="saas-card p-10 text-center space-y-2">
-        <p className="text-sm font-semibold text-slate-800">No candidate creators found</p>
-        <p className="text-xs text-slate-500">Try adjusting your filters or resetting the search query.</p>
+      <div className="rounded-3xl border border-slate-200/90 bg-white p-10 text-center space-y-2 font-thai shadow-2xs">
+        <p className="text-sm font-black text-slate-800">ไม่พบคลิปหรือครีเอเตอร์ตามเงื่อนไข</p>
+        <p className="text-xs text-slate-500">ลองปรับตัวกรองหรือค้นหาด้วยคีย์เวิร์ดอื่น</p>
       </div>
     );
   }
 
   return (
-    <div className="saas-card overflow-hidden">
+    <div className="rounded-3xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden font-thai">
       <div className="overflow-x-auto">
         <table className="w-full text-xs text-left border-collapse">
-          <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-500 font-semibold text-[11px] uppercase tracking-wider">
+          <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-500 font-bold text-[11px] uppercase tracking-wider">
             <tr>
-              <th className="py-3.5 px-4 w-12 text-center">#</th>
-              <th className="py-3.5 px-4">Creator</th>
-              <th className="py-3.5 px-4">Category & Topics</th>
-              <th className="py-3.5 px-4 text-center">Followers</th>
-              <th className="py-3.5 px-4 text-right">Engagement</th>
-              <th className="py-3.5 px-4 text-right">Semantic Match</th>
-              <th className="py-3.5 px-4 text-right">Overall</th>
-              <th className="py-3.5 px-4 text-center">Actions</th>
+              <th className="py-4 px-4 w-12 text-center">อันดับ</th>
+              <th className="py-4 px-4">ครีเอเตอร์</th>
+              <th className="py-4 px-4">หมวดหมู่ & สัญญาณ</th>
+              <th className="py-4 px-4 text-center">ผู้ติดตาม</th>
+              <th className="py-4 px-4 text-right">Engagement</th>
+              <th className="py-4 px-4 text-right">ความตรงประเด็น</th>
+              <th className="py-4 px-4 text-right">AI Match</th>
+              <th className="py-4 px-4 text-center">การดำเนินการ</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {creators.map((creator) => (
               <tr
                 key={creator.username}
-                className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                className="hover:bg-orange-50/30 transition-colors group cursor-pointer"
                 onClick={() => onSelectCreator?.(creator)}
               >
                 {/* Rank */}
-                <td className="py-3.5 px-4 text-center font-mono text-slate-400 font-semibold">
+                <td className="py-4 px-4 text-center font-mono text-slate-400 font-black">
                   {String(creator.rank).padStart(2, '0')}
                 </td>
 
                 {/* Creator Identity */}
-                <td className="py-3.5 px-4">
+                <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/60 border border-orange-200/80 flex items-center justify-center font-black text-[#FF5A1F] text-xs shrink-0 shadow-2xs">
                       {creator.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5 truncate">
+                      <div className="font-black text-slate-900 text-xs flex items-center gap-1.5 truncate group-hover:text-[#FF5A1F] transition-colors">
                         <span>{creator.display_name}</span>
                         {creator.brand_safety_risk_level === 'safe' && (
                           <span title="Screened Brand Safe" className="inline-flex">
@@ -72,35 +73,39 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                 </td>
 
                 {/* Category & Topics */}
-                <td className="py-3.5 px-4">
+                <td className="py-4 px-4">
                   <div className="flex flex-wrap gap-1 max-w-[200px]">
                     {creator.matching_topics && creator.matching_topics.length > 0 ? (
                       creator.matching_topics.slice(0, 2).map((t, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700"
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-orange-50 text-[#C93B07] border border-orange-200/60"
                         >
                           #{t}
                         </span>
                       ))
                     ) : (
-                      <span className="text-slate-400 text-[11px]">General</span>
+                      <span className="text-slate-400 text-[11px]">ทั่วไป</span>
                     )}
                   </div>
                 </td>
 
-                {/* Followers (Public availability check) */}
-                <td className="py-3.5 px-4 text-center">
-                  <span
-                    title="Follower count is not exposed in public snapshots without authenticated creator API access."
-                    className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500 italic"
-                  >
-                    Not available
-                  </span>
+                {/* Followers */}
+                <td className="py-4 px-4 text-center">
+                  {formatCompactNumber(creator.follower_count) ? (
+                    <span
+                      title={`${creator.follower_count?.toLocaleString()} followers`}
+                      className="font-mono font-bold text-slate-800 text-xs"
+                    >
+                      {formatCompactNumber(creator.follower_count)}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 font-medium">ไม่ระบุ</span>
+                  )}
                 </td>
 
                 {/* Engagement Quality */}
-                <td className="py-3.5 px-4 text-right">
+                <td className="py-4 px-4 text-right">
                   <span className="font-mono font-bold text-slate-800 text-xs">
                     {creator.engagement_quality_score.toFixed(1)}
                   </span>
@@ -108,14 +113,14 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                 </td>
 
                 {/* Semantic Match */}
-                <td className="py-3.5 px-4 text-right">
+                <td className="py-4 px-4 text-right">
                   <div className="inline-flex flex-col items-end">
                     <span className="font-mono font-bold text-slate-900 text-xs">
                       {creator.semantic_relevance_score.toFixed(1)}
                     </span>
                     <div className="w-14 bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
                       <div
-                        className="bg-indigo-600 h-1 rounded-full"
+                        className="bg-[#FF5A1F] h-1 rounded-full transition-all duration-500"
                         style={{ width: `${creator.semantic_relevance_score}%` }}
                       />
                     </div>
@@ -123,21 +128,21 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                 </td>
 
                 {/* Overall Score */}
-                <td className="py-3.5 px-4 text-right">
-                  <span className="font-mono font-extrabold text-sm text-slate-900">
+                <td className="py-4 px-4 text-right">
+                  <span className="font-mono font-black text-sm text-[#FF5A1F]">
                     {creator.final_score.toFixed(1)}
                   </span>
                 </td>
 
                 {/* Action Buttons */}
-                <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                <td className="py-4 px-4 text-center" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-center gap-1.5">
                     <button
                       onClick={() => onSelectCreator?.(creator)}
-                      className="p-1.5 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
-                      title="View Details"
+                      className="p-2 rounded-xl text-slate-500 hover:text-[#FF5A1F] hover:bg-orange-50 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                      title="ดูข้อมูลเชิงลึก"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-4 h-4" />
                     </button>
                     <TikTokProfileCTA creator={creator} variant="table" />
                   </div>
@@ -150,3 +155,5 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
     </div>
   );
 };
+
+export default DiscoveryTable;

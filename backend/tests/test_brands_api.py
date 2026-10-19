@@ -1,4 +1,5 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+from services.facebook_provider import MockFacebookProvider
 from starlette.testclient import TestClient
 
 
@@ -39,7 +40,10 @@ def test_analyze_brand_with_mocked_live_sources(client: TestClient):
 
     with patch("core.config.settings.DEMO_MODE", False):
         with patch("services.website_provider.ProductionWebsiteProvider.extract_brand_content", return_value=mock_web):
-            with patch("services.facebook_provider.MockFacebookProvider.extract_page_content", return_value=mock_fb):
+            with patch("api.v1.endpoints.brands.get_facebook_provider") as mock_get_fb:
+                mock_fb_provider = MockFacebookProvider()
+                mock_fb_provider.extract_page_content = MagicMock(return_value=mock_fb)
+                mock_get_fb.return_value = mock_fb_provider
                 response = client.post(
                     "/api/v1/brands/analyze",
                     json={
@@ -75,7 +79,10 @@ def test_analyze_brand_partial_failure_website_only(client: TestClient):
 
     with patch("core.config.settings.DEMO_MODE", False):
         with patch("services.website_provider.ProductionWebsiteProvider.extract_brand_content", return_value=mock_web):
-            with patch("services.facebook_provider.MockFacebookProvider.extract_page_content", return_value=mock_fb_failed):
+            with patch("api.v1.endpoints.brands.get_facebook_provider") as mock_get_fb:
+                mock_fb_prov = MagicMock()
+                mock_fb_prov.extract_page_content.return_value = mock_fb_failed
+                mock_get_fb.return_value = mock_fb_prov
                 response = client.post(
                     "/api/v1/brands/analyze",
                     json={
@@ -106,7 +113,10 @@ def test_analyze_brand_total_failure_returns_422(client: TestClient):
 
     with patch("core.config.settings.DEMO_MODE", False):
         with patch("services.website_provider.ProductionWebsiteProvider.extract_brand_content", return_value=mock_web_failed):
-            with patch("services.facebook_provider.MockFacebookProvider.extract_page_content", return_value=mock_fb_failed):
+            with patch("api.v1.endpoints.brands.get_facebook_provider") as mock_get_fb:
+                mock_fb_prov = MagicMock()
+                mock_fb_prov.extract_page_content.return_value = mock_fb_failed
+                mock_get_fb.return_value = mock_fb_prov
                 response = client.post(
                     "/api/v1/brands/analyze",
                     json={

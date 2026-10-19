@@ -13,6 +13,7 @@ from schemas.matching import (
     SemanticMatchResponse,
     SemanticMatchResult,
     SemanticMatchFromBrandRequest,
+    MatchingRunStatus,
 )
 from schemas.recommendation import (
     KOLRecommendationRequest,
@@ -26,6 +27,12 @@ from services.tiktok_discovery_service import tiktok_discovery_service
 from services.kol_scorer import multi_factor_kol_scorer
 from services.scoring_config import get_scoring_weights, validate_weights
 from services.query_generator import generate_kol_search_queries
+from services.provider_exceptions import (
+    ProviderConfigurationError,
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+    ProviderError,
+)
 from api.v1.endpoints.brands import analyze_brand
 
 router = APIRouter()
@@ -291,8 +298,33 @@ def recommend_from_brand_urls(
             max_results_per_query=20,
             max_candidates=30,
         )
-        disco_res = tiktok_discovery_service.discover_and_aggregate(disco_req, db=db)
-        candidates = disco_res.candidates
+        try:
+            disco_res = tiktok_discovery_service.discover_and_aggregate(disco_req, db=db)
+            candidates = disco_res.candidates
+        except ProviderConfigurationError as e:
+            logger.warning("TikTok provider configuration error: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"TikTok live data provider is not configured: {e.message}",
+            )
+        except ProviderRateLimitError as e:
+            logger.warning("TikTok provider rate limit: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Creator discovery reached provider rate limit: {e.message}",
+            )
+        except ProviderTimeoutError as e:
+            logger.warning("TikTok provider timeout: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                detail=f"The external provider timed out: {e.message}",
+            )
+        except ProviderError as e:
+            logger.error("TikTok provider error: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Creator discovery is temporarily unavailable: {e.message}",
+            )
 
     if not candidates:
         raise HTTPException(
@@ -328,3 +360,107 @@ def recommend_from_brand_urls(
         rec_res.recommendation_count = len(rec_res.recommendations)
 
     return rec_res
+
+
+# ==============================================================================
+# Asynchronous Background Matching Run Endpoints
+# ==============================================================================
+from services.matching_run_manager import matching_run_manager
+
+
+@router.post(
+    "/runs",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Enqueue Asynchronous Brand Analysis & Creator Matching Run",
+    description="Enqueues a background matching run and returns the run_id immediately with status 'queued'.",
+)
+def create_matching_run(
+    request: KOLRecommendationFromBrandRequest,
+) -> dict:
+    run_id = matching_run_manager.start_run(request)
+    return {
+        "run_id": run_id,
+        "status": "queued",
+        "stage": "queued",
+        "progress_percent": 0,
+        "message": "Matching run queued for background execution.",
+    }
+
+
+@router.get(
+    "/runs/{run_id}",
+    response_model=MatchingRunStatus,
+    summary="Get Matching Run Status and Pipeline Progress",
+    description="Polls real-time pipeline stage, progress percentage, error status, and completed recommendation results.",
+)
+def get_matching_run(run_id: str) -> MatchingRunStatus:
+    run_status = matching_run_manager.get_run(run_id)
+    if not run_status:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Matching run '{run_id}' not found.",
+        )
+    return run_status
+
+
+@router.get(
+    "/runs",
+    response_model=List[MatchingRunStatus],
+    summary="List Recent Matching Runs",
+    description="Returns telemetry list of recent asynchronous matching runs.",
+)
+def list_matching_runs() -> List[MatchingRunStatus]:
+    return matching_run_manager.list_runs()
+
+
+@router.get(
+    "/runs/{run_id}/results",
+    summary="Get Completed Matching Run Recommendations",
+    description="Retrieves final ranked creator recommendations once the matching run reaches 'completed' state.",
+)
+def get_matching_run_results(run_id: str) -> dict:
+    run_status = matching_run_manager.get_run(run_id)
+    if not run_status:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Matching run '{run_id}' not found.",
+        )
+    if run_status.status == "failed":
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "status": "failed",
+                "message": f"Matching run failed: {run_status.error}",
+            },
+        )
+    if run_status.status != "completed" or not run_status.result:
+        raise HTTPException(
+            status_code=status.HTTP_202_ACCEPTED,
+            detail={
+                "status": run_status.status,
+                "stage": run_status.stage,
+                "progress_percent": run_status.progress_percent,
+                "message": run_status.stage_message,
+            },
+        )
+    return run_status.result
+
+
+@router.delete(
+    "/runs/{run_id}",
+    summary="Cancel Matching Run",
+    description="Cancels an active or queued background matching run.",
+)
+def cancel_matching_run(run_id: str) -> dict:
+    cancelled = matching_run_manager.cancel_run(run_id)
+    if not cancelled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Matching run '{run_id}' cannot be cancelled (may be already completed, failed, or not found).",
+        )
+    return {
+        "run_id": run_id,
+        "status": "cancelled",
+        "message": f"Matching run '{run_id}' was cancelled.",
+    }
+

@@ -13,6 +13,7 @@ import {
   Trash2,
   MessageSquare,
   Sparkles,
+  Info,
 } from 'lucide-react';
 
 interface ShortlistViewProps {
@@ -27,12 +28,12 @@ interface ShortlistViewProps {
   brandName?: string;
 }
 
-const STATUS_CONFIG: Record<OutreachStatus, { label: string; bg: string; text: string; border: string }> = {
-  shortlisted: { label: 'Shortlisted', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  contacted: { label: 'Contacted', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-  negotiating: { label: 'Negotiating', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  confirmed: { label: 'Confirmed', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  declined: { label: 'Declined', bg: 'bg-slate-100', text: 'text-slate-500', border: 'border-slate-200' },
+const STATUS_CONFIG: Record<OutreachStatus, { label: string; thaiLabel: string; bg: string; text: string; border: string }> = {
+  shortlisted: { label: 'Shortlisted', thaiLabel: 'บันทึกไว้', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  contacted: { label: 'Contacted', thaiLabel: 'ติดต่อแล้ว', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  negotiating: { label: 'Negotiating', thaiLabel: 'กำลังต่อรอง', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  confirmed: { label: 'Confirmed', thaiLabel: 'ยืนยันร่วมงาน', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  declined: { label: 'Declined', thaiLabel: 'ปฏิเสธ/ไม่ผ่าน', bg: 'bg-slate-100', text: 'text-slate-500', border: 'border-slate-200' },
 };
 
 export const ShortlistView: React.FC<ShortlistViewProps> = ({
@@ -41,7 +42,6 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
   onUpdateNotes,
   onRemoveFromShortlist,
   onRemove,
-  onClearAll: _onClearAll,
   onOpenCreatorDetail,
   onGoToRecommendations,
   brandName = 'Campaign',
@@ -52,9 +52,9 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No creators shortlisted yet"
-        description="Star creators from the Recommendations view to build your campaign roster and calculate total budget."
-        actionLabel="Browse Recommendations"
+        title="ยังไม่มีครีเอเตอร์ในรายการบันทึก"
+        description="กดไอคอนบุ๊กมาร์กหรือติดดาวครีเอเตอร์จากการค้นหา เพื่อวางแผนงบประมาณและจัดทีม KOL สำหรับแคมเปญของคุณ"
+        actionLabel="ค้นหาครีเอเตอร์เลย"
         onAction={onGoToRecommendations}
         icon={<Star className="w-5 h-5 text-amber-500" />}
       />
@@ -68,8 +68,8 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
   );
 
   const budgetMetrics = items.reduce(
-    (acc, _item) => {
-      const rate = estimateCreatorRateCard(null, null);
+    (acc, item) => {
+      const rate = estimateCreatorRateCard(item.creator.follower_count, item.creator.average_views);
       return {
         min: acc.min + rate.minRateTHB,
         max: acc.max + rate.maxRateTHB,
@@ -85,15 +85,15 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
   const handleCopyRoster = () => {
     const listText = items
       .map((item, idx) => {
-        const rate = estimateCreatorRateCard(null, null);
-        return `${idx + 1}. ${item.creator.display_name} (@${item.creator.username})\n   Status: ${STATUS_CONFIG[item.status].label} | Match: ${item.creator.final_score.toFixed(1)}/100\n   Est. Cost/Video: ${formatTHBCurrency(rate.minRateTHB)} - ${formatTHBCurrency(rate.maxRateTHB)}\n   Notes: ${item.notes || 'None'}`;
+        const rate = estimateCreatorRateCard(item.creator.follower_count, item.creator.average_views);
+        return `${idx + 1}. ${item.creator.display_name} (@${item.creator.username})\n   สถานะ: ${STATUS_CONFIG[item.status].thaiLabel} (${STATUS_CONFIG[item.status].label}) | แมตช์: ${item.creator.final_score.toFixed(1)}/100\n   ประเมินค่าจ้าง/คลิป: ${formatTHBCurrency(rate.minRateTHB)} - ${formatTHBCurrency(rate.maxRateTHB)}\n   บันทึก: ${item.notes || '-'}`;
       })
       .join('\n\n');
 
     const text = `🎯 THAIKOL AI · CAMPAIGN ROSTER & BUDGET PLANNER
-Brand: ${brandName}
-Creators Shortlisted: ${items.length} (Confirmed: ${confirmedCount})
-Est. Total Campaign Budget: ${formatTHBCurrency(budgetMetrics.min)} - ${formatTHBCurrency(budgetMetrics.max)} (Avg: ${formatTHBCurrency(budgetMetrics.avg)})
+แบรนด์/แคมเปญ: ${brandName}
+จำนวนครีเอเตอร์: ${items.length} คน (ยืนยันแล้ว: ${confirmedCount} คน)
+ประมาณการงบประมาณรวม: ${formatTHBCurrency(budgetMetrics.min)} - ${formatTHBCurrency(budgetMetrics.max)} (เฉลี่ย: ${formatTHBCurrency(budgetMetrics.avg)})
 =====================================================
 
 ${listText}
@@ -120,7 +120,7 @@ ${listText}
     ];
 
     const rows = items.map((item) => {
-      const rate = estimateCreatorRateCard(null, null);
+      const rate = estimateCreatorRateCard(item.creator.follower_count, item.creator.average_views);
       return [
         `"${item.creator.username}"`,
         `"${item.creator.display_name.replace(/"/g, '""')}"`,
@@ -146,133 +146,146 @@ ${listText}
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5 max-w-5xl mx-auto">
+      {/* ─── Header ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Campaign Shortlist & Outreach Pipeline
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              รายการบันทึกแคมเปญ & การติดต่อ
             </h1>
-            <span className="badge badge-neutral font-mono font-bold">
-              {items.length} Creators
+            <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 font-mono font-bold text-xs px-2.5 py-0.5 rounded-full">
+              {items.length} ครีเอเตอร์
             </span>
           </div>
-          <p className="text-xs text-slate-500">
-            Track influencer outreach, negotiation stages, and commercial rate card budgets for {brandName}.
+          <p className="text-xs text-slate-500 font-medium">
+            ติดตามสถานะการติดต่อ ต่อรองราคา และประเมินงบประมาณแคมเปญสำหรับ {brandName}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
           <button
+            type="button"
             onClick={handleCopyRoster}
-            className="btn-secondary text-xs px-3.5 py-2 gap-1.5"
+            className="flex-1 sm:flex-initial btn-secondary text-xs px-4 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer rounded-full font-semibold"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-            <span>{copied ? 'Roster Copied' : 'Copy Roster Brief'}</span>
+            <span>{copied ? 'คัดลอกสรุปแล้ว' : 'คัดลอกสรุป (Brief)'}</span>
           </button>
           <button
+            type="button"
             onClick={handleDownloadCSV}
-            className="btn-primary text-xs px-4 py-2 gap-1.5"
+            className="flex-1 sm:flex-initial btn-orange text-xs px-5 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer shadow-xs rounded-full font-bold"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Shortlist CSV</span>
+            <span>ส่งออก CSV</span>
           </button>
         </div>
       </div>
 
-      {/* Aggregate KPI Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ─── Aggregate KPI Overview (Mobile 2x2 Grid) ───────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         {/* Roster Size */}
-        <div className="saas-card p-4">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase text-slate-400">Roster Pipeline</span>
-            <Star className="w-4 h-4 text-amber-500" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+              ขนาดทีม (Roster)
+            </span>
+            <Star className="w-4 h-4 text-[#FF5A1F] fill-[#FF5A1F]/20" />
           </div>
-          <div className="text-2xl font-black text-slate-900 font-mono mt-1">
-            {items.length}
+          <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
+            {items.length} <span className="text-xs font-normal text-slate-400">คน</span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
-            {confirmedCount} confirmed · {items.length - confirmedCount} in progress
+          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+            {confirmedCount} ยืนยัน · {items.length - confirmedCount} กำลังคุย
           </div>
         </div>
 
         {/* Estimated Budget Range */}
-        <div className="saas-card p-4">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase text-slate-400">Est. Total Budget</span>
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+              งบเฉลี่ย (Est. Budget)
+            </span>
             <DollarSign className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-black text-emerald-600 font-mono mt-1">
+          <div className="text-base sm:text-xl font-black text-emerald-600 font-mono truncate">
             {formatTHBCurrency(budgetMetrics.avg)}
           </div>
-          <div className="text-[10px] text-slate-400 mt-0.5">
-            Range: {formatTHBCurrency(budgetMetrics.min)} - {formatTHBCurrency(budgetMetrics.max)}
+          <div className="text-[9px] sm:text-[10px] text-slate-400 truncate">
+            {formatTHBCurrency(budgetMetrics.min)} - {formatTHBCurrency(budgetMetrics.max)}
           </div>
         </div>
 
         {/* Est Combined Reach */}
-        <div className="saas-card p-4">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase text-slate-400">Est. Combined Reach</span>
-            <Users className="w-4 h-4 text-indigo-500" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+              ผู้ติดตามรวม (Reach)
+            </span>
+            <Users className="w-4 h-4 text-[#FF5A1F]" />
           </div>
-          <div className="text-2xl font-black text-slate-900 font-mono mt-1">
+          <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
             ~{(totalFollowers / 1000).toFixed(0)}k
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
-            Follower audience pool
+          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+            ฐานผู้ติดตามรวม
           </div>
         </div>
 
         {/* Average Match Quality */}
-        <div className="saas-card p-4">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase text-slate-400">Team Match Score</span>
-            <Sparkles className="w-4 h-4 text-cyan-500" />
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+              คะแนนเฉลี่ย (Fit)
+            </span>
+            <Sparkles className="w-4 h-4 text-[#FF5A1F]" />
           </div>
-          <div className="text-2xl font-black text-slate-900 font-mono mt-1">
+          <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
             {(items.reduce((s, i) => s + i.creator.final_score, 0) / items.length).toFixed(1)}
             <span className="text-xs text-slate-400 font-normal"> / 100</span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
-            5-factor composite mean
+          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+            ค่าเฉลี่ย 5 ปัจจัย
           </div>
         </div>
       </div>
 
-      {/* Shortlist Table / Cards */}
-      <div className="saas-card overflow-hidden divide-y divide-slate-100">
-        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-            Shortlisted Influencers & Rate Cards
+      {/* ─── Shortlist Cards List ────────────────────────────────────── */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden divide-y divide-slate-100">
+        <div className="px-4 sm:px-6 py-3.5 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#FF5A1F]" />
+            <span>รายชื่อครีเอเตอร์และสถานะการติดต่อ</span>
           </span>
-          <span className="text-[11px] text-slate-400">
-            Market rate benchmarks for Thailand digital campaigns
+          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+            ประเมินตามอัตราตลาดในประเทศไทย
           </span>
         </div>
 
         {items.map((item) => {
-          const rate = estimateCreatorRateCard(null, null);
+          const rate = estimateCreatorRateCard(item.creator.follower_count, item.creator.average_views);
           const currentStatus = STATUS_CONFIG[item.status];
 
           return (
-            <div key={item.username} className="p-5 hover:bg-slate-50/50 transition space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div key={item.username} className="p-4 sm:p-5 hover:bg-slate-50/40 transition space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 {/* Identity */}
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-sm shrink-0">
-                    {item.creator.display_name.charAt(0)}
+                <div className="flex items-start gap-3.5 min-w-0">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-slate-100 border border-slate-200/90 text-slate-900 flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
+                    {item.creator.display_name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <button
+                        type="button"
                         onClick={() => onOpenCreatorDetail(item.creator)}
-                        className="font-bold text-slate-900 hover:text-indigo-600 transition text-sm cursor-pointer"
+                        className="font-bold text-slate-900 hover:text-[#FF5A1F] transition text-sm sm:text-base cursor-pointer truncate text-left"
                       >
                         {item.creator.display_name}
                       </button>
-                      <span className="text-xs font-mono text-slate-400">
+                      <span className="text-xs font-mono text-slate-400 truncate">
                         @{item.creator.username}
                       </span>
                     </div>
@@ -280,11 +293,11 @@ ${listText}
                       <span className="badge badge-neutral text-[10px]">
                         {rate.tierLabel}
                       </span>
-                      <span className="badge badge-neutral text-[10px] font-mono font-bold text-indigo-600">
-                        Match: {item.creator.final_score.toFixed(1)}/100
+                      <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 text-[10px] font-mono font-bold">
+                        Fit: {item.creator.final_score.toFixed(1)}/100
                       </span>
                       {item.creator.matching_topics.slice(0, 2).map((t, i) => (
-                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span key={i} className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
                           #{t}
                         </span>
                       ))}
@@ -292,59 +305,73 @@ ${listText}
                   </div>
                 </div>
 
-                {/* Status Selector & Rate Card */}
-                <div className="flex flex-wrap items-center gap-3">
+                {/* Status Selector & Rate Card Row */}
+                <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 pt-1 sm:pt-0">
                   {/* Commercial Rate Card */}
-                  <div className="text-right px-3 py-1.5 rounded-lg bg-emerald-50/60 border border-emerald-100">
-                    <div className="text-[10px] uppercase font-bold text-emerald-700">
-                      Est. Rate / Video
+                  <div className="px-3 py-1.5 rounded-xl bg-emerald-50/70 border border-emerald-100 text-left sm:text-right">
+                    <div className="text-[9px] uppercase font-bold text-emerald-700">
+                      ประมาณการค่าจ้าง / คลิป
                     </div>
                     <div className="text-xs font-black text-emerald-800 font-mono">
                       {formatTHBCurrency(rate.minRateTHB)} - {formatTHBCurrency(rate.maxRateTHB)}
                     </div>
                   </div>
 
-                  {/* Status Dropdown */}
-                  <select
-                    value={item.status}
-                    onChange={(e) => onUpdateStatus(item.username, e.target.value as OutreachStatus)}
-                    className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border cursor-pointer ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border}`}
-                  >
-                    <option value="shortlisted">⭐ Shortlisted</option>
-                    <option value="contacted">📩 Contacted</option>
-                    <option value="negotiating">🤝 Negotiating</option>
-                    <option value="confirmed">✅ Confirmed</option>
-                    <option value="declined">❌ Declined</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    {/* Status Dropdown */}
+                    <select
+                      value={item.status}
+                      onChange={(e) => onUpdateStatus(item.username, e.target.value as OutreachStatus)}
+                      className={`text-xs font-bold px-3 py-2 rounded-xl border cursor-pointer min-h-[44px] ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border}`}
+                    >
+                      <option value="shortlisted">⭐ บันทึกไว้</option>
+                      <option value="contacted">📩 ติดต่อแล้ว</option>
+                      <option value="negotiating">🤝 กำลังต่อรอง</option>
+                      <option value="confirmed">✅ ยืนยันร่วมงาน</option>
+                      <option value="declined">❌ ไม่ผ่าน/ปฏิเสธ</option>
+                    </select>
 
-                  <TikTokProfileCTA creator={item.creator} variant="inline" />
+                    <TikTokProfileCTA creator={item.creator} variant="inline" />
 
-                  {/* Remove Button */}
-                  <button
-                    onClick={() => (onRemoveFromShortlist ? onRemoveFromShortlist(item.username) : onRemove?.(item.username))}
-                    className="p-1.5 text-slate-300 hover:text-rose-500 transition rounded-lg hover:bg-rose-50"
-                    title="Remove from shortlist"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    {/* Remove Button */}
+                    <button
+                      type="button"
+                      onClick={() => (onRemoveFromShortlist ? onRemoveFromShortlist(item.username) : onRemove?.(item.username))}
+                      className="w-10 h-10 rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition flex items-center justify-center cursor-pointer min-h-[44px] min-w-[44px]"
+                      title="ลบออกจากรายการบันทึก"
+                      aria-label="ลบออกจากรายการบันทึก"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Notes Field */}
-              <div className="flex items-center gap-2 pt-1">
+              {/* Campaign Notes Field */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                 <MessageSquare className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 <input
                   type="text"
-                  placeholder="Add agency campaign notes (e.g. Line contact, deliverables, special discount, briefing status)..."
+                  placeholder="บันทึกเพิ่มเติม (เช่น ไลน์ติดต่อ, รายละเอียดบรีฟ, เงื่อนไขพิเศษ)..."
                   defaultValue={item.notes || ''}
                   onBlur={(e) => onUpdateNotes(item.username, e.target.value)}
-                  className="w-full text-xs text-slate-700 bg-transparent border-b border-transparent hover:border-slate-200 focus:border-indigo-400 focus:outline-none transition py-0.5"
+                  className="w-full text-xs text-slate-700 bg-transparent border-b border-transparent hover:border-slate-200 focus:border-[#FF5A1F] focus:outline-none transition py-1 font-thai"
                 />
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Persistence Note Footer */}
+      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-2 text-[11px] text-slate-500">
+        <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <span>
+          รายการบันทึกนี้ถูกจัดเก็บไว้ในเบราว์เซอร์ของอุปกรณ์นี้ (Local Browser Storage) โดยอัตโนมัติ
+        </span>
+      </div>
     </div>
   );
 };
+
+export default ShortlistView;

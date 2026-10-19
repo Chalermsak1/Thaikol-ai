@@ -12,6 +12,14 @@ if str(backend_dir) not in sys.path:
 from main import app
 
 
+@pytest.fixture(autouse=True)
+def ensure_test_mode(monkeypatch):
+    """Ensures test suite defaults to deterministic DEMO_MODE unless explicitly testing live mode."""
+    from core.config import settings
+    monkeypatch.setattr(settings, "DEMO_MODE", True)
+    monkeypatch.setattr(settings, "APIFY_API_TOKEN", None)
+
+
 @pytest.fixture(scope="session")
 def client():
     """Yields FastAPI test client instance."""

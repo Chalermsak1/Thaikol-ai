@@ -5,14 +5,27 @@ import uuid
 from sqlalchemy.orm import Session
 
 from core.logging import logger
-from models.kol import KOLCandidateModel, KOLSampleVideoModel, KOLDiscoveryRunModel
+from models.kol import (
+    KOLCandidateModel,
+    KOLCandidateSnapshotModel,
+    KOLSampleVideoModel,
+    KOLDiscoveryRunModel,
+)
 from schemas.kol import (
     TikTokDiscoveryRequest,
     TikTokDiscoveryResponse,
     TikTokVideo,
     KOLCandidate,
 )
+from services.freshness import calculate_data_freshness
 from services.interfaces import TikTokProvider
+from services.provider_exceptions import (
+    ProviderAuthenticationError,
+    ProviderConfigurationError,
+    ProviderError,
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+)
 from services.tiktok_provider import get_tiktok_provider
 from services.tiktok_signals import (
     calculate_thai_language_ratio,
@@ -105,7 +118,13 @@ class TikTokDiscoveryService:
     """Discovers, normalizes, deduplicates, and aggregates public TikTok creators."""
 
     def __init__(self, provider: Optional[TikTokProvider] = None):
-        self.provider = provider or get_tiktok_provider()
+        self._provider = provider
+
+    @property
+    def provider(self) -> TikTokProvider:
+        if self._provider is not None:
+            return self._provider
+        return get_tiktok_provider()
 
     def discover_and_aggregate(
         self,
@@ -144,6 +163,7 @@ class TikTokDiscoveryService:
 
         # Step 1: Collect raw video results from provider for all queries
         raw_items: List[Dict[str, Any]] = []
+        provider_exception: Optional[Exception] = None
         for q in request.queries:
             try:
                 items = self.provider.discover_kols_by_keywords(
@@ -153,8 +173,27 @@ class TikTokDiscoveryService:
                     if "matched_query" not in it:
                         it["matched_query"] = q
                 raw_items.extend(items)
+            except (
+                ProviderConfigurationError,
+                ProviderRateLimitError,
+                ProviderAuthenticationError,
+                ProviderTimeoutError,
+            ) as err:
+                logger.error("Provider error for query '%s': %s", q, err)
+                provider_exception = err
+                break
             except Exception as err:
                 logger.error("Error discovering videos for query '%s': %s", q, err)
+
+        if not raw_items and provider_exception is not None:
+            if discovery_run_record and db:
+                try:
+                    discovery_run_record.status = "failed"
+                    discovery_run_record.error = str(provider_exception)
+                    db.commit()
+                except Exception:
+                    pass
+            raise provider_exception
 
         # Step 2: Normalize into TikTokVideo instances
         now_iso = datetime.now(timezone.utc).isoformat()
@@ -182,6 +221,8 @@ class TikTokDiscoveryService:
                     "profile_status": vid.profile_status,
                     "bio": vid.creator_bio,
                     "follower_count": vid.follower_count,
+                    "avatar_url": vid.creator_avatar_url,
+                    "video_thumbnail_url": vid.video_thumbnail_url,
                     "sample_videos": {},
                     "matched_queries": set(),
                     "hashtags": set(),
@@ -193,6 +234,12 @@ class TikTokDiscoveryService:
                 }
 
             entry = candidates_map[norm_handle]
+
+            # Update avatar or thumbnail if previously missing
+            if vid.creator_avatar_url and not entry.get("avatar_url"):
+                entry["avatar_url"] = vid.creator_avatar_url
+            if vid.video_thumbnail_url and not entry.get("video_thumbnail_url"):
+                entry["video_thumbnail_url"] = vid.video_thumbnail_url
 
             # Update follower count if higher or if previously missing
             if vid.follower_count is not None:
@@ -281,6 +328,8 @@ class TikTokDiscoveryService:
                 profile_status=data["profile_status"],
                 bio=data["bio"],
                 follower_count=followers,
+                avatar_url=data.get("avatar_url"),
+                video_thumbnail_url=data.get("video_thumbnail_url"),
                 sample_video_count=sample_video_count,
                 total_views=total_views,
                 total_likes=total_likes,
@@ -303,7 +352,7 @@ class TikTokDiscoveryService:
                 local_signal_score=local_score,
                 data_source=data["data_source"],
                 collected_at=data["collected_at"],
-                data_freshness="fresh",
+                data_freshness=calculate_data_freshness(data["collected_at"]),
                 is_demo_fixture=data["is_demo_fixture"],
                 provenance=data["provenance"],
             )
@@ -432,6 +481,28 @@ class TikTokDiscoveryService:
                                 collected_at=datetime.now(timezone.utc),
                             )
                             db.add(sample_vid_model)
+
+                    # Persist point-in-time snapshot to track historical metrics safely
+                    snapshot_model = KOLCandidateSnapshotModel(
+                        id=str(uuid.uuid4()),
+                        kol_candidate_id=target_model.id,
+                        provider=cand.data_source or "live",
+                        follower_count=cand.follower_count,
+                        sample_video_count=cand.sample_video_count,
+                        total_views=cand.total_views,
+                        total_likes=cand.total_likes,
+                        total_comments=cand.total_comments,
+                        total_shares=cand.total_shares,
+                        total_saves=cand.total_saves,
+                        average_views=cand.average_views,
+                        average_likes=cand.average_likes,
+                        average_comments=cand.average_comments,
+                        average_shares=cand.average_shares,
+                        average_saves=cand.average_saves,
+                        estimated_engagement_rate=cand.estimated_engagement_rate,
+                        collected_at=datetime.now(timezone.utc),
+                    )
+                    db.add(snapshot_model)
 
                 # Update discovery run record
                 if discovery_run_record:

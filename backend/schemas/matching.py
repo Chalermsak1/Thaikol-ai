@@ -61,3 +61,18 @@ class SemanticMatchFromBrandRequest(BaseModel):
     kol_candidates: Optional[List[KOLCandidate]] = Field(
         None, description="Optional candidates list; defaults to standard discovered candidates if omitted"
     )
+
+
+class MatchingRunStatus(BaseModel):
+    """Execution status and progress telemetry for an asynchronous matching run."""
+    run_id: str = Field(..., description="Unique matching run UUID")
+    status: str = Field(..., description="Overall status: queued | running | completed | failed")
+    stage: str = Field(..., description="Current pipeline stage: queued | brand_analysis | query_generation | tiktok_discovery | normalization | enrichment | embedding | scoring | completed | failed")
+    progress_percent: int = Field(default=0, ge=0, le=100, description="Actual progress percentage (0-100)")
+    stage_message: str = Field(default="", description="Descriptive status of the active pipeline stage")
+    brand_name: Optional[str] = Field(None, description="Target brand name once analyzed")
+    candidate_count: Optional[int] = Field(None, description="Count of candidate creators evaluated")
+    error: Optional[str] = Field(None, description="Error message if execution failed")
+    started_at: str = Field(..., description="ISO 8601 UTC timestamp of run initialization")
+    completed_at: Optional[str] = Field(None, description="ISO 8601 UTC timestamp of run completion")
+    result: Optional[Any] = Field(None, description="Final recommendation result once completed")

@@ -17,6 +17,23 @@ export default {
           cyan: '#25f4ee',
           dark: '#010101',
         },
+        brand: {
+          orange: '#FF5A1F',
+          'orange-hover': '#E54911',
+          'orange-light': '#FFF3EB',
+          'orange-subtle': '#FFF8F4',
+          'orange-dark': '#C93B07',
+          dark: '#14171F',
+          surface: '#F8F9FA',
+        },
+        creator: {
+          orange: '#FF5A1F',
+          lime: '#bef224',
+          'lime-hover': '#addf18',
+          dark: '#13161c',
+          card: '#1a1e27',
+          surface: '#f6f8fa',
+        },
       },
       boxShadow: {
         '2xs': '0 1px 2px 0 rgba(0,0,0,0.04)',

@@ -71,9 +71,24 @@ class KOLRecommendation(BaseModel):
     cautions: List[str] = Field(default_factory=list, description="Deterministic caution and review flags")
     matching_topics: List[str] = Field(default_factory=list, description="Deterministic thematic overlap")
 
+    # Observed public creator metrics (passed through from KOLCandidate; None when not exposed by provider)
+    bio: Optional[str] = Field(None, description="Public creator bio (OBSERVED)")
+    follower_count: Optional[int] = Field(None, ge=0, description="Public follower count (OBSERVED)")
+    sample_video_count: int = Field(default=0, ge=0, description="Number of sampled videos aggregated")
+    average_views: Optional[float] = Field(None, ge=0.0, description="Average views across sampled videos (DERIVED)")
+    average_likes: Optional[float] = Field(None, ge=0.0, description="Average likes across sampled videos (DERIVED)")
+    average_comments: Optional[float] = Field(None, ge=0.0, description="Average comments across sampled videos (DERIVED)")
+    average_shares: Optional[float] = Field(None, ge=0.0, description="Average shares across sampled videos (DERIVED)")
+    estimated_engagement_rate: Optional[float] = Field(None, ge=0.0, description="Estimated engagement rate (DERIVED)")
+    sample_captions: List[str] = Field(default_factory=list, description="Sampled public video captions (OBSERVED)")
+    hashtags: List[str] = Field(default_factory=list, description="Aggregated public hashtags (OBSERVED)")
+    avatar_url: Optional[str] = Field(None, description="Creator profile avatar URL if available")
+    video_thumbnail_url: Optional[str] = Field(None, description="Featured sample video thumbnail URL if available")
+
     # Provenance tracking
     data_source: str = Field(default="live", description="Origin: live | demo_fixture | apify")
     collected_at: str = Field(..., description="ISO 8601 collection timestamp")
+    data_freshness: str = Field(default="fresh", description="Data freshness status: fresh | aging | stale | unknown")
     is_demo_fixture: bool = Field(default=False, description="True if synthetic or curated fixture")
     provenance: str = Field(default="live", description="Data provenance tracker")
 

@@ -22,17 +22,28 @@ class LocalSentenceTransformerEmbeddingService(EmbeddingService):
         self.dimension = 384  # Standard dimension for paraphrase-multilingual-MiniLM-L12-v2
 
     def _get_model(self):
-        if self._model_instance is None:
+        if hasattr(self, "_model_instance") and self._model_instance is not None:
+            return self._model_instance
+        if LocalSentenceTransformerEmbeddingService._model_instance is None:
             with self._model_lock:
-                if self._model_instance is None:
+                if LocalSentenceTransformerEmbeddingService._model_instance is None:
                     try:
                         from sentence_transformers import SentenceTransformer
                         logger.info("Loading local SentenceTransformer model: %s", self.model_name)
-                        self._model_instance = SentenceTransformer(self.model_name)
+                        try:
+                            # 1. Fast load from local disk cache without HF Hub network roundtrips
+                            LocalSentenceTransformerEmbeddingService._model_instance = SentenceTransformer(
+                                self.model_name, local_files_only=True
+                            )
+                        except Exception as local_err:
+                            logger.info("Local model cache miss (%s), downloading from HuggingFace Hub...", local_err)
+                            LocalSentenceTransformerEmbeddingService._model_instance = SentenceTransformer(
+                                self.model_name, local_files_only=False
+                            )
                     except Exception as err:
                         logger.error("Failed to load SentenceTransformer model %s: %s", self.model_name, err)
                         raise RuntimeError(f"Embedding model unavailable: {str(err)}") from err
-        return self._model_instance
+        return LocalSentenceTransformerEmbeddingService._model_instance
 
     def _cache_key(self, text: str) -> str:
         text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -111,3 +122,5 @@ local_embedding_service = LocalSentenceTransformerEmbeddingService()
 def get_embedding_service() -> EmbeddingService:
     """Factory returning the active EmbeddingService instance."""
     return local_embedding_service
+
+

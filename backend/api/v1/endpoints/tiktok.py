@@ -13,6 +13,12 @@ from schemas.kol import (
     KOLDiscoveryRunResponse,
 )
 from services.tiktok_discovery_service import tiktok_discovery_service
+from services.provider_exceptions import (
+    ProviderConfigurationError,
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+    ProviderError,
+)
 
 router = APIRouter()
 
@@ -52,6 +58,30 @@ def discover_tiktok_creators(
             db=db,
         )
         return response
+    except ProviderConfigurationError as e:
+        logger.warning("TikTok provider configuration error: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"TikTok live data provider is not configured: {e.message}",
+        )
+    except ProviderRateLimitError as e:
+        logger.warning("TikTok provider rate limit: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Creator discovery reached provider rate limit: {e.message}",
+        )
+    except ProviderTimeoutError as e:
+        logger.warning("TikTok provider timeout: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail=f"The external provider timed out: {e.message}",
+        )
+    except ProviderError as e:
+        logger.error("TikTok provider error: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Creator discovery is temporarily unavailable: {e.message}",
+        )
     except Exception as e:
         logger.error("TikTok discovery pipeline failed: %s", e)
         raise HTTPException(

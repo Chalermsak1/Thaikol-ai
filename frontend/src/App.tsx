@@ -4,10 +4,18 @@ import {
   RecommendationResponse,
   KOLRecommendation,
   HealthData,
+  ProviderHealthResponse,
   ShortlistItem,
   OutreachStatus,
 } from './types';
-import { recommendFromBrand, getHealthStatus } from './lib/api';
+import {
+  recommendFromBrand,
+  getHealthStatus,
+  getProvidersHealth,
+  createMatchingRun,
+  getMatchingRunStatus,
+  getMatchingRunResults,
+} from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardView } from './pages/DashboardView';
 import { AnalyzeBrandView } from './pages/AnalyzeBrandView';
@@ -49,6 +57,7 @@ export const App: React.FC = () => {
   const [pipelineStage, setPipelineStage] = useState(0);
   const [result, setResult] = useState<RecommendationResponse | null>(saved?.result ?? null);
   const [error, setError] = useState<string | null>(null);
+  const [discoveryQuery, setDiscoveryQuery] = useState<string>('');
 
   // Compare List State
   const [comparisonList, setComparisonList] = useState<string[]>(saved?.comparisonList ?? []);
@@ -60,29 +69,22 @@ export const App: React.FC = () => {
   const [selectedCreatorForDrawer, setSelectedCreatorForDrawer] = useState<KOLRecommendation | null>(null);
   const [isEvidenceDrawerOpen, setIsEvidenceDrawerOpen] = useState(false);
 
-  // Health State
+  // Health & Provider State
   const [health, setHealth] = useState<HealthData | null>(null);
+  const [providerHealth, setProviderHealth] = useState<ProviderHealthResponse | null>(null);
 
-  // Fetch API Health on mount
+  // Fetch API Health & Provider Status on mount
   useEffect(() => {
     getHealthStatus()
       .then(setHealth)
       .catch(() => console.warn('Backend offline or using fallback'));
+
+    getProvidersHealth()
+      .then(setProviderHealth)
+      .catch(() => console.warn('Provider health status endpoint unavailable'));
   }, []);
 
-  // Multi-stage progress ticker while loading
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    if (isLoading) {
-      setPipelineStage(0);
-      interval = setInterval(() => {
-        setPipelineStage((prev) => (prev < 7 ? prev + 1 : prev));
-      }, 650);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isLoading]);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Main Analyze Workflow
   const handleAnalyze = async (webOverride?: string, fbOverride?: string) => {
@@ -96,27 +98,90 @@ export const App: React.FC = () => {
 
     setIsLoading(true);
     setError(null);
+    setPipelineStage(0);
+    setElapsedSeconds(0);
+
+    // Track elapsed time accurately
+    const startTime = Date.now();
+    const elapsedInterval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    const stageMap: Record<string, number> = {
+      queued: 1,
+      brand_analysis: 2,
+      query_generation: 4,
+      tiktok_discovery: 5,
+      normalization: 6,
+      enrichment: 6,
+      embedding: 7,
+      scoring: 7,
+      completed: 8,
+    };
 
     try {
-      const data = await recommendFromBrand({
-        website_url: web || undefined,
-        facebook_page_url: fb || undefined,
-        limit: 10,
-      });
+      let data: RecommendationResponse | null = null;
 
-      setResult(data);
+      // Primary strategy: Asynchronous matching run with real backend progress telemetry
+      try {
+        const run = await createMatchingRun({
+          website_url: web || undefined,
+          facebook_page_url: fb || undefined,
+          limit: 10,
+        });
 
-      // Pre-populate comparison list with top 2 creators for immediate usability
-      if (data.recommendations && data.recommendations.length >= 2) {
-        setComparisonList([
-          data.recommendations[0].username,
-          data.recommendations[1].username,
-        ]);
+        const runId = run.run_id;
+        let isDone = false;
+        let pollCount = 0;
+        const maxPolls = 120; // 120 * 800ms = ~96 seconds max
+
+        while (!isDone && pollCount < maxPolls) {
+          await new Promise((r) => setTimeout(r, 800));
+          pollCount++;
+          const status = await getMatchingRunStatus(runId);
+          if (status.stage && stageMap[status.stage]) {
+            setPipelineStage(stageMap[status.stage]);
+          }
+          if (status.status === 'completed') {
+            isDone = true;
+            data = status.result ?? (await getMatchingRunResults(runId));
+          } else if (status.status === 'failed') {
+            throw new Error(status.error || 'Matching run failed.');
+          }
+        }
+
+        if (!isDone) {
+          throw new Error('Pipeline timed out waiting for external creator discovery.');
+        }
+      } catch (asyncErr: any) {
+        // If async endpoint failed to start, gracefully fallback to synchronous matching endpoint
+        console.warn('Async run pipeline unavailable, falling back to sync:', asyncErr);
+        data = await recommendFromBrand({
+          website_url: web || undefined,
+          facebook_page_url: fb || undefined,
+          limit: 10,
+        });
       }
 
-      // Automatically transition to recommendations view to see results
-      setActivePage('recommendations');
+      clearInterval(elapsedInterval);
+      setPipelineStage(8);
+
+      if (data) {
+        setResult(data);
+
+        // Pre-populate comparison list with top 2 creators for immediate usability
+        if (data.recommendations && data.recommendations.length >= 2) {
+          setComparisonList([
+            data.recommendations[0].username,
+            data.recommendations[1].username,
+          ]);
+        }
+
+        // Automatically transition to recommendations view to see results
+        setActivePage('recommendations');
+      }
     } catch (err: any) {
+      clearInterval(elapsedInterval);
       const detail = err.response?.data?.detail;
       let errMsg = 'Failed to execute recommendation engine. Please verify the URL inputs.';
       if (typeof detail === 'object' && detail !== null) {
@@ -128,6 +193,7 @@ export const App: React.FC = () => {
       }
       setError(errMsg);
     } finally {
+      clearInterval(elapsedInterval);
       setIsLoading(false);
     }
   };
@@ -250,6 +316,7 @@ export const App: React.FC = () => {
       onRunDemo={handleRunDemo}
       isLoading={isLoading}
       demoModeActive={health?.demo_mode ?? true}
+      providerHealth={providerHealth}
       onResetSession={handleResetSession}
     >
       {/* View Routing */}
@@ -258,9 +325,20 @@ export const App: React.FC = () => {
           result={result}
           onSelectPage={setActivePage}
           onRunDemo={handleRunDemo}
-          isLoading={isLoading}
+          onAnalyzePreset={(web, fb) => {
+            setWebsiteUrl(web);
+            setFacebookUrl(fb);
+            handleAnalyze(web, fb);
+          }}
           onOpenEvidence={() => setIsEvidenceDrawerOpen(true)}
           onResetSession={handleResetSession}
+          onSearchKOL={(q) => {
+            setDiscoveryQuery(q);
+            setActivePage('discovery');
+          }}
+          onSelectCreator={(c) => setSelectedCreatorForDrawer(c)}
+          shortlist={shortlist}
+          onToggleShortlist={handleToggleShortlist}
         />
       )}
 
@@ -273,9 +351,16 @@ export const App: React.FC = () => {
           onAnalyze={handleAnalyze}
           isLoading={isLoading}
           pipelineStage={pipelineStage}
+          elapsedSeconds={elapsedSeconds}
+          isLive={!(health?.demo_mode ?? true)}
           result={result}
           error={error}
           onSelectPage={setActivePage}
+          onOpenEvidence={() => setIsEvidenceDrawerOpen(true)}
+          onSearchKOL={(q) => {
+            setDiscoveryQuery(q);
+            setActivePage('discovery');
+          }}
         />
       )}
 
@@ -285,6 +370,11 @@ export const App: React.FC = () => {
           onOpenEvidence={() => setIsEvidenceDrawerOpen(true)}
           onGoToDashboard={() => setActivePage('dashboard')}
           onGoToAnalyze={() => setActivePage('analyze')}
+          onGoToRecommendations={() => setActivePage('recommendations')}
+          onSearchKOL={(q) => {
+            setDiscoveryQuery(q);
+            setActivePage('discovery');
+          }}
         />
       )}
 
@@ -294,6 +384,9 @@ export const App: React.FC = () => {
           onSelectCreator={(c) => setSelectedCreatorForDrawer(c)}
           onGoToDashboard={() => setActivePage('dashboard')}
           onGoToAnalyze={() => setActivePage('analyze')}
+          shortlist={shortlist}
+          onToggleShortlist={handleToggleShortlist}
+          initialQuery={discoveryQuery}
         />
       )}
 
@@ -341,10 +434,14 @@ export const App: React.FC = () => {
         />
       )}
 
-      {activePage === 'sources' && <DataSourcesView />}
+      {activePage === 'sources' && <DataSourcesView providerHealth={providerHealth} />}
 
       {activePage === 'technical' && (
-        <TechnicalView demoMode={health?.demo_mode ?? true} />
+        <TechnicalView
+          demoMode={health?.demo_mode ?? true}
+          providerHealth={providerHealth}
+          onGoToDashboard={() => setActivePage('dashboard')}
+        />
       )}
 
       {/* Slide-over Drawers */}

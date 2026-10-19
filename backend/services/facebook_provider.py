@@ -79,7 +79,6 @@ class MockFacebookProvider(FacebookProvider):
                 error=None,
             )
         else:
-            # Generic fallback mock for other URLs
             slug = clean_url.split("/")[-1].replace("-", " ").title()
             result = FacebookPageContent(
                 page_url=clean_url,
@@ -108,12 +107,30 @@ class MockFacebookProvider(FacebookProvider):
         return data
 
 
+class UnconfiguredFacebookProvider(FacebookProvider):
+    """Signals that Facebook extraction was requested in LIVE mode without configured provider."""
+
+    def extract_page_content(self, page_url: str) -> Dict[str, Any]:
+        clean_url = page_url.strip()
+        logger.warning(
+            "Live Facebook extraction requested for '%s', but APIFY_API_TOKEN is not configured.",
+            clean_url,
+        )
+        return FacebookPageContent(
+            page_url=clean_url,
+            extracted_at=datetime.now(timezone.utc).isoformat(),
+            extraction_status="failed",
+            error="Live Facebook data provider is not configured. APIFY_API_TOKEN is missing from environment.",
+        ).model_dump()
+
+
 class ApifyFacebookProvider(FacebookProvider):
     """Apify-backed Facebook scraper for extracting public page details and posts."""
 
     def __init__(self, api_token: Optional[str] = None, actor_id: Optional[str] = None):
-        self.api_token = api_token or settings.APIFY_API_TOKEN
-        self.actor_id = actor_id or settings.APIFY_FACEBOOK_ACTOR_ID
+        self.api_token = api_token if api_token is not None else settings.APIFY_API_TOKEN
+        raw_actor = actor_id or settings.APIFY_FACEBOOK_ACTOR_ID
+        self.actor_id = raw_actor.replace("/", "~")
 
     def extract_page_content(self, page_url: str) -> Dict[str, Any]:
         extracted_at = datetime.now(timezone.utc).isoformat()
@@ -128,7 +145,7 @@ class ApifyFacebookProvider(FacebookProvider):
 
         # Check API token
         if not self.api_token:
-            logger.warning("Apify API token missing; falling back to controlled error")
+            logger.warning("Apify API token missing; returning controlled failure")
             return FacebookPageContent(
                 page_url=clean_url,
                 extracted_at=extracted_at,
@@ -200,8 +217,11 @@ class ApifyFacebookProvider(FacebookProvider):
 def get_facebook_provider() -> FacebookProvider:
     """Factory selecting ApifyFacebookProvider if token is set and not in DEMO_MODE;
 
-    otherwise MockFacebookProvider for reliable zero-cost demoing.
+    otherwise MockFacebookProvider when DEMO_MODE=true,
+    or UnconfiguredFacebookProvider when DEMO_MODE=false but token is missing.
     """
-    if not settings.DEMO_MODE and settings.APIFY_API_TOKEN:
+    if settings.DEMO_MODE:
+        return MockFacebookProvider()
+    if settings.APIFY_API_TOKEN and settings.APIFY_API_TOKEN.strip():
         return ApifyFacebookProvider()
-    return MockFacebookProvider()
+    return UnconfiguredFacebookProvider()
