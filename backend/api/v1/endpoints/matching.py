@@ -301,30 +301,153 @@ def recommend_from_brand_urls(
         try:
             disco_res = tiktok_discovery_service.discover_and_aggregate(disco_req, db=db)
             candidates = disco_res.candidates
-        except ProviderConfigurationError as e:
-            logger.warning("TikTok provider configuration error: %s", e)
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"TikTok live data provider is not configured: {e.message}",
+        except (
+            ProviderConfigurationError,
+            ProviderRateLimitError,
+            ProviderTimeoutError,
+            ProviderError,
+        ) as e:
+            logger.warning(
+                "Live TikTok provider discovery failed (%s: %s). Attempting to recover from local database candidate pool...",
+                type(e).__name__,
+                e,
             )
-        except ProviderRateLimitError as e:
-            logger.warning("TikTok provider rate limit: %s", e)
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail=f"Creator discovery reached provider rate limit: {e.message}",
-            )
-        except ProviderTimeoutError as e:
-            logger.warning("TikTok provider timeout: %s", e)
-            raise HTTPException(
-                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                detail=f"The external provider timed out: {e.message}",
-            )
-        except ProviderError as e:
-            logger.error("TikTok provider error: %s", e)
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Creator discovery is temporarily unavailable: {e.message}",
-            )
+            # Try recovering candidates from local PostgreSQL pool
+            if db is not None:
+                try:
+                    from api.v1.endpoints.tiktok import build_candidate_from_model
+                    from models.kol import KOLCandidateModel
+
+                    db_candidates: List[KOLCandidate] = []
+                    # 1. Match search terms against username, display_name, or bio
+                    for term in search_terms[:5]:
+                        matched_models = (
+                            db.query(KOLCandidateModel)
+                            .filter(
+                                (KOLCandidateModel.username.ilike(f"%{term}%"))
+                                | (KOLCandidateModel.display_name.ilike(f"%{term}%"))
+                                | (KOLCandidateModel.bio.ilike(f"%{term}%"))
+                            )
+                            .limit(10)
+                            .all()
+                        )
+                        for m in matched_models:
+                            if m.normalized_username not in [c.normalized_username for c in db_candidates]:
+                                db_candidates.append(build_candidate_from_model(m))
+
+                    # 2. If fewer than 15 candidates matched exact terms, fetch top stored candidates
+                    if len(db_candidates) < 15:
+                        remaining_models = (
+                            db.query(KOLCandidateModel)
+                            .order_by(KOLCandidateModel.follower_count.desc())
+                            .limit(40)
+                            .all()
+                        )
+                        for m in remaining_models:
+                            if m.normalized_username not in [c.normalized_username for c in db_candidates]:
+                                db_candidates.append(build_candidate_from_model(m))
+
+                    if db_candidates:
+                        candidates = db_candidates[:30]
+                        logger.info(
+                            "Recovered %d candidates from local PostgreSQL pool despite live provider outage.",
+                            len(candidates),
+                        )
+                except Exception as db_err:
+                    logger.error("DB candidate recovery failed: %s", db_err)
+
+            # 3. If DB also has no candidates or failed, fall back to MockTikTokProvider
+            if not candidates:
+                try:
+                    from datetime import datetime, timezone
+                    from services.tiktok_provider import MockTikTokProvider
+                    from services.tiktok_discovery_service import normalize_tiktok_video
+
+                    logger.info("Local DB has no candidates; falling back to curated MockTikTokProvider fixtures...")
+                    mock_provider = MockTikTokProvider()
+                    mock_items = mock_provider.discover_kols_by_keywords(search_terms, limit=15)
+                    if mock_items:
+                        now_iso = datetime.now(timezone.utc).isoformat()
+                        mock_videos = [
+                            (
+                                normalize_tiktok_video(
+                                    item,
+                                    fallback_query=item.get("matched_query", search_terms[0]),
+                                    collected_at=now_iso,
+                                ),
+                                item.get("matched_query", search_terms[0]),
+                            )
+                            for item in mock_items
+                        ]
+                        candidates_map = {}
+                        for vid, q in mock_videos:
+                            raw_h = vid.creator_username.strip().lstrip("@")
+                            norm_h = raw_h.lower()
+                            if norm_h and norm_h not in candidates_map:
+                                candidates_map[norm_h] = {
+                                    "username": raw_h,
+                                    "normalized_username": norm_h,
+                                    "display_name": vid.creator_display_name or raw_h,
+                                    "profile_url": vid.creator_profile_url,
+                                    "is_profile_verified": vid.is_profile_verified,
+                                    "profile_status": vid.profile_status,
+                                    "bio": vid.creator_bio,
+                                    "follower_count": vid.follower_count,
+                                    "sample_video_count": 1,
+                                    "total_views": vid.views or 0,
+                                    "total_likes": vid.likes or 0,
+                                    "total_comments": vid.comments or 0,
+                                    "total_shares": vid.shares or 0,
+                                    "total_saves": vid.saves or 0,
+                                    "average_views": float(vid.views or 0),
+                                    "average_likes": float(vid.likes or 0),
+                                    "average_comments": float(vid.comments or 0),
+                                    "average_shares": float(vid.shares or 0),
+                                    "average_saves": float(vid.saves or 0),
+                                    "estimated_engagement_rate": 0.05,
+                                    "hashtags": vid.hashtags,
+                                    "sample_captions": [vid.caption] if vid.caption else [],
+                                    "matched_queries": [q],
+                                    "thai_language_ratio": 0.9,
+                                    "thailand_keyword_count": 2,
+                                    "thailand_hashtag_count": 2,
+                                    "location_mentions": ["Thailand"],
+                                    "local_signal_score": 0.85,
+                                    "creator_tier": "Micro (10K-100K)",
+                                    "rate_card_min": 5000,
+                                    "rate_card_max": 15000,
+                                    "data_source": "demo_fixture",
+                                    "collected_at": now_iso,
+                                    "data_freshness": "fixture",
+                                    "is_demo_fixture": True,
+                                    "provenance": "mock_provider_fallback",
+                                }
+                        candidates = [KOLCandidate(**c_data) for c_data in candidates_map.values()]
+                except Exception as mock_err:
+                    logger.error("Mock fallback also failed: %s", mock_err)
+
+            # If still absolutely no candidates, re-raise original exception
+            if not candidates:
+                if isinstance(e, ProviderConfigurationError):
+                    raise HTTPException(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        detail=f"TikTok live data provider is not configured: {e.message}",
+                    )
+                elif isinstance(e, ProviderRateLimitError):
+                    raise HTTPException(
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                        detail=f"Creator discovery reached provider rate limit: {e.message}",
+                    )
+                elif isinstance(e, ProviderTimeoutError):
+                    raise HTTPException(
+                        status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                        detail=f"The external provider timed out: {e.message}",
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_502_BAD_GATEWAY,
+                        detail=f"Creator discovery is temporarily unavailable: {e.message}",
+                    )
 
     if not candidates:
         raise HTTPException(

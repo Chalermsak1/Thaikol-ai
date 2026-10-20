@@ -83,24 +83,65 @@ def discover_tiktok_creators(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"TikTok live data provider is not configured: {e.message}",
         )
-    except ProviderRateLimitError as e:
-        logger.warning("TikTok provider rate limit: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=f"Creator discovery reached provider rate limit: {e.message}",
-        )
-    except ProviderTimeoutError as e:
-        logger.warning("TikTok provider timeout: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-            detail=f"The external provider timed out: {e.message}",
-        )
-    except ProviderError as e:
-        logger.error("TikTok provider error: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Creator discovery is temporarily unavailable: {e.message}",
-        )
+    except (ProviderRateLimitError, ProviderTimeoutError, ProviderError) as e:
+        logger.warning("TikTok provider error (%s: %s). Checking local database candidate pool...", type(e).__name__, e)
+        if db is not None:
+            try:
+                db_candidates: List[KOLCandidate] = []
+                for q in request.queries:
+                    term = f"%{q.strip().lower()}%"
+                    matched = (
+                        db.query(KOLCandidateModel)
+                        .filter(
+                            (KOLCandidateModel.username.ilike(term))
+                            | (KOLCandidateModel.display_name.ilike(term))
+                            | (KOLCandidateModel.bio.ilike(term))
+                        )
+                        .limit(request.max_candidates)
+                        .all()
+                    )
+                    for m in matched:
+                        if m.normalized_username not in [c.normalized_username for c in db_candidates]:
+                            db_candidates.append(build_candidate_from_model(m))
+
+                if len(db_candidates) < request.max_candidates:
+                    more = (
+                        db.query(KOLCandidateModel)
+                        .order_by(KOLCandidateModel.follower_count.desc())
+                        .limit(request.max_candidates)
+                        .all()
+                    )
+                    for m in more:
+                        if m.normalized_username not in [c.normalized_username for c in db_candidates]:
+                            db_candidates.append(build_candidate_from_model(m))
+
+                if db_candidates:
+                    return TikTokDiscoveryResponse(
+                        run_id=str(uuid.uuid4()),
+                        queries=request.queries,
+                        total_candidates=len(db_candidates[:request.max_candidates]),
+                        candidates=db_candidates[:request.max_candidates],
+                        provider="PostgreSQL (Cached Fallback)",
+                        data_freshness="cached",
+                    )
+            except Exception as db_err:
+                logger.error("DB discovery fallback failed: %s", db_err)
+
+        if isinstance(e, ProviderRateLimitError):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Creator discovery reached provider rate limit: {e.message}",
+            )
+        elif isinstance(e, ProviderTimeoutError):
+            raise HTTPException(
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                detail=f"The external provider timed out: {e.message}",
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Creator discovery is temporarily unavailable: {e.message}",
+            )
     except Exception as e:
         logger.error("TikTok discovery pipeline failed: %s", e)
         raise HTTPException(
