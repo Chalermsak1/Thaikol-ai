@@ -168,14 +168,14 @@ ${listText}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
               รายการบันทึกแคมเปญ & การติดต่อ
             </h1>
-            <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 font-mono font-bold text-xs px-2.5 py-0.5 rounded-full">
+            <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 font-mono font-bold text-xs sm:text-sm px-2.5 py-0.5 rounded-full">
               {items.length} ครีเอเตอร์
             </span>
           </div>
-          <p className="text-xs text-slate-500 font-medium">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
             ติดตามสถานะการติดต่อ ต่อรองราคา และประเมินงบประมาณแคมเปญสำหรับ {brandName}
           </p>
         </div>
@@ -185,7 +185,7 @@ ${listText}
           <button
             type="button"
             onClick={handleCopyRoster}
-            className="flex-1 sm:flex-initial btn-secondary text-xs px-4 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer rounded-full font-semibold"
+            className="flex-1 sm:flex-initial btn-secondary text-xs sm:text-sm px-4 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer rounded-full font-semibold"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
             <span>{copied ? 'คัดลอกสรุปแล้ว' : 'คัดลอกสรุป (Brief)'}</span>
@@ -193,7 +193,7 @@ ${listText}
           <button
             type="button"
             onClick={handleDownloadCSV}
-            className="flex-1 sm:flex-initial btn-orange text-xs px-5 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer shadow-xs rounded-full font-bold"
+            className="flex-1 sm:flex-initial btn-orange text-xs sm:text-sm px-5 py-2.5 gap-1.5 min-h-[44px] justify-center cursor-pointer shadow-xs rounded-full font-bold"
           >
             <Download className="w-3.5 h-3.5" />
             <span>ส่งออก CSV</span>
@@ -206,7 +206,7 @@ ${listText}
         {/* Roster Size */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+            <span className="text-xs font-bold uppercase text-slate-500">
               ขนาดทีม (Roster)
             </span>
             <Star className="w-4 h-4 text-[#FF5A1F] fill-[#FF5A1F]/20" />
@@ -214,7 +214,7 @@ ${listText}
           <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
             {items.length} <span className="text-xs font-normal text-slate-400">คน</span>
           </div>
-          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+          <div className="text-xs text-slate-500 truncate font-medium">
             {confirmedCount} ยืนยัน · {items.length - confirmedCount} กำลังคุย
           </div>
         </div>
@@ -222,7 +222,7 @@ ${listText}
         {/* Estimated Budget Range */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+            <span className="text-xs font-bold uppercase text-slate-500">
               งบเฉลี่ย (Est. Budget)
             </span>
             <DollarSign className="w-4 h-4 text-emerald-500" />
@@ -230,7 +230,7 @@ ${listText}
           <div className="text-base sm:text-xl font-black text-emerald-600 font-mono truncate">
             {formatTHBCurrency(budgetMetrics.avg)}
           </div>
-          <div className="text-[9px] sm:text-[10px] text-slate-400 truncate">
+          <div className="text-xs text-slate-500 truncate font-medium">
             {formatTHBCurrency(budgetMetrics.min)} - {formatTHBCurrency(budgetMetrics.max)}
           </div>
         </div>
@@ -238,7 +238,7 @@ ${listText}
         {/* Est Combined Reach */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+            <span className="text-xs font-bold uppercase text-slate-500">
               ผู้ติดตามรวม (Reach)
             </span>
             <Users className="w-4 h-4 text-[#FF5A1F]" />
@@ -246,7 +246,7 @@ ${listText}
           <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
             ~{(totalFollowers / 1000).toFixed(0)}k
           </div>
-          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+          <div className="text-xs text-slate-500 truncate font-medium">
             ฐานผู้ติดตามรวม
           </div>
         </div>
@@ -254,7 +254,7 @@ ${listText}
         {/* Average Match Quality */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4.5 space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-400">
+            <span className="text-xs font-bold uppercase text-slate-500">
               คะแนนเฉลี่ย (Fit)
             </span>
             <Sparkles className="w-4 h-4 text-[#FF5A1F]" />
@@ -263,7 +263,7 @@ ${listText}
             {(items.reduce((s, i) => s + i.creator.final_score, 0) / items.length).toFixed(1)}
             <span className="text-xs text-slate-400 font-normal"> / 100</span>
           </div>
-          <div className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+          <div className="text-xs text-slate-500 truncate font-medium">
             ค่าเฉลี่ย 5 ปัจจัย
           </div>
         </div>
@@ -272,11 +272,11 @@ ${listText}
       {/* ─── Shortlist Cards List ────────────────────────────────────── */}
       <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden divide-y divide-slate-100">
         <div className="px-4 sm:px-6 py-3.5 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+          <span className="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#FF5A1F]" />
             <span>รายชื่อครีเอเตอร์และสถานะการติดต่อ</span>
           </span>
-          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+          <span className="text-xs text-slate-500 font-medium hidden sm:inline">
             ประเมินตามอัตราตลาดในประเทศไทย
           </span>
         </div>
@@ -302,19 +302,19 @@ ${listText}
                       >
                         {item.creator.display_name}
                       </button>
-                      <span className="text-xs font-mono text-slate-400 truncate">
+                      <span className="text-xs sm:text-sm font-mono text-slate-400 truncate">
                         @{item.creator.username}
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                      <span className="badge badge-neutral text-[10px]">
+                      <span className="badge badge-neutral text-xs font-semibold">
                         {rate.tierLabel}
                       </span>
-                      <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 text-[10px] font-mono font-bold">
+                      <span className="badge bg-orange-50 text-[#FF5A1F] border border-orange-200/80 text-xs font-mono font-bold">
                         Fit: {item.creator.final_score.toFixed(1)}/100
                       </span>
                       {item.creator.matching_topics.slice(0, 2).map((t, i) => (
-                        <span key={i} className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
+                        <span key={i} className="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
                           #{t}
                         </span>
                       ))}
@@ -326,10 +326,10 @@ ${listText}
                 <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 pt-1 sm:pt-0">
                   {/* Commercial Rate Card */}
                   <div className="px-3 py-1.5 rounded-xl bg-emerald-50/70 border border-emerald-100 text-left sm:text-right">
-                    <div className="text-[9px] uppercase font-bold text-emerald-700">
+                    <div className="text-[11px] uppercase font-bold text-emerald-700">
                       ประมาณการค่าจ้าง / คลิป
                     </div>
-                    <div className="text-xs font-black text-emerald-800 font-mono">
+                    <div className="text-xs sm:text-sm font-black text-emerald-800 font-mono">
                       {formatTHBCurrency(rate.minRateTHB)} - {formatTHBCurrency(rate.maxRateTHB)}
                     </div>
                   </div>
@@ -339,7 +339,7 @@ ${listText}
                     <select
                       value={item.status}
                       onChange={(e) => onUpdateStatus(item.username, e.target.value as OutreachStatus)}
-                      className={`text-xs font-bold px-3 py-2 rounded-xl border cursor-pointer min-h-[44px] ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border}`}
+                      className={`text-xs sm:text-sm font-bold px-3 py-2 rounded-xl border cursor-pointer min-h-[44px] ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border}`}
                     >
                       <option value="shortlisted">⭐ บันทึกไว้</option>
                       <option value="contacted">📩 ติดต่อแล้ว</option>
@@ -372,7 +372,7 @@ ${listText}
                   placeholder="บันทึกเพิ่มเติม (เช่น ไลน์ติดต่อ, รายละเอียดบรีฟ, เงื่อนไขพิเศษ)..."
                   defaultValue={item.notes || ''}
                   onBlur={(e) => onUpdateNotes(item.username, e.target.value)}
-                  className="w-full text-xs text-slate-700 bg-transparent border-b border-transparent hover:border-slate-200 focus:border-[#FF5A1F] focus:outline-none transition py-1 font-thai"
+                  className="w-full text-xs sm:text-sm text-slate-700 bg-transparent border-b border-transparent hover:border-slate-200 focus:border-[#FF5A1F] focus:outline-none transition py-1 font-thai"
                 />
               </div>
             </div>
@@ -381,7 +381,7 @@ ${listText}
       </div>
 
       {/* Persistence Note Footer */}
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-2 text-[11px] text-slate-500">
+      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center gap-2 text-xs text-slate-500 font-medium">
         <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         <span>
           รายการบันทึกนี้ถูกจัดเก็บไว้ในเบราว์เซอร์ของอุปกรณ์นี้ (Local Browser Storage) โดยอัตโนมัติ

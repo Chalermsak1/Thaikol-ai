@@ -54,15 +54,15 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="text-base sm:text-lg font-black text-slate-900 truncate">
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 truncate">
                   {creator.display_name}
                 </h3>
                 {creator.is_demo_fixture && (
-                  <span className="badge badge-demo text-[9px] px-1.5 py-0.2">Demo</span>
+                  <span className="badge badge-demo text-[11px] px-2 py-0.5">Demo</span>
                 )}
                 {isSamplePortrait(creator) && (
                   <span
-                    className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200/60"
+                    className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60"
                     title="ภาพจำลองสำหรับการสาธิต ไม่ใช่ภาพบุคคลจริง"
                   >
                     รูปตัวอย่างจำลอง
@@ -77,17 +77,17 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                       href={linkStatus.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs text-[#FF5A1F] hover:text-[#E24A12] hover:underline inline-flex items-center gap-1 font-mono font-semibold"
+                      className="text-xs sm:text-sm text-[#FF5A1F] hover:text-[#E24A12] hover:underline inline-flex items-center gap-1 font-mono font-semibold"
                     >
                       @{creator.username}
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   );
                 }
                 return (
                   <span
                     title={linkStatus.tooltip}
-                    className="text-xs text-slate-500 inline-flex items-center gap-1 font-mono cursor-default"
+                    className="text-xs sm:text-sm text-slate-500 inline-flex items-center gap-1 font-mono cursor-default"
                   >
                     @{creator.username}
                   </span>
@@ -110,22 +110,22 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
           {/* Section 1: Hero Match Score Card */}
           <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-orange-50/80 via-white to-orange-50/40 border border-orange-200/90 shadow-2xs flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#FF5A1F] uppercase tracking-wider flex items-center gap-1">
+              <span className="text-xs font-bold text-[#FF5A1F] uppercase tracking-wider flex items-center gap-1">
                 <span>✦</span>
                 <span>ความเข้ากันได้โดยรวม (Overall Fit)</span>
               </span>
-              <div className="text-xs text-slate-600 font-medium">
+              <div className="text-xs sm:text-sm text-slate-600 font-medium">
                 ประเมินผ่านแบบจำลอง 5 ปัจจัยสำหรับแบรนด์ไทย
               </div>
               <div className="pt-1">
                 {creator.brand_safety_risk_level === 'safe' ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-semibold">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     ปลอดภัยต่อภาพลักษณ์แบรนด์ (Brand Safe)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold">
-                    <AlertTriangle className="w-3 h-3 text-amber-600" />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                     {creator.brand_safety_risk_level === 'review' ? 'ควรตรวจทานเนื้อหา (Review)' : 'ความเสี่ยงสูง (High Risk)'}
                   </span>
                 )}
@@ -136,7 +136,7 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
               <div className="text-3xl sm:text-4xl font-mono font-black text-[#FF5A1F] tabular-nums leading-none">
                 {creator.final_score.toFixed(1)}
               </div>
-              <div className="text-[10px] text-slate-400 font-bold mt-1">คะแนนเต็ม 100</div>
+              <div className="text-xs text-slate-400 font-bold mt-1">คะแนนเต็ม 100</div>
             </div>
           </div>
 
@@ -159,23 +159,23 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                 { label: 'อัตรา Engagement', value: formatPercent(creator.estimated_engagement_rate), tag: 'ประเมินเบื้องต้น' },
               ].map((m) => (
                 <div key={m.label} className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-                  <div className="text-[10px] text-slate-500 font-medium truncate">{m.label}</div>
-                  <div className="text-sm font-bold font-mono text-slate-900">
+                  <div className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">{m.label}</div>
+                  <div className="text-sm sm:text-base font-bold font-mono text-slate-900 mt-0.5">
                     {m.value ?? <span className="text-xs font-normal italic text-slate-400">N/A</span>}
                   </div>
-                  <div className="text-[9px] text-slate-400 uppercase tracking-wider">{m.tag}</div>
+                  <div className="text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">{m.tag}</div>
                 </div>
               ))}
             </div>
             {/* Section 1c: Video Content & Portfolio Showcase */}
             {creator.sample_captions && creator.sample_captions.length > 0 && (
               <div className="space-y-2.5 pt-2">
-                <div className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <div className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <span className="text-[#FF5A1F]">🎬</span>
                     <span>ตัวอย่างวิดีโอคอนเทนต์ (Sampled TikTok Videos)</span>
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono">
+                  <span className="text-xs text-slate-400 font-mono">
                     {creator.sample_video_count ?? creator.sample_captions.length} คลิปตัวอย่าง
                   </span>
                 </div>
@@ -184,7 +184,7 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                     <div
                       key={idx}
                       onClick={() => setPreviewClip({ caption: cap, index: idx + 1 })}
-                      className="p-3 rounded-2xl bg-orange-50/30 border border-orange-100/70 text-xs text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-100/40 hover:border-orange-300 transition flex gap-3 items-start cursor-pointer shadow-2xs"
+                      className="p-3 rounded-2xl bg-orange-50/30 border border-orange-100/70 text-xs sm:text-sm text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-100/40 hover:border-orange-300 transition flex gap-3 items-start cursor-pointer shadow-2xs"
                     >
                       <div className="w-12 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-orange-200/60 mt-0.5 group-hover:scale-105 transition-transform">
                         <img
@@ -202,10 +202,10 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-[10px] font-bold text-[#FF5A1F] uppercase font-mono tracking-wider flex items-center gap-1">
+                          <span className="text-[11px] sm:text-xs font-bold text-[#FF5A1F] uppercase font-mono tracking-wider flex items-center gap-1">
                             <span>▶ Clip #{idx + 1}</span>
                           </span>
-                          <span className="text-[9px] text-[#FF5A1F] font-semibold bg-orange-100/60 px-1.5 py-0.5 rounded">แตะเพื่อเล่นคลิป</span>
+                          <span className="text-[10px] sm:text-[11px] text-[#FF5A1F] font-semibold bg-orange-100/60 px-2 py-0.5 rounded">แตะเพื่อเล่นคลิป</span>
                         </div>
                         <p className="text-slate-800 line-clamp-3 leading-relaxed">
                           "{cap}"
@@ -221,25 +221,25 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
           {/* Section 2: Key Score Metrics Strip */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-              <div className="text-[10px] text-slate-500 uppercase font-bold">
+              <div className="text-xs text-slate-500 uppercase font-bold">
                 ดัชนีการมีส่วนร่วม (Engagement Index)
               </div>
-              <div className="text-xl font-black font-mono text-slate-900">
+              <div className="text-xl sm:text-2xl font-black font-mono text-slate-900">
                 {creator.engagement_quality_score.toFixed(1)}
-                <span className="text-xs text-slate-400 font-normal"> / 100</span>
+                <span className="text-xs sm:text-sm text-slate-400 font-normal"> / 100</span>
               </div>
-              <div className="text-[10px] text-slate-500">คุณภาพการมีส่วนร่วมเทียบเคียงในกลุ่ม</div>
+              <div className="text-[11px] sm:text-xs text-slate-500">คุณภาพการมีส่วนร่วมเทียบเคียงในกลุ่ม</div>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-              <div className="text-[10px] text-slate-500 uppercase font-bold">
+              <div className="text-xs text-slate-500 uppercase font-bold">
                 ความสอดคล้องบริบทไทย (Local Context)
               </div>
-              <div className="text-xl font-black font-mono text-slate-900">
+              <div className="text-xl sm:text-2xl font-black font-mono text-slate-900">
                 {creator.local_content_relevance_score.toFixed(1)}
-                <span className="text-xs text-slate-400 font-normal"> / 100</span>
+                <span className="text-xs sm:text-sm text-slate-400 font-normal"> / 100</span>
               </div>
-              <div className="text-[10px] text-slate-500">สัญญาณภาษาและวัฒนธรรมไทย</div>
+              <div className="text-[11px] sm:text-xs text-slate-500">สัญญาณภาษาและวัฒนธรรมไทย</div>
             </div>
           </div>
 

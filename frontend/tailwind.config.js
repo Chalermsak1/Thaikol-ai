@@ -7,9 +7,21 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'Sarabun', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        thai: ['Sarabun', 'Inter', 'sans-serif'],
+        sans: ['Prompt', 'Plus Jakarta Sans', 'Sarabun', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        thai: ['Prompt', 'Sarabun', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Prompt', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1.05rem' }],       // 11px
+        'xs': ['0.75rem', { lineHeight: '1.25rem' }],          // 12px
+        'sm': ['0.875rem', { lineHeight: '1.45rem' }],         // 14px
+        'base': ['1rem', { lineHeight: '1.65rem' }],          // 16px
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],         // 18px
+        'xl': ['1.25rem', { lineHeight: '1.875rem' }],         // 20px
+        '2xl': ['1.5rem', { lineHeight: '2.125rem' }],         // 24px
+        '3xl': ['1.875rem', { lineHeight: '2.375rem' }],       // 30px
+        '4xl': ['2.25rem', { lineHeight: '2.75rem' }],         // 36px
       },
       colors: {
         tiktok: {

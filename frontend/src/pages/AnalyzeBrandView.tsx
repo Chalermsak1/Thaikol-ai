@@ -153,13 +153,13 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
           {/* Website Input */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
+              <label className="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-2">
                 <div className="w-5 h-5 rounded-md bg-orange-50 text-[#FF5A1F] flex items-center justify-center">
                   <Globe className="w-3 h-3" />
                 </div>
                 <span>เว็บไซต์ทางการ (Website URL)</span>
               </label>
-              <span className="text-[10px] text-slate-400">e-Commerce, Homepage, Catalog</span>
+              <span className="text-xs text-slate-400">e-Commerce, Homepage, Catalog</span>
             </div>
             <div className="relative flex items-center">
               <input
@@ -186,13 +186,13 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
           {/* Facebook Input */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
+              <label className="text-xs sm:text-sm font-bold text-slate-700 flex items-center gap-2">
                 <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Facebook className="w-3 h-3" />
                 </div>
                 <span>เพจ Facebook สาธารณะ (Facebook Page URL)</span>
               </label>
-              <span className="text-[10px] text-slate-400">Official Page URL</span>
+              <span className="text-xs text-slate-400">Official Page URL</span>
             </div>
             <div className="relative flex items-center">
               <input
@@ -221,7 +221,7 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
             <button
               type="submit"
               disabled={isLoading || (!websiteUrl && !facebookUrl)}
-              className="w-full sm:w-auto btn-orange px-8 py-3 text-sm justify-center gap-2 font-bold cursor-pointer disabled:opacity-50 min-h-[46px] shadow-sm"
+              className="w-full sm:w-auto btn-orange px-8 py-3 text-xs sm:text-sm justify-center gap-2 font-bold cursor-pointer disabled:opacity-50 min-h-[46px] shadow-sm"
             >
               {isLoading ? (
                 <>
@@ -252,10 +252,10 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
         {/* Demo Benchmarks Section */}
         <div className="pt-4 border-t border-slate-100 space-y-2.5">
           <div className="flex items-center justify-between">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
               ชุดทดสอบแบรนด์ตัวอย่าง (Curated Benchmark Presets)
             </div>
-            <span className="text-[10px] text-slate-400">คลิกเดียวเพื่อวิเคราะห์</span>
+            <span className="text-xs text-slate-400">คลิกเดียวเพื่อวิเคราะห์</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -272,20 +272,20 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
                     {p.initial}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                    <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
                       {p.name}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-thai truncate">
+                    <div className="text-xs text-slate-500 font-thai truncate">
                       {p.thaiName}
                     </div>
                   </div>
                 </div>
-                <div className="text-[10px] text-slate-500 truncate">
+                <div className="text-xs text-slate-500 truncate">
                   {p.category}
                 </div>
-                <div className="mt-1.5 pt-1.5 border-t border-slate-200/50 flex items-center justify-between text-[10px]">
+                <div className="mt-1.5 pt-1.5 border-t border-slate-200/50 flex items-center justify-between text-xs">
                   <span className="font-semibold text-indigo-600 group-hover:underline">แตะเพื่อทดสอบ</span>
-                  <ArrowRight className="w-2.5 h-2.5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                  <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
                 </div>
               </button>
             ))}
@@ -679,8 +679,8 @@ export const AnalyzeBrandView: React.FC<AnalyzeBrandViewProps> = ({
             <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <item.icon className="w-3.5 h-3.5" />
             </div>
-            <div className="text-xs font-bold text-slate-900">{item.label}</div>
-            <div className="text-[10px] text-slate-500 leading-tight">{item.desc}</div>
+            <div className="text-xs sm:text-sm font-bold text-slate-900">{item.label}</div>
+            <div className="text-xs text-slate-500 leading-tight">{item.desc}</div>
           </div>
         ))}
       </div>

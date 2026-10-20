@@ -298,13 +298,13 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span className="w-7 h-7 rounded-xl bg-orange-50 text-[#FF5A1F] flex items-center justify-center text-sm shadow-2xs">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <span className="w-8 h-8 rounded-xl bg-orange-50 text-[#FF5A1F] flex items-center justify-center text-base shadow-2xs">
                 ★
               </span>
               <span>ค้นหาและคัดเลือก KOL (Discovery)</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               ค้นหา TikTok Creator ชาวไทย สำรวจสถิติจริง และเลือกครีเอเตอร์ที่เหมาะสมกับแคมเปญ
             </p>
           </div>
@@ -313,7 +313,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
           <div className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
             <button
               onClick={() => setViewMode('cards')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'cards'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-500 hover:text-slate-900'
@@ -324,7 +324,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'table'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-500 hover:text-slate-900'
@@ -345,7 +345,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ค้นหาชื่อครีเอเตอร์, @username, หรือคีย์เวิร์ด เช่น สกินแคร์, กาแฟ..."
-              className="w-full pl-10 pr-10 py-3 text-sm rounded-2xl bg-white border border-slate-200/90 shadow-2xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all font-sans"
+              className="w-full pl-10 pr-10 py-3 text-sm sm:text-base rounded-2xl bg-white border border-slate-200/90 shadow-2xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all font-sans"
             />
             {searchQuery && (
               <button
@@ -361,7 +361,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
           <button
             type="submit"
             disabled={isSearchingDirect}
-            className="btn-orange px-5 sm:px-6 py-3 rounded-2xl text-white text-sm font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer shrink-0 disabled:opacity-50 min-h-[46px]"
+            className="btn-orange px-5 sm:px-6 py-3 rounded-2xl text-white text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer shrink-0 disabled:opacity-50 min-h-[46px]"
           >
             {isSearchingDirect ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -389,7 +389,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
         </form>
 
         {/* Category Suggestion Chips (Horizontal scrollable on mobile) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1 text-xs">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1 text-xs sm:text-sm">
           {CATEGORY_CHIPS.map((chip) => {
             const isActive = activeCategory === chip.id;
             return (
@@ -410,10 +410,10 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
         </div>
 
         {/* Tier & Budget Quick Filter Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-100 text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-100 text-xs sm:text-sm">
           {/* Follower Tier Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
               ขนาดผู้ติดตาม:
             </span>
             {[
@@ -427,7 +427,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
                 key={tier.id}
                 type="button"
                 onClick={() => setSelectedTier(tier.id)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer shrink-0 min-h-[30px] ${
+                className={`px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shrink-0 min-h-[32px] ${
                   selectedTier === tier.id
                     ? 'bg-slate-900 text-white shadow-2xs'
                     : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80'
@@ -440,7 +440,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
 
           {/* Budget Filter Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
               งบ/คลิป:
             </span>
             {[
@@ -453,7 +453,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
                 key={budget.id}
                 type="button"
                 onClick={() => setSelectedBudget(budget.id)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer shrink-0 min-h-[30px] ${
+                className={`px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shrink-0 min-h-[32px] ${
                   selectedBudget === budget.id
                     ? 'bg-[#FF5A1F] text-white shadow-2xs font-bold'
                     : 'bg-orange-50/70 text-orange-900 hover:bg-orange-100 border border-orange-200/60'
@@ -574,16 +574,16 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
       {/* ─── Main Content Display: Creator Cards / Table ────────────── */}
       {!isSearchingDirect && filtered.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span className="font-semibold text-slate-700">
+          <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 px-1">
+            <span className="font-bold text-slate-800">
               พบครีเอเตอร์ {filtered.length} รายการ
               {hasBrandResult && (
-                <span className="font-normal text-slate-400 ml-1">
+                <span className="font-normal text-slate-500 ml-1">
                   (จากแบรนด์ {result?.brand_profile?.brand_name})
                 </span>
               )}
             </span>
-            <span className="font-mono text-[11px] text-slate-400">
+            <span className="font-mono text-xs text-slate-400">
               แตะการ์ดเพื่อดูสถิติเชิงลึก
             </span>
           </div>

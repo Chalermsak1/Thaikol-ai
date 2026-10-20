@@ -267,25 +267,25 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
       <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200/90 shadow-2xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5A1F] bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#FF5A1F] bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
                 Recommended Creators
               </span>
               {result.provenance === 'live' || result.data_source === 'apify' ? (
-                <span className="badge badge-safe text-[10px]">
-                  <Radio className="w-2.5 h-2.5" />
+                <span className="badge badge-safe text-xs font-semibold">
+                  <Radio className="w-3 h-3" />
                   Live TikTok Discovery
                 </span>
               ) : (
-                <span className="badge badge-demo text-[10px]">
+                <span className="badge badge-demo text-xs font-semibold">
                   ชุดทดสอบมาตรฐาน (Benchmark)
                 </span>
               )}
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
               อันดับครีเอเตอร์แนะนำสำหรับ {brand?.brand_name || 'Campaign'}
             </h1>
-            <p className="text-xs text-slate-500 font-medium">
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
               จัดอันดับด้วยโมเดลความเข้ากันได้ 5 มิติ อธิบายผลลัพธ์ได้โปร่งใสสำหรับตลาดไทย
             </p>
           </div>
@@ -295,7 +295,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
             {onGoToShortlist && Object.keys(shortlist).length > 0 && (
               <button
                 onClick={onGoToShortlist}
-                className="btn-secondary text-xs px-3.5 py-2.5 gap-1.5 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 font-bold min-h-[44px] cursor-pointer"
+                className="btn-secondary text-xs sm:text-sm px-3.5 py-2.5 gap-1.5 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 font-bold min-h-[44px] cursor-pointer"
               >
                 <BookmarkCheck className="w-3.5 h-3.5 text-amber-600" />
                 <span>Shortlist ({Object.keys(shortlist).length})</span>
@@ -304,7 +304,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
 
             <button
               onClick={handleCopySummary}
-              className="btn-secondary text-xs px-3.5 py-2.5 gap-1.5 min-h-[44px] cursor-pointer"
+              className="btn-secondary text-xs sm:text-sm px-3.5 py-2.5 gap-1.5 min-h-[44px] cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
               <span>{copied ? 'คัดลอกแล้ว' : 'คัดลอกสรุป'}</span>
@@ -312,7 +312,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
 
             <button
               onClick={handleDownloadCSV}
-              className="btn-secondary text-xs px-3.5 py-2.5 gap-1.5 min-h-[44px] cursor-pointer"
+              className="btn-secondary text-xs sm:text-sm px-3.5 py-2.5 gap-1.5 min-h-[44px] cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-slate-400" />
               <span>Export CSV</span>
@@ -321,48 +321,48 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
         </div>
 
         {/* Metadata Strip: Candidate Pool, Search Topics, Freshness, Provider */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
           <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-0.5">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
               Candidate Pool
             </span>
-            <div className="font-mono font-black text-slate-900 text-sm">
+            <div className="font-mono font-black text-slate-900 text-sm sm:text-base">
               {result.candidate_pool_count || rawRecommendations.length} ครีเอเตอร์
             </div>
-            <span className="text-[10px] text-slate-500">รวบรวมจาก TikTok</span>
+            <span className="text-xs text-slate-500">รวบรวมจาก TikTok</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-0.5">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
               Search Topics
             </span>
-            <div className="font-mono font-black text-slate-900 text-sm truncate">
+            <div className="font-mono font-black text-slate-900 text-sm sm:text-base truncate">
               {result.search_queries?.length || 0} หัวข้อค้นหา
             </div>
-            <span className="text-[10px] text-slate-500 truncate block">
+            <span className="text-xs text-slate-500 truncate block">
               {result.search_queries?.[0] || 'Brand topics'}
             </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-0.5">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1">
+            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1">
               <Clock className="w-3 h-3 text-slate-400" />
               <span>ความสดใหม่ข้อมูล</span>
             </span>
-            <div className={`font-bold text-xs mt-0.5 ${freshnessLabel[poolFreshness]?.cls ?? 'text-slate-500'}`}>
+            <div className={`font-bold text-xs sm:text-sm mt-0.5 ${freshnessLabel[poolFreshness]?.cls ?? 'text-slate-500'}`}>
               {freshnessLabel[poolFreshness]?.text ?? 'ไม่ระบุ'}
             </div>
-            <span className="text-[10px] text-slate-500">สแนปช็อตในระบบ</span>
+            <span className="text-xs text-slate-500">สแนปช็อตในระบบ</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-0.5">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
               แหล่งที่มาข้อมูล
             </span>
-            <div className="font-bold text-slate-800 text-xs truncate">
+            <div className="font-bold text-slate-800 text-xs sm:text-sm truncate">
               {result.data_source === 'apify' ? 'Apify Live Scraper' : 'ชุดทดสอบมาตรฐาน'}
             </div>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-xs text-slate-500">
               {result.provenance === 'live' ? 'Live TikTok API' : 'Benchmark Set'}
             </span>
           </div>
@@ -460,11 +460,11 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
         </div>
 
         {/* Sub-bar: Follower Tier & Budget Filter Chips */}
-        <div className="w-full pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="w-full pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
           {/* Follower Tier Chips */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-              <Users className="w-3 h-3 text-slate-400" />
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 flex items-center gap-1">
+              <Users className="w-3.5 h-3.5 text-slate-400" />
               <span>ขนาดผู้ติดตาม:</span>
             </span>
             {[
@@ -477,7 +477,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
               <button
                 key={tier.id}
                 onClick={() => setSelectedTier(tier.id)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer min-h-[30px] ${
+                className={`px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer min-h-[32px] ${
                   selectedTier === tier.id
                     ? 'bg-slate-900 text-white shadow-2xs'
                     : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80'
@@ -490,8 +490,8 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
 
           {/* Budget Filter Chips */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-              <DollarSign className="w-3 h-3 text-[#FF5A1F]" />
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 flex items-center gap-1">
+              <DollarSign className="w-3.5 h-3.5 text-[#FF5A1F]" />
               <span>เพดานงบ/คลิป:</span>
             </span>
             {[
@@ -503,9 +503,9 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
               <button
                 key={b.id}
                 onClick={() => setSelectedBudget(b.id)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer min-h-[30px] ${
+                className={`px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer min-h-[32px] ${
                   selectedBudget === b.id
-                    ? 'bg-[#FF5A1F] text-white shadow-2xs'
+                    ? 'bg-[#FF5A1F] text-white shadow-2xs font-bold'
                     : 'bg-orange-50 text-orange-800 border border-orange-200/60 hover:bg-orange-100'
                 }`}
               >
@@ -520,8 +520,8 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
       {topMatch && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-[#FF5A1F] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#FF5A1F]" />
+            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#FF5A1F] flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#FF5A1F]" />
               <span>อันดับ 1 ที่คะแนนสูงสุด (Highest Ranked Candidate)</span>
             </span>
           </div>
@@ -540,10 +540,10 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
       {remainingMatches.length > 0 && (
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">
               อันดับครีเอเตอร์อื่นๆ ในระบบ ({remainingMatches.length} คน)
             </h2>
-            <span className="text-[11px] text-slate-400 font-mono">
+            <span className="text-xs text-slate-400 font-mono">
               เรียงตาม {sortBy === 'match' ? 'Match Score' : sortBy}
             </span>
           </div>

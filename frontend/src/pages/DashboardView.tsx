@@ -211,15 +211,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF5A1F] bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200/60 inline-flex items-center gap-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#FF5A1F] bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200/60 inline-flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A1F] animate-pulse" />
                   Active Brand
                 </span>
-                <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight truncate">
+                <h1 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight truncate">
                   {brandName}
                 </h1>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5 truncate font-medium">
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 truncate font-medium">
                 🇹🇭 ประเทศไทย · {industry}
               </p>
             </div>
@@ -230,7 +230,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               type="button"
               onClick={() => onSelectPage('analyze')}
-              className="btn-secondary text-xs px-3.5 py-2.5 rounded-full cursor-pointer min-h-[44px] font-semibold flex items-center gap-1.5 flex-1 sm:flex-none justify-center touch-manipulation"
+              className="btn-secondary text-xs sm:text-sm px-3.5 py-2.5 rounded-full cursor-pointer min-h-[44px] font-semibold flex items-center gap-1.5 flex-1 sm:flex-none justify-center touch-manipulation"
             >
               <Building2 className="w-3.5 h-3.5 text-slate-400" />
               <span>เปลี่ยนแบรนด์</span>
@@ -238,7 +238,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               type="button"
               onClick={() => onSelectPage('discovery')}
-              className="btn-orange text-xs px-4 py-2.5 rounded-full cursor-pointer min-h-[44px] font-bold shadow-xs flex items-center gap-1.5 flex-1 sm:flex-none justify-center touch-manipulation"
+              className="btn-orange text-xs sm:text-sm px-4 py-2.5 rounded-full cursor-pointer min-h-[44px] font-bold shadow-xs flex items-center gap-1.5 flex-1 sm:flex-none justify-center touch-manipulation"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>ค้นหา KOL ทันที</span>
@@ -248,8 +248,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* 1-Tap Benchmark Switcher: Smooth Horizontal Pill Scroll */}
         <div className="pt-3 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 shrink-0 mr-1 flex items-center gap-1">
-            <Flame className="w-3 h-3 text-[#FF5A1F]" />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 shrink-0 mr-1 flex items-center gap-1">
+            <Flame className="w-3.5 h-3.5 text-[#FF5A1F]" />
             แบรนด์ตัวอย่าง:
           </span>
           {BENCHMARK_PRESETS.map((preset) => (
@@ -257,7 +257,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               key={preset.id}
               type="button"
               onClick={() => handleLaunchPreset(preset.websiteUrl, preset.facebookUrl)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 hover:bg-orange-50 hover:border-orange-200 hover:text-[#FF5A1F] border border-slate-200/80 text-xs font-semibold text-slate-700 transition cursor-pointer shrink-0 min-h-[38px] touch-manipulation active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 hover:bg-orange-50 hover:border-orange-200 hover:text-[#FF5A1F] border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-700 transition cursor-pointer shrink-0 min-h-[38px] touch-manipulation active:scale-95"
             >
               <span>{preset.category}</span>
               <span className="text-slate-900 font-bold">{preset.name}</span>
@@ -275,11 +275,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             value={quickSearchInput}
             onChange={(e) => setQuickSearchInput(e.target.value)}
             placeholder="ค้นหาชื่อครีเอเตอร์ TikTok, @username หรือคีย์เวิร์ด..."
-            className="w-full pl-11 pr-24 sm:pr-28 py-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all placeholder:text-slate-400 font-sans"
+            className="w-full pl-11 pr-24 sm:pr-28 py-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all placeholder:text-slate-400 font-sans"
           />
           <button
             type="submit"
-            className="btn-orange absolute right-2 top-1/2 -translate-y-1/2 py-2 px-4 text-xs font-bold shadow-xs cursor-pointer min-h-[36px] touch-manipulation"
+            className="btn-orange absolute right-2 top-1/2 -translate-y-1/2 py-2 px-4 text-xs sm:text-sm font-bold shadow-xs cursor-pointer min-h-[36px] touch-manipulation"
           >
             ค้นหา
           </button>
@@ -301,7 +301,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     onSelectPage('discovery');
                   }
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shrink-0 min-h-[38px] touch-manipulation active:scale-95 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition cursor-pointer shrink-0 min-h-[38px] touch-manipulation active:scale-95 ${
                   isSelected
                     ? 'bg-[#FF5A1F] text-white border border-[#FF5A1F] shadow-xs'
                     : 'bg-white hover:bg-orange-50 hover:border-orange-200 hover:text-[#FF5A1F] border border-slate-200/90 text-slate-700'
@@ -326,10 +326,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <Star className="w-4 h-4 fill-[#FF5A1F]" />
                 </div>
                 <div>
-                  <h2 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                  <h2 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
                     ครีเอเตอร์ที่เหมาะสมสูงสุด (Top Matches)
                   </h2>
-                  <p className="text-[11px] text-slate-400 font-medium">
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
                     คัดเลือกจากสัญญาณคอนเทนต์และแบบจำลองความเข้ากันได้
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectPage('discovery')}
-                className="text-xs font-bold text-[#FF5A1F] hover:text-[#E24A12] flex items-center gap-1 cursor-pointer shrink-0 min-h-[40px] px-2 touch-manipulation"
+                className="text-xs sm:text-sm font-bold text-[#FF5A1F] hover:text-[#E24A12] flex items-center gap-1 cursor-pointer shrink-0 min-h-[40px] px-2 touch-manipulation"
               >
                 <span>ดูทั้งหมด</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -348,11 +348,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* ── FEATURE 1: Swipeable Hero Creator Carousel (iPhone 390px Optimized) ── */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#FF5A1F]" />
                   <span>ไฮไลท์ครีเอเตอร์ยอดนิยม (Swipe to Explore)</span>
                 </span>
-                <span className="text-[11px] font-mono font-semibold text-slate-400">
+                <span className="text-xs font-mono font-semibold text-slate-400">
                   {displayCreators.length} รายการ
                 </span>
               </div>
@@ -389,7 +389,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {/* Rank Badge + Disclosure */}
                         <div className="flex flex-col gap-1 items-start">
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
                               isTop
                                 ? 'bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white ring-2 ring-white/30'
                                 : idx === 1
@@ -405,7 +405,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                           {/* Sample Portrait Disclosure Badge (100% Ethical & Truthful) */}
                           {samplePortrait && (
-                            <span className="text-[9px] font-bold text-white/80 bg-black/50 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/15">
+                            <span className="text-[11px] font-bold text-white/90 bg-black/50 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/15">
                               รูปตัวอย่างจำลอง
                             </span>
                           )}
@@ -413,7 +413,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                         {/* Right: Fit Score + Shortlist Button */}
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#FF7A3D] border border-orange-400/40 font-mono font-black text-xs shadow-sm">
+                          <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#FF7A3D] border border-orange-400/40 font-mono font-black text-xs sm:text-sm shadow-sm">
                             {Number(creator.final_score).toFixed(1)} Fit
                           </span>
 
@@ -448,7 +448,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           <CreatorAvatar creator={creator} size="sm" showVerified={false} />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1">
-                              <h3 className="text-sm font-black text-white truncate drop-shadow-sm">
+                              <h3 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
                                 {creator.display_name}
                               </h3>
                               {creator.is_profile_verified && (
@@ -457,19 +457,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                                 </div>
                               )}
                             </div>
-                            <div className="text-[11px] font-mono text-white/75 truncate">
+                            <div className="text-xs font-mono text-white/80 truncate">
                               @{creator.username}
                             </div>
                           </div>
                         </div>
 
                         {/* Quick Metrics Bar with Rate Card */}
-                        <div className="grid grid-cols-3 gap-1 text-[11px] bg-white/10 backdrop-blur-md rounded-xl px-2 py-1.5 border border-white/15 text-white/90 text-center">
+                        <div className="grid grid-cols-3 gap-1 text-xs bg-white/10 backdrop-blur-md rounded-xl px-2 py-1.5 border border-white/15 text-white/90 text-center">
                           <div>
-                            <span className="text-[9px] uppercase text-white/60 block leading-none">
+                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
                               ผู้ติดตาม
                             </span>
-                            <span className="font-mono font-bold text-xs">
+                            <span className="font-mono font-black text-xs sm:text-sm">
                               {creator.follower_count
                                 ? formatCompactNumber(creator.follower_count)
                                 : '100K+'}
@@ -477,19 +477,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           </div>
 
                           <div className="border-x border-white/15">
-                            <span className="text-[9px] uppercase text-white/60 block leading-none">
+                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
                               เรทการ์ด
                             </span>
-                            <span className="font-mono font-bold text-xs text-emerald-300">
+                            <span className="font-mono font-black text-xs sm:text-sm text-emerald-300">
                               ~{formatCompactNumber(rateCard.avgRateTHB)}฿
                             </span>
                           </div>
 
                           <div>
-                            <span className="text-[9px] uppercase text-white/60 block leading-none">
+                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
                               Engagement
                             </span>
-                            <span className="font-mono font-bold text-xs text-[#FF9E66]">
+                            <span className="font-mono font-black text-xs sm:text-sm text-[#FF9E66]">
                               {creator.estimated_engagement_rate
                                 ? formatPercent(creator.estimated_engagement_rate)
                                 : '4.5%'}
@@ -503,7 +503,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             {creator.matching_topics.slice(0, 2).map((t: string, i: number) => (
                               <span
                                 key={i}
-                                className="px-2 py-0.5 rounded-md bg-white/15 text-white text-[10px] font-medium truncate backdrop-blur-xs"
+                                className="px-2 py-0.5 rounded-md bg-white/15 text-white text-[11px] font-medium truncate backdrop-blur-xs"
                               >
                                 #{t}
                               </span>
@@ -514,10 +514,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {/* Action CTA Button */}
                         <button
                           type="button"
-                          className="w-full py-2 rounded-xl bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white text-xs font-black shadow-md shadow-orange-500/25 flex items-center justify-center gap-1.5 group-hover:brightness-110 active:scale-95 transition-all touch-manipulation cursor-pointer"
+                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white text-xs sm:text-sm font-black shadow-md shadow-orange-500/25 flex items-center justify-center gap-1.5 group-hover:brightness-110 active:scale-95 transition-all touch-manipulation cursor-pointer"
                         >
                           <span>ดูโปรไฟล์เชิงลึก</span>
-                          <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </button>
                       </div>
                     </article>
@@ -529,10 +529,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* ── FEATURE 2: Image-Rich Vertical Creator Feed ── */}
             <div className="pt-2 border-t border-slate-100 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-800">
+                <span className="text-sm sm:text-base font-black text-slate-900">
                   รายการจัดอันดับครีเอเตอร์เด่น (Ranked Creator Feed)
                 </span>
-                <span className="text-[11px] text-slate-400">รูปภาพจริง & วิดีโอพรีวิว</span>
+                <span className="text-xs text-slate-500 font-medium">รูปภาพจริง & วิดีโอพรีวิว</span>
               </div>
 
               <div className="divide-y divide-slate-100">
@@ -578,17 +578,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {/* Name & Metric Signals */}
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#FF5A1F] transition-colors truncate">
+                            <span className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#FF5A1F] transition-colors truncate">
                               {creator.display_name}
                             </span>
                             {idx < 3 && (
-                              <span className="text-[9px] font-black uppercase text-[#FF5A1F] bg-orange-50 px-1.5 py-0.2 rounded">
+                              <span className="text-[11px] font-black uppercase text-[#FF5A1F] bg-orange-50 px-2 py-0.5 rounded-md">
                                 #{idx + 1}
                               </span>
                             )}
                           </div>
 
-                          <div className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
+                          <div className="text-xs text-slate-500 font-mono truncate mt-0.5">
                             @{creator.username}
                             {creator.follower_count ? (
                               <span className="text-slate-600 font-medium">
@@ -603,7 +603,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           {/* Content Theme & Rate Card Chips */}
                           <div className="flex items-center gap-1.5 mt-1 overflow-hidden flex-wrap">
                             <span
-                              className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-md font-bold"
+                              className="text-[11px] sm:text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md font-bold"
                               title={`เรทการ์ดประมาณการ ${rateCard.tierLabel}`}
                             >
                               💰 ~{formatTHBCurrency(rateCard.avgRateTHB)} ({rateCard.tier})
@@ -612,7 +612,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               creator.matching_topics.slice(0, 1).map((t: string, i: number) => (
                                 <span
                                   key={i}
-                                  className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-md font-medium"
+                                  className="text-[11px] sm:text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md font-medium"
                                 >
                                   #{t}
                                 </span>
@@ -626,7 +626,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <div className="flex items-center gap-2 shrink-0">
                         {/* Score Pill */}
                         <div className="text-right">
-                          <span className="px-2.5 py-1 rounded-full bg-orange-50 text-[#FF5A1F] border border-orange-200/70 font-mono font-black text-xs block">
+                          <span className="px-2.5 py-1 rounded-full bg-orange-50 text-[#FF5A1F] border border-orange-200/70 font-mono font-black text-xs sm:text-sm block">
                             {Number(creator.final_score).toFixed(1)} Fit
                           </span>
                         </div>
@@ -660,7 +660,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             e.stopPropagation();
                             handleCreatorClick(creator);
                           }}
-                          className="btn-pill-view shrink-0 font-bold hidden sm:inline-flex"
+                          className="btn-pill-view shrink-0 font-bold hidden sm:inline-flex text-xs"
                         >
                           ดูข้อมูล
                         </button>
@@ -676,7 +676,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectPage('discovery')}
-                className="w-full py-3 rounded-2xl bg-slate-50 hover:bg-orange-50 hover:text-[#FF5A1F] text-slate-700 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation min-h-[44px]"
+                className="w-full py-3 rounded-2xl bg-slate-50 hover:bg-orange-50 hover:text-[#FF5A1F] text-slate-700 text-xs sm:text-sm font-bold transition cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation min-h-[46px]"
               >
                 <span>สำรวจฐานข้อมูลครีเอเตอร์ทั้งหมด ({recommendations.length || 11}+ รายการ)</span>
                 <ArrowRight className="w-4 h-4" />
@@ -694,23 +694,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-8 h-8 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-2xs">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm sm:text-base font-black text-slate-900">
                   กลยุทธ์คอนเทนต์ (Campaign Strategy)
                 </h3>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-orange-50 text-[#FF5A1F] text-[10px] font-bold border border-orange-200/60">
+              <span className="px-2.5 py-0.5 rounded-full bg-orange-50 text-[#FF5A1F] text-xs font-bold border border-orange-200/60">
                 UGC Style
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-thai">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-thai">
               {brand?.summary ||
                 'เน้นการรีวิวจากประสบการณ์จริง (Real User Experience) สื่อสารถึงจุดเด่นของสารสกัดธรรมชาติ ปราศจากสารเคมีรุนแรง เหมาะสำหรับผู้ที่มีผิวและหนังศีรษะแพ้ง่าย ตอบโจทย์กลุ่มวัยทำงานและคนรุ่นใหม่ที่มองหาการดูแลอย่างปลอดภัย'}
             </p>
 
             {/* Content Hashtags */}
             <div className="space-y-1.5 pt-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 แฮชแท็กแนะนำบน TikTok
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -724,7 +724,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 ].map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-medium"
+                    className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium"
                   >
                     {tag}
                   </span>
@@ -734,7 +734,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             {/* Target Signals */}
             <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 กลุ่มเป้าหมายผู้บริโภค
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -749,7 +749,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 ).map((aud, i) => (
                   <span
                     key={i}
-                    className="px-2.5 py-1 rounded-xl bg-orange-50/70 text-orange-950 border border-orange-200/60 text-[11px] font-medium"
+                    className="px-3 py-1.5 rounded-xl bg-orange-50/70 text-orange-950 border border-orange-200/60 text-xs sm:text-sm font-medium"
                   >
                     ✓ {aud}
                   </span>
@@ -768,10 +768,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="w-9 h-9 rounded-2xl bg-orange-50 text-[#FF5A1F] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
                 <Users className="w-4 h-4" />
               </div>
-              <div className="text-xs font-bold text-slate-900 group-hover:text-[#FF5A1F] transition-colors">
+              <div className="text-sm font-black text-slate-900 group-hover:text-[#FF5A1F] transition-colors">
                 ค้นหา TikTok KOL
               </div>
-              <div className="text-[10px] text-slate-400 mt-0.5 font-medium">
+              <div className="text-xs text-slate-500 mt-0.5 font-medium">
                 คัดเลือกตามหมวดหมู่
               </div>
             </button>
@@ -784,10 +784,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
                 <BookmarkCheck className="w-4 h-4" />
               </div>
-              <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+              <div className="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors">
                 รายการที่บันทึก
               </div>
-              <div className="text-[10px] text-slate-400 mt-0.5 font-medium">
+              <div className="text-xs text-slate-500 mt-0.5 font-medium">
                 พอร์ตโฟลิโอ & งบประมาณ
               </div>
             </button>

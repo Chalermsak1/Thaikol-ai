@@ -68,23 +68,23 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
               {creator.rank > 0 && (
-                <span className="font-mono text-[10px] font-bold text-slate-400">
+                <span className="font-mono text-xs font-bold text-slate-400">
                   #{creator.rank}
                 </span>
               )}
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base truncate group-hover:text-[#FF5A1F] transition-colors">
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate group-hover:text-[#FF5A1F] transition-colors">
                 {creator.display_name}
               </h3>
             </div>
 
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-              <span className="text-xs font-mono text-slate-500 truncate">
+              <span className="text-xs sm:text-sm font-mono text-slate-500 truncate">
                 @{creator.username}
               </span>
 
               {creator.brand_safety_risk_level === 'safe' && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                  <ShieldCheck className="w-2.5 h-2.5" />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 leading-tight">
+                  <ShieldCheck className="w-3 h-3" />
                   <span>Safe</span>
                 </span>
               )}
@@ -96,7 +96,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           {showScore && creator.final_score > 0 && (
             <div
-              className={`px-2.5 py-1 rounded-xl text-center border shadow-2xs ${
+              className={`px-3 py-1.5 rounded-xl text-center border shadow-2xs ${
                 creator.final_score >= 80
                   ? 'bg-orange-50/80 text-[#FF5A1F] border-orange-200'
                   : creator.final_score >= 65
@@ -104,10 +104,10 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
                   : 'bg-slate-100 text-slate-700 border-slate-200'
               }`}
             >
-              <div className="text-[9px] font-bold uppercase tracking-wider text-orange-900/60 leading-none">
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-orange-900/60 leading-none">
                 AI Match
               </div>
-              <div className="text-sm font-extrabold font-mono leading-tight mt-0.5">
+              <div className="text-sm sm:text-base font-extrabold font-mono leading-tight mt-0.5">
                 {creator.final_score.toFixed(1)}
               </div>
             </div>
@@ -135,32 +135,32 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
         </div>
       </div>
 
-      {/* Metrics Row: Rendered gracefully (No ugly 3-box 'ไม่ระบุ') */}
+      {/* Metrics Row: Rendered gracefully with clear responsive sizes */}
       {hasNumericalMetrics ? (
         <div className="grid grid-cols-3 gap-2 py-2 px-3 rounded-2xl bg-orange-50/30 border border-orange-100/60 text-center">
           <div>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            <div className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-tight">
               ผู้ติดตาม
             </div>
-            <div className="text-xs sm:text-sm font-black text-slate-800 font-mono mt-0.5">
+            <div className="text-xs sm:text-sm md:text-base font-black text-slate-800 font-mono mt-0.5">
               {followersStr || <span className="text-slate-400 font-normal text-xs">-</span>}
             </div>
           </div>
 
           <div className="border-x border-slate-200/60">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            <div className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-tight">
               เฉลี่ยวิว
             </div>
-            <div className="text-xs sm:text-sm font-black text-slate-800 font-mono mt-0.5">
+            <div className="text-xs sm:text-sm md:text-base font-black text-slate-800 font-mono mt-0.5">
               {viewsStr || <span className="text-slate-400 font-normal text-xs">-</span>}
             </div>
           </div>
 
           <div>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            <div className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-tight">
               ER คุณภาพ
             </div>
-            <div className="text-xs sm:text-sm font-black text-[#FF5A1F] font-mono mt-0.5">
+            <div className="text-xs sm:text-sm md:text-base font-black text-[#FF5A1F] font-mono mt-0.5">
               {erStr || <span className="text-slate-400 font-normal text-xs">-</span>}
             </div>
           </div>
@@ -203,7 +203,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
             </div>
           </div>
         </div>
-        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-thai min-w-0 flex-1">
+        <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed font-thai min-w-0 flex-1">
           <span className="font-bold text-slate-500">
             {creator.sample_captions && creator.sample_captions.length > 0 ? 'คลิปตัวอย่าง: ' : 'คอนเทนต์: '}
           </span>
@@ -212,7 +212,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
       </div>
 
       {/* Tags Row: Locality, Rate Card, Hashtags, Data Source */}
-      <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+      <div className="flex items-center gap-1.5 flex-wrap text-xs">
         {/* Estimated Commercial Rate Card */}
         <span
           className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-bold"
@@ -220,7 +220,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
         >
           <span>💰</span>
           <span>~{formatTHBCurrency(rateCard.avgRateTHB)}/คลิป</span>
-          <span className="text-[10px] text-emerald-600 font-semibold font-mono">({rateCard.tier})</span>
+          <span className="text-[11px] text-emerald-600 font-semibold font-mono">({rateCard.tier})</span>
         </span>
 
         {/* Thai Content Signal */}
@@ -238,7 +238,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
               key={i}
               className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200/80 font-medium"
             >
-              <Sparkles className="w-2.5 h-2.5 text-orange-500" />
+              <Sparkles className="w-3 h-3 text-orange-500" />
               <span>{topic}</span>
             </span>
           ))}
@@ -248,7 +248,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
           creator.hashtags.slice(0, 1).map((tag, i) => (
             <span
               key={i}
-              className="px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 font-mono text-[10px] border border-slate-100"
+              className="px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 font-mono text-[11px] border border-slate-100"
             >
               #{tag.replace(/^#/, '')}
             </span>
@@ -257,7 +257,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
         {/* Sample Portrait Disclosure */}
         {isSamplePortrait(creator) && (
           <span
-            className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200/60"
+            className="text-[10px] sm:text-[11px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60"
             title="ภาพจำลองเพื่อการสาธิต ไม่ใช่ภาพบุคคลจริง"
           >
             รูปตัวอย่างจำลอง
@@ -266,7 +266,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
 
         {/* Provenance Tag */}
         <span
-          className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full ${
+          className={`ml-auto text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full ${
             creator.is_demo_fixture
               ? 'bg-amber-100/70 text-amber-800'
               : 'bg-emerald-100/70 text-emerald-800'
@@ -277,7 +277,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
       </div>
 
       {/* Bottom Action Footer (Reference: View Profile pill & Open TikTok) */}
-      <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+      <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm">
         <span className="btn-pill-view font-bold group-hover:border-orange-400 group-hover:text-[#FF5A1F] transition-all">
           ดูข้อมูลครีเอเตอร์
         </span>

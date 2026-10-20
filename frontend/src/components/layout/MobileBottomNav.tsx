@@ -68,14 +68,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   }`}
                 />
                 {item.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-3 min-w-[18px] h-[18px] px-1 bg-[#FF5A1F] text-white text-[10px] font-black rounded-full flex items-center justify-center leading-none shadow-xs">
+                  <span className="absolute -top-1.5 -right-3 min-w-[18px] h-[18px] px-1 bg-[#FF5A1F] text-white text-[11px] font-black rounded-full flex items-center justify-center leading-none shadow-xs font-mono">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
               </div>
               <span
-                className={`text-[10px] mt-1 tracking-tight leading-none ${
-                  isActive ? 'font-bold text-slate-900' : 'text-slate-400'
+                className={`text-[11px] mt-1 tracking-tight font-thai leading-tight ${
+                  isActive ? 'font-bold text-slate-900' : 'text-slate-500 font-medium'
                 }`}
               >
                 {item.label}
