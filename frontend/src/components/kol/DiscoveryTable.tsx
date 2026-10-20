@@ -25,8 +25,8 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
   return (
     <div className="rounded-3xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden font-thai">
       <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left border-collapse">
-          <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-500 font-bold text-[11px] uppercase tracking-wider">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-600 font-bold text-xs uppercase tracking-wider">
             <tr>
               <th className="py-4 px-4 w-12 text-center">อันดับ</th>
               <th className="py-4 px-4">ครีเอเตอร์</th>
@@ -46,26 +46,26 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                 onClick={() => onSelectCreator?.(creator)}
               >
                 {/* Rank */}
-                <td className="py-4 px-4 text-center font-mono text-slate-400 font-black">
+                <td className="py-4 px-4 text-center font-mono text-slate-400 font-black text-sm">
                   {String(creator.rank).padStart(2, '0')}
                 </td>
 
                 {/* Creator Identity */}
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/60 border border-orange-200/80 flex items-center justify-center font-black text-[#FF5A1F] text-xs shrink-0 shadow-2xs">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/60 border border-orange-200/80 flex items-center justify-center font-black text-[#FF5A1F] text-sm shrink-0 shadow-2xs">
                       {creator.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-black text-slate-900 text-xs flex items-center gap-1.5 truncate group-hover:text-[#FF5A1F] transition-colors">
+                      <div className="font-black text-slate-900 text-sm sm:text-base flex items-center gap-1.5 truncate group-hover:text-[#FF5A1F] transition-colors">
                         <span>{creator.display_name}</span>
                         {creator.brand_safety_risk_level === 'safe' && (
                           <span title="Screened Brand Safe" className="inline-flex">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 font-mono truncate">
+                      <div className="text-xs text-slate-500 font-mono truncate">
                         @{creator.username}
                       </div>
                     </div>
@@ -79,13 +79,13 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                       creator.matching_topics.slice(0, 2).map((t, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-orange-50 text-[#C93B07] border border-orange-200/60"
+                          className="px-2 py-0.5 rounded-lg text-xs font-bold bg-orange-50 text-[#C93B07] border border-orange-200/60"
                         >
                           #{t}
                         </span>
                       ))
                     ) : (
-                      <span className="text-slate-400 text-[11px]">ทั่วไป</span>
+                      <span className="text-slate-400 text-xs">ทั่วไป</span>
                     )}
                   </div>
                 </td>
@@ -95,32 +95,32 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                   {formatCompactNumber(creator.follower_count) ? (
                     <span
                       title={`${creator.follower_count?.toLocaleString()} followers`}
-                      className="font-mono font-bold text-slate-800 text-xs"
+                      className="font-mono font-bold text-slate-800 text-sm"
                     >
                       {formatCompactNumber(creator.follower_count)}
                     </span>
                   ) : (
-                    <span className="text-[10px] text-slate-400 font-medium">ไม่ระบุ</span>
+                    <span className="text-xs text-slate-400 font-medium">ไม่ระบุ</span>
                   )}
                 </td>
 
                 {/* Engagement Quality */}
                 <td className="py-4 px-4 text-right">
-                  <span className="font-mono font-bold text-slate-800 text-xs">
+                  <span className="font-mono font-bold text-slate-800 text-sm">
                     {creator.engagement_quality_score.toFixed(1)}
                   </span>
-                  <span className="text-[10px] text-slate-400 ml-0.5">/100</span>
+                  <span className="text-xs text-slate-400 ml-0.5">/100</span>
                 </td>
 
                 {/* Semantic Match */}
                 <td className="py-4 px-4 text-right">
                   <div className="inline-flex flex-col items-end">
-                    <span className="font-mono font-bold text-slate-900 text-xs">
+                    <span className="font-mono font-bold text-slate-900 text-sm">
                       {creator.semantic_relevance_score.toFixed(1)}
                     </span>
-                    <div className="w-14 bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
+                    <div className="w-16 bg-slate-100 rounded-full h-1.5 mt-1 overflow-hidden">
                       <div
-                        className="bg-[#FF5A1F] h-1 rounded-full transition-all duration-500"
+                        className="bg-[#FF5A1F] h-1.5 rounded-full transition-all duration-500"
                         style={{ width: `${creator.semantic_relevance_score}%` }}
                       />
                     </div>
@@ -129,7 +129,7 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
 
                 {/* Overall Score */}
                 <td className="py-4 px-4 text-right">
-                  <span className="font-mono font-black text-sm text-[#FF5A1F]">
+                  <span className="font-mono font-black text-base text-[#FF5A1F]">
                     {creator.final_score.toFixed(1)}
                   </span>
                 </td>

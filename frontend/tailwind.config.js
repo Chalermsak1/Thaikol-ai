@@ -13,15 +13,15 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       fontSize: {
-        '2xs': ['0.6875rem', { lineHeight: '1.05rem' }],       // 11px
-        'xs': ['0.75rem', { lineHeight: '1.25rem' }],          // 12px
-        'sm': ['0.875rem', { lineHeight: '1.45rem' }],         // 14px
-        'base': ['1rem', { lineHeight: '1.65rem' }],          // 16px
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],         // 18px
-        'xl': ['1.25rem', { lineHeight: '1.875rem' }],         // 20px
-        '2xl': ['1.5rem', { lineHeight: '2.125rem' }],         // 24px
-        '3xl': ['1.875rem', { lineHeight: '2.375rem' }],       // 30px
-        '4xl': ['2.25rem', { lineHeight: '2.75rem' }],         // 36px
+        '2xs': ['0.75rem', { lineHeight: '1.15rem' }],       // 12px
+        'xs': ['0.8125rem', { lineHeight: '1.35rem' }],       // 13px
+        'sm': ['0.9375rem', { lineHeight: '1.55rem' }],       // 15px
+        'base': ['1.0625rem', { lineHeight: '1.75rem' }],     // 17px
+        'lg': ['1.25rem', { lineHeight: '1.9rem' }],          // 20px
+        'xl': ['1.375rem', { lineHeight: '2.1rem' }],         // 22px
+        '2xl': ['1.625rem', { lineHeight: '2.35rem' }],       // 26px
+        '3xl': ['2rem', { lineHeight: '2.65rem' }],           // 32px
+        '4xl': ['2.5rem', { lineHeight: '3.15rem' }],         // 40px
       },
       colors: {
         tiktok: {

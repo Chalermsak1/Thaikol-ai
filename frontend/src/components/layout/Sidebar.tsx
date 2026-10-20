@@ -69,15 +69,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <button
         key={item.id}
         onClick={() => handleNavClick(item.id)}
-        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer group ${
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer group ${
           isActive
-            ? 'bg-white/12 text-white font-semibold shadow-xs ring-1 ring-white/10'
+            ? 'bg-white/12 text-white font-bold shadow-xs ring-1 ring-white/10'
             : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
         }`}
         title={isCollapsed ? item.label : undefined}
       >
         <Icon
-          className={`shrink-0 ${isCollapsed ? 'w-5 h-5 mx-auto' : 'w-4 h-4'} ${
+          className={`shrink-0 ${isCollapsed ? 'w-5 h-5 mx-auto' : 'w-4.5 h-4.5'} ${
             isActive ? 'text-[#FF5A1F]' : 'text-slate-400 group-hover:text-slate-200'
           }`}
         />
@@ -86,8 +86,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
         {!isCollapsed && 'badge' in item && item.badge && (
           <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full tabular-nums ${
-              isActive ? 'bg-[#FF5A1F] text-white font-bold' : 'bg-white/10 text-slate-300'
+            className={`text-xs font-bold px-2 py-0.5 rounded-full tabular-nums ${
+              isActive ? 'bg-[#FF5A1F] text-white' : 'bg-white/10 text-slate-300'
             }`}
           >
             {item.badge}
@@ -108,21 +108,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed ? (
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Modern Creator Logo with vibrant orange accent */}
-            <div className="w-8 h-8 rounded-xl bg-[#FF5A1F] text-white flex items-center justify-center shrink-0 shadow-sm font-black text-xs tracking-wider">
+            <div className="w-9 h-9 rounded-xl bg-[#FF5A1F] text-white flex items-center justify-center shrink-0 shadow-sm font-black text-sm tracking-wider">
               ✦
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-sm text-white leading-tight tracking-tight truncate flex items-center gap-1.5">
+              <div className="font-black text-base text-white leading-tight tracking-tight truncate flex items-center gap-1.5">
                 <span>ThaiKOL AI</span>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-[#FF5A1F]/20 text-[#FF5A1F] border border-[#FF5A1F]/40 font-mono">2025</span>
+                <span className="text-xs font-bold px-1.5 py-0.2 rounded-full bg-[#FF5A1F]/20 text-[#FF5A1F] border border-[#FF5A1F]/40 font-mono">2025</span>
               </div>
-              <div className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 tracking-wider uppercase">
+              <div className="text-xs text-slate-400 font-semibold leading-tight mt-0.5 tracking-wider uppercase">
                 Creator Platform
               </div>
             </div>
           </div>
         ) : (
-          <div className="w-8 h-8 rounded-xl bg-[#FF5A1F] text-white flex items-center justify-center shadow-sm font-black text-xs tracking-wider">
+          <div className="w-9 h-9 rounded-xl bg-[#FF5A1F] text-white flex items-center justify-center shadow-sm font-black text-sm tracking-wider">
             ✦
           </div>
         )}
@@ -144,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Workspace group */}
         <div className="space-y-1">
           {!isCollapsed && (
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-2 pb-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
               Workspace
             </div>
           )}
@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* System group */}
         <div className="space-y-1">
           {!isCollapsed && (
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-2 pb-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
               System
             </div>
           )}
@@ -205,18 +205,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-semibold text-slate-200 leading-tight">API Connected</div>
-                <div className="text-[10px] text-slate-400 font-mono truncate">FastAPI · Port 8000</div>
+                <div className="text-xs font-bold text-slate-200 leading-tight">API Connected</div>
+                <div className="text-xs text-slate-400 font-mono truncate">FastAPI · Port 8000</div>
               </div>
               <Wifi className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             </div>
 
             {/* Demo Mode indicator when active */}
             {demoModeActive && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                <span className="font-semibold text-[10px] tracking-wide uppercase">Demo Mode</span>
-                <span className="text-[10px] text-amber-400/80 ml-auto font-medium truncate">Curated</span>
+                <span className="font-bold text-xs tracking-wide uppercase">Demo Mode</span>
+                <span className="text-xs text-amber-400/80 ml-auto font-medium truncate">Curated</span>
               </div>
             )}
           </>
