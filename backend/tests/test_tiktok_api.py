@@ -63,3 +63,44 @@ def test_get_discovery_run_not_found(client: TestClient):
     # Nonexistent run ID
     response = client.get("/api/v1/tiktok/discovery-runs/nonexistent-run-id-99999")
     assert response.status_code in (404, 503)
+
+
+def test_ingest_creator_from_url_success(client: TestClient):
+    payload = {
+        "url_or_handle": "https://www.tiktok.com/@supassra_bliss?lang=en",
+        "brand_name": "เขาค้อทะเลภู",
+        "industry": "Beauty & Personal Care",
+        "keywords": ["แชมพู", "ลดผมร่วง", "ออร์แกนิค"],
+    }
+    response = client.post("/api/v1/tiktok/ingest-creator", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] in ("created", "existing")
+    assert "supassra_bliss" in data["candidate"]["username"].lower()
+    assert data["candidate"]["profile_url"] is not None
+    assert data["recommendation"] is not None
+    assert data["recommendation"]["final_score"] > 0
+    assert data["recommendation"]["rank"] == 1
+
+
+def test_ingest_creator_from_handle_success(client: TestClient):
+    payload = {
+        "url_or_handle": "@maya_lifestyle",
+    }
+    response = client.post("/api/v1/tiktok/ingest-creator", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["candidate"]["username"] == "maya_lifestyle"
+    assert data["candidate"]["creator_tier"] is not None
+    assert data["candidate"]["contact_line_id"] is not None
+
+
+def test_ingest_creator_invalid_input_error(client: TestClient):
+    # Empty input
+    res_empty = client.post("/api/v1/tiktok/ingest-creator", json={"url_or_handle": "   "})
+    assert res_empty.status_code in (400, 422)
+
+    # Missing field
+    res_missing = client.post("/api/v1/tiktok/ingest-creator", json={})
+    assert res_missing.status_code == 422
+

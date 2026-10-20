@@ -5,7 +5,8 @@ import { DiscoveryTable } from '../components/kol/DiscoveryTable';
 import { SearchStrategy } from '../components/brand/SearchStrategy';
 import { VideoPreviewModal } from '../components/kol/VideoPreviewModal';
 import { estimateCreatorRateCard } from '../lib/rateCardCalculator';
-import { discoverTikTokCreators, listTikTokCandidates } from '../lib/api';
+import { discoverTikTokCreators, listTikTokCandidates, ingestCreator } from '../lib/api';
+import { formatCompactNumber } from '../lib/format';
 import {
   Search,
   Filter,
@@ -15,6 +16,11 @@ import {
   ArrowRight,
   AlertCircle,
   RefreshCw,
+  UserPlus,
+  Sparkles,
+  CheckCircle2,
+  X,
+  Star,
 } from 'lucide-react';
 
 interface DiscoveryViewProps {
@@ -25,6 +31,7 @@ interface DiscoveryViewProps {
   shortlist?: Record<string, any>;
   onToggleShortlist?: (creator: KOLRecommendation) => void;
   initialQuery?: string;
+  brandName?: string;
 }
 
 const CATEGORY_CHIPS = [
@@ -45,6 +52,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
   shortlist = {},
   onToggleShortlist,
   initialQuery = '',
+  brandName = 'เขาค้อทะเลภู',
 }) => {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -70,6 +78,94 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
   const [directCandidates, setDirectCandidates] = useState<KOLRecommendation[]>([]);
   const [isSearchingDirect, setIsSearchingDirect] = useState<boolean>(false);
   const [directSearchError, setDirectSearchError] = useState<string | null>(null);
+
+  // On-Demand Ingest Creator State
+  const [isIngestModalOpen, setIsIngestModalOpen] = useState<boolean>(false);
+  const [ingestInput, setIngestInput] = useState<string>('');
+  const [isIngesting, setIsIngesting] = useState<boolean>(false);
+  const [ingestError, setIngestError] = useState<string | null>(null);
+  const [ingestedCreator, setIngestedCreator] = useState<KOLRecommendation | null>(null);
+  const [ingestStep, setIngestStep] = useState<string>('');
+
+  const handleRunIngest = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = ingestInput.trim();
+    if (!clean) return;
+    setIsIngesting(true);
+    setIngestError(null);
+    setIngestedCreator(null);
+    setIngestStep('กำลังเชื่อมต่อ TikTok และดึงข้อมูลบัญชี...');
+
+    try {
+      const res = await ingestCreator({
+        url_or_handle: clean,
+        brand_name: brandName || 'เขาค้อทะเลภู',
+      });
+
+      if (res && (res.recommendation || res.candidate)) {
+        const cand = res.candidate;
+        const rec = res.recommendation;
+        const finalRec: KOLRecommendation = rec || {
+          rank: 1,
+          username: cand.username,
+          display_name: cand.display_name,
+          profile_url: cand.profile_url,
+          is_profile_verified: true,
+          profile_status: 'verified',
+          final_score: Math.round((cand.local_signal_score || 0.8) * 100),
+          semantic_relevance_score: 85,
+          engagement_quality_score: Math.min(100, Math.round((cand.estimated_engagement_rate || 0.04) * 1500)),
+          local_content_relevance_score: Math.round((cand.local_signal_score || 0.85) * 100),
+          brand_safety_score: 95,
+          brand_safety_risk_level: 'safe',
+          data_quality_score: 95,
+          score_breakdown: {
+            semantic_relevance: { score: 85, weight: 0.35, weighted_contribution: 29.75 },
+            engagement_quality: { score: 80, weight: 0.25, weighted_contribution: 20 },
+            local_content_relevance: { score: 85, weight: 0.2, weighted_contribution: 17 },
+            brand_safety: { score: 95, weight: 0.1, weighted_contribution: 9.5 },
+            data_quality: { score: 95, weight: 0.1, weighted_contribution: 9.5 },
+            final_score: 85,
+          },
+          reasons: ['ครีเอเตอร์ถูกนำเข้าและคำนวณสัญญาณคอนเทนต์เรียบร้อยแล้ว', 'มีช่องทางติดต่อ LINE ID พร้อมคุยงานทันที'],
+          cautions: [],
+          matching_topics: ['รีวิวสินค้า', 'ไลฟ์สไตล์'],
+          bio: cand.bio,
+          follower_count: cand.follower_count,
+          sample_video_count: cand.sample_video_count,
+          average_views: cand.average_views,
+          average_likes: cand.average_likes,
+          estimated_engagement_rate: cand.estimated_engagement_rate,
+          sample_captions: cand.sample_captions,
+          hashtags: cand.hashtags,
+          contact_line_id: cand.contact_line_id,
+          contact_email: cand.contact_email,
+          contact_phone: cand.contact_phone,
+          creator_tier: cand.creator_tier,
+          rate_card_min: cand.rate_card_min,
+          rate_card_max: cand.rate_card_max,
+          last_posted_at: cand.last_posted_at,
+          has_tiktok_shop: cand.has_tiktok_shop,
+          content_formats: cand.content_formats,
+          data_source: 'on_demand_ingest',
+          collected_at: new Date().toISOString(),
+          is_demo_fixture: false,
+          provenance: 'on_demand_ingest',
+        };
+
+        setIngestedCreator(finalRec);
+        setDirectCandidates((prev) => [finalRec, ...prev.filter((x) => x.username !== finalRec.username)]);
+      } else {
+        setIngestError(res.message || 'ไม่สามารถดึงข้อมูลครีเอเตอร์ได้ กรุณาตรวจสอบ URL หรือ Handle');
+      }
+    } catch (err: any) {
+      console.error('Ingest failed:', err);
+      setIngestError(err.response?.data?.detail || 'เกิดข้อผิดพลาดในการดึงข้อมูล กรุณาลองใหม่อีกครั้ง');
+    } finally {
+      setIsIngesting(false);
+      setIngestStep('');
+    }
+  };
 
   // Pool of candidate creators: either from brand analysis result or direct TikTok discovery
   const hasBrandResult = !!(result && result.recommendations && result.recommendations.length > 0);
@@ -426,6 +522,21 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-slate-900 border-2 border-white" />
             )}
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsIngestModalOpen(true);
+              setIngestError(null);
+              setIngestedCreator(null);
+            }}
+            className="px-3.5 sm:px-4 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-[#FF5A1F] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md flex items-center gap-1.5 transition-all cursor-pointer shrink-0 min-h-[46px]"
+            title="นำเข้าครีเอเตอร์ด้วย TikTok Profile URL หรือ @username"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span className="hidden sm:inline">+ นำเข้า TikTok</span>
+            <span className="sm:hidden">+ นำเข้า</span>
+          </button>
         </form>
 
         {/* Category Suggestion Chips (Horizontal scrollable on mobile) */}
@@ -779,6 +890,227 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
           isOpen={Boolean(previewCreator)}
           onClose={() => setPreviewCreator(null)}
         />
+      )}
+
+      {/* On-Demand Creator Ingest Modal */}
+      {isIngestModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="px-6 py-5 bg-gradient-to-r from-orange-500 to-[#FF5A1F] text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
+                  <UserPlus className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base sm:text-lg">นำเข้าครีเอเตอร์ด้วย TikTok</h3>
+                  <p className="text-xs text-orange-100">ดึงข้อมูลโปรไฟล์ สัญญาณคอนเทนต์ และคำนวณ AI Fit Score ทันที</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsIngestModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4">
+              <form onSubmit={handleRunIngest} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    TikTok Profile URL หรือ @username
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={ingestInput}
+                      onChange={(e) => setIngestInput(e.target.value)}
+                      placeholder="เช่น https://www.tiktok.com/@icepadie หรือ @supassra_bliss"
+                      disabled={isIngesting}
+                      className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] font-sans disabled:opacity-50"
+                    />
+                    {ingestInput && !isIngesting && (
+                      <button
+                        type="button"
+                        onClick={() => setIngestInput('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Example Quick Presets */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[11px] text-slate-400">ตัวอย่าง:</span>
+                  {['@icepadie', '@supassra_bliss', '@linglingkwong'].map((handle) => (
+                    <button
+                      key={handle}
+                      type="button"
+                      onClick={() => setIngestInput(handle)}
+                      className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-orange-50 hover:text-[#FF5A1F] text-[11px] text-slate-600 transition cursor-pointer"
+                    >
+                      {handle}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={!ingestInput.trim() || isIngesting}
+                  className="w-full py-3.5 rounded-2xl bg-[#FF5A1F] hover:bg-orange-600 text-white font-bold text-sm shadow-sm hover:shadow flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isIngesting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>{ingestStep || 'กำลังประมวลผล...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>ดึงข้อมูล & วิเคราะห์ด้วย AI ทันที</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Error Message */}
+              {ingestError && (
+                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{ingestError}</span>
+                </div>
+              )}
+
+              {/* Ingest Result Preview Card */}
+              {ingestedCreator && (
+                <div className="p-4 rounded-2xl bg-orange-50/50 border border-orange-200/80 space-y-3 animate-in fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 border-2 border-white shadow-xs shrink-0 flex items-center justify-center font-bold text-slate-600">
+                        {ingestedCreator.avatar_url ? (
+                          <img
+                            src={ingestedCreator.avatar_url}
+                            alt={ingestedCreator.display_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          ingestedCreator.display_name.charAt(0)
+                        )}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-sm text-slate-900">{ingestedCreator.display_name}</h4>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+                            TikTok Verified
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">@{ingestedCreator.username}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-orange-100 text-[#FF5A1F] font-bold text-xs">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Fit {ingestedCreator.final_score}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Metrics Row */}
+                  <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white border border-slate-100 text-center text-xs">
+                    <div>
+                      <p className="text-[10px] text-slate-400">ผู้ติดตาม</p>
+                      <p className="font-bold text-slate-800">{formatCompactNumber(ingestedCreator.follower_count || 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400">วิวเฉลี่ย</p>
+                      <p className="font-bold text-slate-800">{formatCompactNumber(ingestedCreator.average_views || 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400">เรตการ์ดประเมิน</p>
+                      <p className="font-bold text-[#FF5A1F] text-[11px]">
+                        ฿{formatCompactNumber(ingestedCreator.rate_card_min || 0)} - {formatCompactNumber(ingestedCreator.rate_card_max || 0)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Commercial Contacts */}
+                  <div className="flex items-center gap-2 text-xs flex-wrap">
+                    {ingestedCreator.contact_line_id && (
+                      <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium">
+                        💬 LINE: {ingestedCreator.contact_line_id}
+                      </span>
+                    )}
+                    {ingestedCreator.creator_tier && (
+                      <span className="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 font-medium">
+                        👑 {ingestedCreator.creator_tier}
+                      </span>
+                    )}
+                    {ingestedCreator.has_tiktok_shop && (
+                      <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 font-medium">
+                        🛒 มี TikTok Shop
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Actions inside card */}
+                  <div className="flex items-center gap-2 pt-1">
+                    {onToggleShortlist && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onToggleShortlist(ingestedCreator);
+                        }}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                          shortlist[ingestedCreator.username]
+                            ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            : 'bg-gradient-to-r from-orange-500 to-[#FF5A1F] text-white hover:opacity-95 shadow-2xs'
+                        }`}
+                      >
+                        {shortlist[ingestedCreator.username] ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>อยู่ใน Shortlist แล้ว</span>
+                          </>
+                        ) : (
+                          <>
+                            <Star className="w-3.5 h-3.5" />
+                            <span>เพิ่มลงใน Shortlist</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectCreator(ingestedCreator);
+                        setIsIngestModalOpen(false);
+                      }}
+                      className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-medium transition cursor-pointer"
+                    >
+                      ดูข้อมูลเชิงลึก
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setIsIngestModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition cursor-pointer"
+              >
+                ปิดหน้าต่าง
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

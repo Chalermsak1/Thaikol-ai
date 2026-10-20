@@ -182,3 +182,20 @@ class KOLResponse(KOLBase):
     disclaimer: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CreatorIngestRequest(BaseModel):
+    """Payload to on-demand ingest and score a creator by TikTok URL or username."""
+    url_or_handle: str = Field(..., min_length=1, description="TikTok profile URL (e.g. https://www.tiktok.com/@handle) or username")
+    brand_name: Optional[str] = Field(None, description="Optional target brand name for scoring")
+    industry: Optional[str] = Field(None, description="Optional target industry")
+    keywords: List[str] = Field(default_factory=list, description="Optional campaign target keywords")
+
+
+class CreatorIngestResponse(BaseModel):
+    """Response containing the ingested candidate and optional scored recommendation."""
+    status: str = Field(..., description="Ingestion outcome status: created | existing | updated")
+    message: str = Field(..., description="User-friendly status message")
+    candidate: KOLCandidate
+    recommendation: Optional[Any] = Field(None, description="Scored recommendation card if scoring was performed")
+

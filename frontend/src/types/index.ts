@@ -221,7 +221,24 @@ export type ActiveNavPage =
   | 'sources'
   | 'technical';
 
-export type OutreachStatus = 'shortlisted' | 'contacted' | 'negotiating' | 'confirmed' | 'declined';
+export type OutreachStatus = 'shortlisted' | 'contacted' | 'negotiating' | 'confirmed' | 'declined' | 'completed';
+
+export interface DocumentAttachment {
+  id: string;
+  label: string;
+  url: string;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  brandName?: string;
+  targetBudget: number;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  createdAt: string;
+}
 
 export interface ShortlistItem {
   username: string;
@@ -229,6 +246,37 @@ export interface ShortlistItem {
   status: OutreachStatus;
   addedAt: string;
   notes?: string;
+  campaignId?: string;
+  // Timeline & Milestones
+  draftDueDate?: string;
+  liveDate?: string;
+  agreedRateTHB?: number;
+  deliverableFormat?: string;
+  // Document Attachments
+  documentLinks?: DocumentAttachment[];
+  // Post-Campaign Live Post Tracking & Actual Performance
+  livePostUrl?: string;
+  actualCostTHB?: number;
+  actualViews?: number;
+  actualLikes?: number;
+  actualComments?: number;
+  actualShares?: number;
+  trackingStatus?: 'pending_post' | 'live' | 'tracking_done';
+  trackingUpdatedAt?: string;
+}
+
+export interface CreatorIngestRequest {
+  url_or_handle: string;
+  brand_name?: string;
+  industry?: string;
+  keywords?: string[];
+}
+
+export interface CreatorIngestResponse {
+  status: 'created' | 'existing' | 'updated' | string;
+  message: string;
+  candidate: KOLCandidate;
+  recommendation?: KOLRecommendation | null;
 }
 
 export interface Report {
@@ -237,4 +285,5 @@ export interface Report {
   description: string;
   content: string;
   created_at: string;
-} 
+}
+ 

@@ -90,3 +90,22 @@ export async function listTikTokCandidates(params?: {
   return response.data;
 }
 
+export async function ingestCreator(params: {
+  url_or_handle: string;
+  brand_name?: string;
+  industry?: string;
+  keywords?: string[];
+}): Promise<{
+  status: string;
+  message: string;
+  candidate: any;
+  recommendation?: any;
+}> {
+  const response = await apiClient.post(
+    '/api/v1/tiktok/ingest-creator',
+    params
+  );
+  return response.data;
+}
+
+

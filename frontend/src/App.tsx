@@ -224,10 +224,6 @@ export const App: React.FC = () => {
   // LocalStorage Persistence
   useEffect(() => {
     try {
-      if (!result) {
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
       const sessionData = {
         activePage,
         websiteUrl,
@@ -293,6 +289,19 @@ export const App: React.FC = () => {
         [username]: {
           ...prev[username],
           notes,
+        },
+      };
+    });
+  };
+
+  const handleUpdateShortlistItem = (username: string, updates: Partial<ShortlistItem>) => {
+    setShortlist((prev) => {
+      if (!prev[username]) return prev;
+      return {
+        ...prev,
+        [username]: {
+          ...prev[username],
+          ...updates,
         },
       };
     });
@@ -387,6 +396,7 @@ export const App: React.FC = () => {
           shortlist={shortlist}
           onToggleShortlist={handleToggleShortlist}
           initialQuery={discoveryQuery}
+          brandName={result?.brand_profile?.brand_name || 'เขาค้อทะเลภู'}
         />
       )}
 
@@ -419,6 +429,7 @@ export const App: React.FC = () => {
           shortlist={shortlist}
           onUpdateStatus={handleUpdateShortlistStatus}
           onUpdateNotes={handleUpdateShortlistNotes}
+          onUpdateItem={handleUpdateShortlistItem}
           onRemoveFromShortlist={handleRemoveFromShortlist}
           onOpenCreatorDetail={(c) => setSelectedCreatorForDrawer(c)}
           onGoToRecommendations={() => setActivePage('recommendations')}
