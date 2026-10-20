@@ -379,6 +379,8 @@ class TikTokDiscoveryService:
                         target_model.profile_url = cand.profile_url
                         target_model.is_profile_verified = cand.is_profile_verified
                         target_model.profile_status = cand.profile_status
+                        target_model.avatar_url = cand.avatar_url
+                        target_model.video_thumbnail_url = cand.video_thumbnail_url
                         target_model.bio = cand.bio
                         target_model.follower_count = cand.follower_count
                         target_model.sample_video_count = cand.sample_video_count
@@ -416,6 +418,8 @@ class TikTokDiscoveryService:
                             profile_url=cand.profile_url,
                             is_profile_verified=cand.is_profile_verified,
                             profile_status=cand.profile_status,
+                            avatar_url=cand.avatar_url,
+                            video_thumbnail_url=cand.video_thumbnail_url,
                             bio=cand.bio,
                             follower_count=cand.follower_count,
                             sample_video_count=cand.sample_video_count,
