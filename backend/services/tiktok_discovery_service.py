@@ -32,6 +32,11 @@ from services.tiktok_signals import (
     calculate_thailand_keyword_count,
     calculate_thailand_hashtag_count,
     calculate_local_signal_score,
+    extract_bio_contacts,
+    classify_creator_tier,
+    estimate_rate_card_range,
+    detect_content_formats_and_shop,
+    extract_last_posted_at,
 )
 
 
@@ -319,6 +324,16 @@ class TikTokDiscoveryService:
                 thai_ratio, kw_count, hashtag_count, locations
             )
 
+            # Commercial & Contact Extraction
+            bio_text = data["bio"] or ""
+            contacts = extract_bio_contacts(bio_text)
+            tier = classify_creator_tier(followers)
+            rate_min, rate_max = estimate_rate_card_range(followers, avg_views)
+            formats, has_shop = detect_content_formats_and_shop(
+                data["sample_captions"], list(data["hashtags"]), bio_text
+            )
+            last_posted = extract_last_posted_at(videos_list)
+
             candidate = KOLCandidate(
                 username=data["username"],
                 normalized_username=data["normalized_username"],
@@ -330,6 +345,15 @@ class TikTokDiscoveryService:
                 follower_count=followers,
                 avatar_url=data.get("avatar_url"),
                 video_thumbnail_url=data.get("video_thumbnail_url"),
+                contact_line_id=contacts.get("contact_line_id"),
+                contact_email=contacts.get("contact_email"),
+                contact_phone=contacts.get("contact_phone"),
+                creator_tier=tier,
+                rate_card_min=rate_min,
+                rate_card_max=rate_max,
+                last_posted_at=last_posted,
+                has_tiktok_shop=has_shop,
+                content_formats=formats,
                 sample_video_count=sample_video_count,
                 total_views=total_views,
                 total_likes=total_likes,
@@ -383,6 +407,14 @@ class TikTokDiscoveryService:
                         target_model.video_thumbnail_url = cand.video_thumbnail_url
                         target_model.bio = cand.bio
                         target_model.follower_count = cand.follower_count
+                        target_model.contact_line_id = cand.contact_line_id
+                        target_model.contact_email = cand.contact_email
+                        target_model.contact_phone = cand.contact_phone
+                        target_model.creator_tier = cand.creator_tier
+                        target_model.rate_card_min = cand.rate_card_min
+                        target_model.rate_card_max = cand.rate_card_max
+                        target_model.has_tiktok_shop = cand.has_tiktok_shop
+                        target_model.content_formats = cand.content_formats
                         target_model.sample_video_count = cand.sample_video_count
                         target_model.total_views = cand.total_views
                         target_model.total_likes = cand.total_likes
@@ -422,6 +454,14 @@ class TikTokDiscoveryService:
                             video_thumbnail_url=cand.video_thumbnail_url,
                             bio=cand.bio,
                             follower_count=cand.follower_count,
+                            contact_line_id=cand.contact_line_id,
+                            contact_email=cand.contact_email,
+                            contact_phone=cand.contact_phone,
+                            creator_tier=cand.creator_tier,
+                            rate_card_min=cand.rate_card_min,
+                            rate_card_max=cand.rate_card_max,
+                            has_tiktok_shop=cand.has_tiktok_shop,
+                            content_formats=cand.content_formats,
                             sample_video_count=cand.sample_video_count,
                             total_views=cand.total_views,
                             total_likes=cand.total_likes,

@@ -107,6 +107,17 @@ class KOLCandidate(BaseModel):
         description="Composite score representing Thailand/local content signals, not verified audience location"
     )
 
+    # Commercial & Contact Channels
+    contact_line_id: Optional[str] = Field(None, description="Direct LINE ID extracted from bio")
+    contact_email: Optional[str] = Field(None, description="Business email extracted from bio")
+    contact_phone: Optional[str] = Field(None, description="Contact phone number extracted from bio")
+    creator_tier: str = Field(default="Nano (1K-10K)", description="Audience volume tier: Nano | Micro | Mid-Tier | Macro | Mega")
+    rate_card_min: Optional[int] = Field(None, ge=0, description="Estimated minimum rate per video (THB)")
+    rate_card_max: Optional[int] = Field(None, ge=0, description="Estimated maximum rate per video (THB)")
+    last_posted_at: Optional[str] = Field(None, description="Latest video publication timestamp")
+    has_tiktok_shop: bool = Field(default=False, description="True if creator actively features TikTok Shop or affiliate basket")
+    content_formats: List[str] = Field(default_factory=list, description="Primary content delivery formats (e.g. Review, How-to, Unboxing)")
+
     # Provenance
     data_source: str = Field(default="live", description="Origin: live | demo_fixture | apify")
     collected_at: str = Field(..., description="Collection timestamp")

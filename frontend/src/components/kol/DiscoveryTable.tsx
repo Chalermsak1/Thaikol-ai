@@ -68,6 +68,31 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                       <div className="text-xs text-slate-500 font-mono truncate">
                         @{creator.username}
                       </div>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        {creator.creator_tier && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/80 leading-none">
+                            {creator.creator_tier}
+                          </span>
+                        )}
+                        {creator.contact_line_id && (
+                          <span
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#06C755]/10 text-[#05963f] border border-[#06C755]/30 leading-none"
+                            title={`LINE: ${creator.contact_line_id}`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#06C755]" />
+                            <span>LINE</span>
+                          </span>
+                        )}
+                        {creator.has_tiktok_shop && (
+                          <span
+                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 leading-none"
+                            title="มี TikTok Shop / เปิดตะกร้าสินค้า"
+                          >
+                            <span>🛒</span>
+                            <span>Shop</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -90,15 +115,25 @@ export const DiscoveryTable: React.FC<DiscoveryTableProps> = ({
                   </div>
                 </td>
 
-                {/* Followers */}
+                {/* Followers & Rate Card */}
                 <td className="py-4 px-4 text-center">
                   {formatCompactNumber(creator.follower_count) ? (
-                    <span
-                      title={`${creator.follower_count?.toLocaleString()} followers`}
-                      className="font-mono font-bold text-slate-800 text-sm"
-                    >
-                      {formatCompactNumber(creator.follower_count)}
-                    </span>
+                    <div>
+                      <span
+                        title={`${creator.follower_count?.toLocaleString()} followers`}
+                        className="font-mono font-bold text-slate-800 text-sm block"
+                      >
+                        {formatCompactNumber(creator.follower_count)}
+                      </span>
+                      {creator.rate_card_min && creator.rate_card_max && (
+                        <span
+                          className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 font-mono mt-1 inline-block"
+                          title="ประมาณการเรทการ์ดสปอนเซอร์ต่อคลิป"
+                        >
+                          ~{formatCompactNumber(creator.rate_card_min)}-{formatCompactNumber(creator.rate_card_max)}฿
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-xs text-slate-400 font-medium">ไม่ระบุ</span>
                   )}

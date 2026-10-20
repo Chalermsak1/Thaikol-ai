@@ -14,6 +14,10 @@ import {
   AlertTriangle,
   Info,
   Play,
+  MessageCircle,
+  Mail,
+  Phone,
+  ShoppingBag,
 } from 'lucide-react';
 import { formatCompactNumber, formatPercent } from '../../lib/format';
 import { CreatorAvatar, getCreatorCover, isSamplePortrait } from '../../lib/creatorMedia';
@@ -167,6 +171,110 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                 </div>
               ))}
             </div>
+
+            {/* ─── NEW: Commercial & Direct Contact Section ─── */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-50/70 via-white to-amber-50/50 border border-orange-200/80 shadow-xs space-y-3 font-thai">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm text-slate-900">
+                  <span className="w-6 h-6 rounded-lg bg-[#FF5A1F] text-white flex items-center justify-center text-xs shadow-2xs">
+                    💼
+                  </span>
+                  <span>ช่องทางติดต่องาน & ข้อมูลพาณิชย์</span>
+                </div>
+                {creator.creator_tier && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-orange-100 text-[#C93B07] border border-orange-200">
+                    {creator.creator_tier}
+                  </span>
+                )}
+              </div>
+
+              {/* Rate Card Range & TikTok Shop Badges */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-white/90 border border-slate-200/80 shadow-2xs">
+                  <span className="text-[11px] text-slate-500 font-medium block">ประมาณการเรทการ์ด</span>
+                  <span className="text-sm font-black font-mono text-emerald-600 mt-0.5 block">
+                    {creator.rate_card_min && creator.rate_card_max
+                      ? `~${formatCompactNumber(creator.rate_card_min)} - ${formatCompactNumber(creator.rate_card_max)}฿`
+                      : 'ตามตกลง'}
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/90 border border-slate-200/80 shadow-2xs">
+                  <span className="text-[11px] text-slate-500 font-medium block">TikTok Shop / ตะกร้า</span>
+                  <span className={`text-xs font-bold inline-flex items-center gap-1.5 mt-0.5 ${
+                    creator.has_tiktok_shop ? 'text-amber-600' : 'text-slate-500'
+                  }`}>
+                    {creator.has_tiktok_shop ? (
+                      <>
+                        <ShoppingBag className="w-3.5 h-3.5 text-amber-500" />
+                        <span>มีตะกร้าสินค้า</span>
+                      </>
+                    ) : (
+                      <span>— ไม่ได้เปิดตะกร้า</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Content Formats */}
+              {creator.content_formats && creator.content_formats.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[11px] text-slate-500 font-semibold">สไตล์คลิป:</span>
+                  {creator.content_formats.map((fmt, i) => (
+                    <span key={i} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 text-[11px] font-medium shadow-2xs">
+                      {fmt}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Quick Contact Action Buttons */}
+              <div className="space-y-1.5 pt-2 border-t border-orange-100">
+                <span className="text-[11px] font-bold text-slate-600 block">
+                  ช่องทางติดต่อที่ตรวจพบใน Bio:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {creator.contact_line_id ? (
+                    <a
+                      href={`https://line.me/R/ti/p/~${creator.contact_line_id.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold shadow-xs transition active:scale-95"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>LINE: {creator.contact_line_id}</span>
+                      <ExternalLink className="w-3 h-3 opacity-80" />
+                    </a>
+                  ) : null}
+
+                  {creator.contact_email ? (
+                    <a
+                      href={`mailto:${creator.contact_email}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition active:scale-95"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>{creator.contact_email}</span>
+                    </a>
+                  ) : null}
+
+                  {creator.contact_phone ? (
+                    <a
+                      href={`tel:${creator.contact_phone}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition active:scale-95"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{creator.contact_phone}</span>
+                    </a>
+                  ) : null}
+
+                  {!creator.contact_line_id && !creator.contact_email && !creator.contact_phone && (
+                    <span className="text-xs text-slate-400 italic">
+                      ไม่พบ LINE/Email ใน Bio สาธารณะ (แนะนำติดต่อผ่าน TikTok Direct Message)
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Section 1c: Video Content & Portfolio Showcase */}
             {creator.sample_captions && creator.sample_captions.length > 0 && (
               <div className="space-y-2.5 pt-2">

@@ -82,6 +82,12 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
                     Safe
                   </span>
                 )}
+
+                {recommendation.creator_tier && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    {recommendation.creator_tier}
+                  </span>
+                )}
               </div>
 
               {/* Tags row & Rate Card */}
@@ -94,6 +100,25 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
                   <span>~{formatTHBCurrency(rateCard.avgRateTHB)} / คลิป</span>
                   <span className="text-[10px] text-emerald-600 font-normal">({rateCard.tier})</span>
                 </span>
+
+                {recommendation.contact_line_id && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#06C755]/10 text-[#05963f] text-[11px] font-bold border border-[#06C755]/30"
+                    title={`LINE: ${recommendation.contact_line_id}`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#06C755]" />
+                    <span>LINE</span>
+                  </span>
+                )}
+
+                {recommendation.has_tiktok_shop && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200/80"
+                    title="มี TikTok Shop / เปิดตะกร้าสินค้า"
+                  >
+                    <span>🛒 มีตะกร้า</span>
+                  </span>
+                )}
 
                 {recommendation.matching_topics.slice(0, 3).map((topic, i) => (
                   <span

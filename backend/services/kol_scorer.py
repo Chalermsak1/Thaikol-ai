@@ -16,6 +16,12 @@ from services.brand_safety_service import brand_safety_service
 from services.data_quality_service import data_quality_service
 from services.audience_fit_service import calculate_audience_fit_proxy
 from services.explainability_service import explanation_service
+from services.tiktok_signals import (
+    extract_bio_contacts,
+    classify_creator_tier,
+    estimate_rate_card_range,
+    detect_content_formats_and_shop,
+)
 
 
 class MultiFactorKOLScorer(KOLScorer):
@@ -189,6 +195,48 @@ class MultiFactorKOLScorer(KOLScorer):
                 hashtags=list(cand.hashtags[:15]),
                 avatar_url=getattr(cand, "avatar_url", None),
                 video_thumbnail_url=getattr(cand, "video_thumbnail_url", None),
+                contact_line_id=(
+                    getattr(cand, "contact_line_id", None)
+                    or extract_bio_contacts(cand.bio or "").get("contact_line_id")
+                ),
+                contact_email=(
+                    getattr(cand, "contact_email", None)
+                    or extract_bio_contacts(cand.bio or "").get("contact_email")
+                ),
+                contact_phone=(
+                    getattr(cand, "contact_phone", None)
+                    or extract_bio_contacts(cand.bio or "").get("contact_phone")
+                ),
+                creator_tier=(
+                    getattr(cand, "creator_tier", None)
+                    or classify_creator_tier(cand.follower_count or 0)
+                ),
+                rate_card_min=(
+                    getattr(cand, "rate_card_min", None)
+                    or estimate_rate_card_range(cand.follower_count or 0, cand.average_views)[0]
+                ),
+                rate_card_max=(
+                    getattr(cand, "rate_card_max", None)
+                    or estimate_rate_card_range(cand.follower_count or 0, cand.average_views)[1]
+                ),
+                last_posted_at=getattr(cand, "last_posted_at", None),
+                has_tiktok_shop=(
+                    getattr(cand, "has_tiktok_shop", None)
+                    if getattr(cand, "has_tiktok_shop", None) is not None
+                    else detect_content_formats_and_shop(
+                        list(cand.sample_captions or []),
+                        list(cand.hashtags or []),
+                        cand.bio or "",
+                    )[1]
+                ),
+                content_formats=(
+                    getattr(cand, "content_formats", None)
+                    or detect_content_formats_and_shop(
+                        list(cand.sample_captions or []),
+                        list(cand.hashtags or []),
+                        cand.bio or "",
+                    )[0]
+                ),
                 data_source=cand.data_source,
                 collected_at=cand.collected_at,
                 data_freshness=getattr(cand, "data_freshness", "fresh"),

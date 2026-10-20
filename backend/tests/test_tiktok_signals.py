@@ -4,6 +4,11 @@ from services.tiktok_signals import (
     calculate_thailand_keyword_count,
     calculate_thailand_hashtag_count,
     calculate_local_signal_score,
+    extract_bio_contacts,
+    classify_creator_tier,
+    estimate_rate_card_range,
+    detect_content_formats_and_shop,
+    extract_last_posted_at,
 )
 
 
@@ -81,3 +86,50 @@ def test_calculate_local_signal_score_bounds_and_heuristic():
         location_mentions=["Bangkok", "Chiang Mai", "Phuket", "Pattaya"],
     )
     assert extreme_score <= 1.0
+
+
+def test_extract_bio_contacts():
+    # Bio with Line, Email, and Phone
+    bio_full = "รีวิวบิวตี้ & แฟชั่น | ติดต่องาน Line: @mookda.work หรือ email: mookda.biz@gmail.com โทร 081-234-5678"
+    contacts = extract_bio_contacts(bio_full)
+    assert contacts["contact_line_id"] == "@mookda.work"
+    assert contacts["contact_email"] == "mookda.biz@gmail.com"
+    assert contacts["contact_phone"] == "081-234-5678"
+
+    # Bio with Thai prefix for Line
+    bio_line_only = "ติดต่องานแบรนด์ ไลน์: work_creator99"
+    contacts2 = extract_bio_contacts(bio_line_only)
+    assert contacts2["contact_line_id"] == "work_creator99"
+    assert contacts2["contact_email"] is None
+
+    # Empty or None bio
+    assert extract_bio_contacts(None) == {"contact_line_id": None, "contact_email": None, "contact_phone": None}
+    assert extract_bio_contacts("") == {"contact_line_id": None, "contact_email": None, "contact_phone": None}
+
+
+def test_classify_creator_tier():
+    assert classify_creator_tier(5_000) == "Nano (1K-10K)"
+    assert classify_creator_tier(50_000) == "Micro (10K-100K)"
+    assert classify_creator_tier(250_000) == "Mid-Tier (100K-500K)"
+    assert classify_creator_tier(750_000) == "Macro (500K-1M)"
+    assert classify_creator_tier(2_000_000) == "Mega (1M+)"
+    assert classify_creator_tier(None) == "Nano (1K-10K)"
+
+
+def test_estimate_rate_card_range():
+    min_rate, max_rate = estimate_rate_card_range(50_000, 15_000)
+    assert min_rate is not None and max_rate is not None
+    assert min_rate >= 3_500
+    assert max_rate <= 15_000
+    assert min_rate <= max_rate
+
+
+def test_detect_content_formats_and_shop():
+    captions = ["แกะกล่องสกินแคร์ตัวใหม่ล่าสุด ป้ายยาแรงมาก #unboxing #รีวิว"]
+    hashtags = ["#unboxing", "#รีวิวบิวตี้", "#tiktokshop"]
+    bio = "พิกัดในโปรไฟล์ กดที่ตะกร้าได้เลยจ้า Line: @shop"
+
+    formats, has_shop = detect_content_formats_and_shop(captions, hashtags, bio)
+    assert "รีวิว / พลีชีพ" in formats or "แกะกล่อง / Unboxing" in formats
+    assert has_shop is True
+

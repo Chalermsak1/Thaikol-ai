@@ -47,6 +47,17 @@ class KOLCandidateModel(Base):
     location_mentions = Column(JSON, default=list)
     local_signal_score = Column(Float, default=0.0)
 
+    # Commercial, Contact & Content Format Signals
+    contact_line_id = Column(String(100), nullable=True)
+    contact_email = Column(String(255), nullable=True)
+    contact_phone = Column(String(50), nullable=True)
+    creator_tier = Column(String(50), nullable=True, default="Nano (1K-10K)")
+    rate_card_min = Column(Integer, nullable=True)
+    rate_card_max = Column(Integer, nullable=True)
+    last_posted_at = Column(DateTime, nullable=True)
+    has_tiktok_shop = Column(Boolean, default=False)
+    content_formats = Column(JSON, default=list)
+
     # Provenance & lifecycle
     data_source = Column(String(50), default="live", index=True)
     collected_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
@@ -142,6 +153,17 @@ class KOLModel(Base):
     avg_views = Column(Integer, default=0)
     engagement_rate = Column(Float, default=0.0)
     estimated_thai_audience_ratio = Column(Float, default=0.9)
+
+    # Commercial & Contact Channels
+    contact_line_id = Column(String(100), nullable=True)
+    contact_email = Column(String(255), nullable=True)
+    contact_phone = Column(String(50), nullable=True)
+    creator_tier = Column(String(50), nullable=True, default="Nano (1K-10K)")
+    rate_card_min = Column(Integer, nullable=True)
+    rate_card_max = Column(Integer, nullable=True)
+    last_posted_at = Column(DateTime, nullable=True)
+    has_tiktok_shop = Column(Boolean, default=False)
+    content_formats = Column(JSON, default=list)
 
     is_demo_fixture = Column(Boolean, default=False)
     data_source = Column(String(50), default="live")

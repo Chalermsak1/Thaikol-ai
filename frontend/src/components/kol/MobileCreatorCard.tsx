@@ -88,6 +88,12 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
                   <span>Safe</span>
                 </span>
               )}
+
+              {creator.creator_tier && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/80 leading-tight">
+                  {creator.creator_tier}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -228,6 +234,39 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-50 text-orange-800 border border-orange-200/70 font-semibold">
             <span>🇹🇭</span>
             <span>ไทย</span>
+          </span>
+        )}
+
+        {/* LINE Direct Contact Badge */}
+        {creator.contact_line_id && (
+          <span
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#06C755]/10 text-[#05963f] border border-[#06C755]/30 font-bold"
+            title={`LINE ID สำหรับติดต่องาน: ${creator.contact_line_id}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#06C755]" />
+            <span>LINE พร้อม</span>
+          </span>
+        )}
+
+        {/* TikTok Shop Badge */}
+        {creator.has_tiktok_shop && (
+          <span
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 font-bold"
+            title="มี TikTok Shop / เปิดตะกร้าสินค้าในช่อง"
+          >
+            <span>🛒</span>
+            <span>มีตะกร้า</span>
+          </span>
+        )}
+
+        {/* Content Formats */}
+        {creator.content_formats && creator.content_formats.length > 0 && (
+          <span
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-semibold"
+            title={`รูปแบบคอนเทนต์: ${creator.content_formats.join(', ')}`}
+          >
+            <span>🎬</span>
+            <span>{creator.content_formats[0]}</span>
           </span>
         )}
 
