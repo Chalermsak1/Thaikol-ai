@@ -170,3 +170,41 @@ def test_tiktok_db_failed_provider_does_not_leave_fake_success(in_memory_db):
     failed_runs = in_memory_db.query(KOLDiscoveryRunModel).filter_by(status="failed").all()
     assert len(failed_runs) == 1
     assert "timed out" in failed_runs[0].error
+
+
+def test_tiktok_db_fallback_recovers_when_candidates_exist(in_memory_db):
+    from services.tiktok_provider import TikTokProvider
+    from services.provider_exceptions import ProviderAuthenticationError
+
+    # 1. Populate a candidate in DB
+    existing_cand = KOLCandidateModel(
+        id="cand_test_001",
+        username="herbal_expert_thai",
+        normalized_username="herbal_expert_thai",
+        display_name="Herbal Expert Thai",
+        bio="สมุนไพรบำรุงผม และสกินแคร์ธรรมชาติ",
+        profile_url="https://www.tiktok.com/@herbal_expert_thai",
+        follower_count=55000,
+        sample_video_count=1,
+    )
+    in_memory_db.add(existing_cand)
+    in_memory_db.commit()
+
+    # 2. Simulate failing provider (e.g. Apify 403 Forbidden)
+    class AuthFailingProvider(TikTokProvider):
+        def discover_kols_by_keywords(self, keywords, limit=20):
+            raise ProviderAuthenticationError("Apify 403 Forbidden - Token expired", provider="ApifyTikTokProvider")
+
+        def get_profile_details(self, handle):
+            return {}
+
+    service = TikTokDiscoveryService(provider=AuthFailingProvider())
+    req = TikTokDiscoveryRequest(queries=["สมุนไพร"], max_results_per_query=5, max_candidates=5)
+
+    # 3. Discovery should NOT crash; it recovers from DB candidates
+    resp = service.discover_and_aggregate(request=req, db=in_memory_db)
+    assert resp.status == "fallback"
+    assert resp.candidate_count == 1
+    assert resp.candidates[0].username == "herbal_expert_thai"
+    assert resp.candidates[0].data_source == "database_cache"
+

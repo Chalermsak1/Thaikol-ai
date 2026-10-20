@@ -74,12 +74,108 @@ def build_creator_embedding_text(candidate: KOLCandidate, max_captions: int = 5,
             caps_str = "\n".join(f"- {c}" for c in clean_caps)
             sections.append(f"Captions:\n{caps_str}")
 
-    # Hashtags (bounded)
+# Comprehensive Thai marketing and creator vocabulary sorted by length descending
+# for maximal longest-match segmentation of compound hashtags and phrases.
+THAI_MARKETING_TERMS: List[str] = sorted(
+    [
+        # Long compound keywords
+        "สมุนไพรไทยเพื่อสุขภาพ", "ยาสระผมสมุนไพร", "แชมพูลดผมร่วง", "อาหารเสริมเพื่อสุขภาพ",
+        "สกินแคร์คนเป็นสิว", "รีวิวสกินแคร์", "รีวิวของใช้", "ของดีบอกต่อ", "ใช้ดีบอกต่อ",
+        "เซรั่มหน้าใส", "ครีมบำรุงผิว", "สกินแคร์กู้ผิว", "ลดน้ำหนักปลอดภัย", "สอนแต่งหน้า",
+        # Hair & Scalp
+        "ลดผมร่วง", "บำรุงผม", "ผมร่วง", "ผมแห้งเสีย", "ผมสวย", "หนังศีรษะ", "ผมบาง", "รังแค",
+        "แชมพู", "ยาสระผม", "ครีมนวด", "เซรั่มผม", "ทรีทเม้นท์",
+        # Herbs & Nature
+        "สมุนไพรไทย", "สมุนไพร", "เพื่อสุขภาพ", "สุขภาพ", "ธรรมชาติ", "ออร์แกนิก", "ออแกนิค",
+        # Skincare & Face
+        "สกินแคร์", "ความงาม", "บิวตี้", "เครื่องสำอาง", "ผิวแพ้ง่าย", "กู้หน้าพัง", "กู้ผิว",
+        "ผิวขาว", "ผิวใส", "ผิวสวย", "ผิวมัน", "ผิวแห้ง", "หน้าใส", "หน้าฉ่ำ", "หน้าเนียน",
+        "เซรั่ม", "สบู่", "โลชั่น", "กันแดด", "มอยเจอร์ไรเซอร์", "คลีนซิ่ง", "โทนเนอร์",
+        "มาส์กหน้า", "สครับ", "น้ำหอม", "คอลลาเจน", "กลูต้า", "วิตามินซี", "ไฮยา", "เรตินอล",
+        "ริ้วรอย", "รอยสิว", "สิวอุดตัน", "สิวเสี้ยน", "สิวอักเสบ", "ฝ้ากระ", "จุดด่างดำ",
+        # Makeup
+        "แต่งหน้า", "ลิปสติก", "ลิปบาล์ม", "บลัชออน", "แป้งพัฟ", "รองพื้น", "คุชชั่น",
+        # Health & Diet
+        "ลดน้ำหนัก", "ลดพุง", "คุมหิว", "โปรตีน", "ดีท็อกซ์", "ปลอดภัย", "อาหารเสริม", "วิตามิน",
+        # Lifestyle & Food
+        "ของกิน", "อาหาร", "ทำอาหาร", "อร่อย", "คาเฟ่", "ท่องเที่ยว", "เที่ยวไทย",
+        "แม่และเด็ก", "ของใช้ในบ้าน", "เสื้อผ้า", "แฟชั่น",
+        # Creator Intents & Commercial
+        "มือใหม่", "ป้ายยา", "ชี้เป้า", "เปิดกรุ", "เห่อของใหม่", "แกะกล่อง", "ถูกและดี",
+        "งบน้อย", "ของแท้", "โปรโมชั่น", "ส่งฟรี", "คุมมัน", "กันน้ำ", "ติดทน",
+        "บอกต่อ", "รีวิว", "ของดี", "ใช้ดี", "จริงใจ", "คนไทย", "ประเทศไทย", "กรุงเทพ",
+    ],
+    key=len,
+    reverse=True,
+)
+
+
+def unpack_thai_hashtag(tag: str) -> List[str]:
+    """Decomposes concatenated Thai hashtags and compound phrases into individual semantic tokens.
+
+    Example:
+        '#สมุนไพรไทยเพื่อสุขภาพ' -> ['สมุนไพรไทย', 'สมุนไพร', 'ไทย', 'เพื่อสุขภาพ', 'สุขภาพ']
+        '#รีวิวบิวตี้' -> ['รีวิว', 'บิวตี้']
+        '#แชมพูลดผมร่วง' -> ['แชมพู', 'ลดผมร่วง', 'ผมร่วง']
+    """
+    clean = re.sub(r"[#_0-9\s]", "", tag).strip()
+    if not clean or len(clean) < 2:
+        return [clean] if clean else []
+
+    extracted: List[str] = []
+    # 1. Match known high-signal Thai vocabulary terms
+    for term in THAI_MARKETING_TERMS:
+        if term in clean:
+            if term not in extracted:
+                extracted.append(term)
+
+    # 2. Also split camelCase or snake_case for bilingual tags
+    bilingual_parts = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+", tag)
+    for p in bilingual_parts:
+        low = p.lower().strip()
+        if len(low) >= 3 and low not in extracted:
+            extracted.append(low)
+
+    return extracted if extracted else [clean]
+
+
+def build_creator_embedding_text(candidate: KOLCandidate, max_captions: int = 5, max_hashtags: int = 15) -> str:
+    """Constructs a deterministic, bounded textual representation of a creator for embedding generation.
+
+    CRITICAL: Strictly excludes all numerical metrics (followers, views, likes, comments, shares, engagement rate)
+    so semantic similarity measures only content relevance.
+    """
+    sections: List[str] = []
+
+    name = candidate.display_name.strip() if candidate.display_name else candidate.username.strip()
+    sections.append(f"Creator:\n{name} (@{candidate.username.strip()})")
+
+    if candidate.bio and candidate.bio.strip():
+        sections.append(f"Bio:\n{candidate.bio.strip()}")
+
+    # Captions (bounded to top N unique captions)
+    if candidate.sample_captions:
+        clean_caps = [c.strip() for c in candidate.sample_captions if c.strip()][:max_captions]
+        if clean_caps:
+            caps_str = "\n".join(f"- {c}" for c in clean_caps)
+            sections.append(f"Captions:\n{caps_str}")
+
+    # Hashtags (bounded) with unpacked semantic tokens
     if candidate.hashtags:
         clean_tags = [h.strip().lstrip("#") for h in candidate.hashtags if h.strip()][:max_hashtags]
         if clean_tags:
             tags_str = " ".join(f"#{t}" for t in clean_tags)
             sections.append(f"Hashtags:\n{tags_str}")
+
+            # Segment compound Thai hashtags into keywords for multilingual semantic embedding
+            segmented_tokens: List[str] = []
+            for t in clean_tags:
+                sub_words = unpack_thai_hashtag(t)
+                for sw in sub_words:
+                    if sw != t and sw not in segmented_tokens:
+                        segmented_tokens.append(sw)
+            if segmented_tokens:
+                sections.append(f"Hashtag Topics:\n{', '.join(segmented_tokens)}")
 
     # Matched queries
     if candidate.matched_queries:
@@ -118,13 +214,18 @@ def extract_matching_topics(brand_profile: BrandProfile, candidate: KOLCandidate
     if brand_profile.industry and len(brand_profile.industry.strip()) >= 3:
         brand_terms.append(brand_profile.industry.strip())
 
-    # 2. Compile creator content corpus
+    # 2. Compile creator content corpus, including unpacked compound hashtags
     creator_parts: List[str] = []
     if candidate.bio:
         creator_parts.append(candidate.bio)
     creator_parts.extend(candidate.sample_captions)
     creator_parts.extend([f"#{h}" for h in candidate.hashtags])
     creator_parts.extend(candidate.hashtags)
+    # Include unpacked tokens from hashtags to capture word boundaries
+    for tag in candidate.hashtags:
+        unpacked = unpack_thai_hashtag(tag)
+        if unpacked:
+            creator_parts.extend(unpacked)
     creator_parts.extend(candidate.matched_queries)
 
     creator_corpus = " ".join(creator_parts).lower()
@@ -136,13 +237,17 @@ def extract_matching_topics(brand_profile: BrandProfile, candidate: KOLCandidate
         if term_lower in creator_corpus:
             matched.add(term_clean)
 
-    # 4. Check creator hashtags directly against brand keywords / themes
+    # 4. Check creator hashtags and unpacked tokens directly against brand keywords / themes
     brand_corpus = " ".join(brand_terms + [brand_profile.summary]).lower()
     for tag in candidate.hashtags:
         tag_clean = tag.strip().lstrip("#")
         tag_lower = tag_clean.lower()
         if len(tag_clean) >= 3 and tag_lower in brand_corpus:
             matched.add(tag_clean)
+        # Check unpacked sub-tokens
+        for sub in unpack_thai_hashtag(tag_clean):
+            if len(sub) >= 3 and sub.lower() in brand_corpus:
+                matched.add(sub)
 
     # 5. Check common domain keywords
     domain_cues = [

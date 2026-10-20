@@ -52,6 +52,144 @@ def _safe_int(val: Any) -> Optional[int]:
         return None
 
 
+def build_candidate_from_model(r: KOLCandidateModel) -> KOLCandidate:
+    """Converts a persisted KOLCandidateModel into a strongly typed KOLCandidate schema."""
+    is_verified = bool(
+        r.is_profile_verified
+        if r.is_profile_verified is not None
+        else (r.profile_url and "tiktok.com/@" in r.profile_url)
+    )
+    prof_status = r.profile_status or ("verified" if is_verified else "unavailable")
+
+    sample_videos_list: List[KOLSampleVideo] = []
+    if getattr(r, "sample_videos", None):
+        for v in r.sample_videos:
+            sample_videos_list.append(
+                KOLSampleVideo(
+                    video_id=v.video_id,
+                    video_url=v.video_url,
+                    caption=v.caption,
+                    views=v.views,
+                    likes=v.likes,
+                    comments=v.comments,
+                    shares=v.shares,
+                    cover_image_url=getattr(v, "cover_image_url", None) or getattr(r, "video_thumbnail_url", None),
+                )
+            )
+
+    return KOLCandidate(
+        username=r.username,
+        normalized_username=r.normalized_username,
+        display_name=r.display_name,
+        profile_url=r.profile_url,
+        is_profile_verified=is_verified,
+        profile_status=prof_status,
+        bio=r.bio,
+        follower_count=r.follower_count,
+        sample_video_count=r.sample_video_count or len(sample_videos_list),
+        total_views=r.total_views,
+        total_likes=r.total_likes,
+        total_comments=r.total_comments,
+        total_shares=r.total_shares,
+        total_saves=r.total_saves,
+        average_views=r.average_views,
+        average_likes=r.average_likes,
+        average_comments=r.average_comments,
+        average_shares=r.average_shares,
+        average_saves=r.average_saves,
+        estimated_engagement_rate=r.estimated_engagement_rate,
+        hashtags=r.hashtags or [],
+        sample_captions=r.sample_captions or [],
+        matched_queries=r.matched_queries or [],
+        thai_language_ratio=r.thai_language_ratio or 0.0,
+        thailand_keyword_count=r.thailand_keyword_count or 0,
+        thailand_hashtag_count=r.thailand_hashtag_count or 0,
+        location_mentions=r.location_mentions or [],
+        local_signal_score=r.local_signal_score or 0.0,
+        avatar_url=r.avatar_url,
+        video_thumbnail_url=r.video_thumbnail_url,
+        contact_line_id=r.contact_line_id,
+        contact_email=r.contact_email,
+        contact_phone=r.contact_phone,
+        creator_tier=r.creator_tier or "Nano (1K-10K)",
+        rate_card_min=r.rate_card_min,
+        rate_card_max=r.rate_card_max,
+        last_posted_at=r.last_posted_at.isoformat() if r.last_posted_at else None,
+        has_tiktok_shop=bool(r.has_tiktok_shop),
+        content_formats=r.content_formats or [],
+        data_source=r.data_source or "database_cache",
+        collected_at=r.collected_at.isoformat() if r.collected_at else "",
+        data_freshness="cached",
+        is_demo_fixture=bool(r.is_demo_fixture),
+        provenance=r.provenance or "database_cache",
+        sample_videos=sample_videos_list,
+    )
+
+
+def find_candidates_in_db(
+    queries: List[str],
+    db: Session,
+    max_candidates: int = 15,
+) -> List[KOLCandidate]:
+    """Finds matching KOL candidates from PostgreSQL database as a resilient fallback.
+
+    Searches by query keywords against username, display_name, and bio.
+    Falls back to top creators by follower count / views if specific query matches are sparse.
+    """
+    seen_usernames: Set[str] = set()
+    results: List[KOLCandidate] = []
+
+    # 1. Targeted keyword match across database
+    for q in queries:
+        clean_q = q.strip().lower()
+        if not clean_q:
+            continue
+        term = f"%{clean_q}%"
+        matched_models = (
+            db.query(KOLCandidateModel)
+            .filter(
+                (KOLCandidateModel.username.ilike(term))
+                | (KOLCandidateModel.display_name.ilike(term))
+                | (KOLCandidateModel.bio.ilike(term))
+            )
+            .limit(max_candidates)
+            .all()
+        )
+        for m in matched_models:
+            norm_name = m.normalized_username or m.username.lower()
+            if norm_name not in seen_usernames:
+                seen_usernames.add(norm_name)
+                cand = build_candidate_from_model(m)
+                cand.data_source = "database_cache"
+                cand.data_freshness = "cached"
+                results.append(cand)
+                if len(results) >= max_candidates:
+                    break
+        if len(results) >= max_candidates:
+            break
+
+    # 2. If fewer than max_candidates, supplement with top creators in database
+    if len(results) < max_candidates:
+        more_models = (
+            db.query(KOLCandidateModel)
+            .order_by(KOLCandidateModel.follower_count.desc().nullslast())
+            .limit(max_candidates * 2)
+            .all()
+        )
+        for m in more_models:
+            norm_name = m.normalized_username or m.username.lower()
+            if norm_name not in seen_usernames:
+                seen_usernames.add(norm_name)
+                cand = build_candidate_from_model(m)
+                cand.data_source = "database_cache"
+                cand.data_freshness = "cached"
+                results.append(cand)
+                if len(results) >= max_candidates:
+                    break
+
+    return results[:max_candidates]
+
+
 def normalize_tiktok_video(
     raw: Dict[str, Any],
     fallback_query: Optional[str] = None,
@@ -191,15 +329,62 @@ class TikTokDiscoveryService:
             except Exception as err:
                 logger.error("Error discovering videos for query '%s': %s", q, err)
 
-        if not raw_items and provider_exception is not None:
-            if discovery_run_record and db:
+        if not raw_items:
+            # If the provider is explicitly unconfigured, preserve ProviderConfigurationError for setup transparency
+            if isinstance(provider_exception, ProviderConfigurationError):
+                if discovery_run_record and db:
+                    try:
+                        discovery_run_record.status = "failed"
+                        discovery_run_record.error = str(provider_exception)
+                        db.commit()
+                    except Exception:
+                        pass
+                raise provider_exception
+
+            logger.warning(
+                "No raw items returned from provider %s (exception=%s). Attempting local PostgreSQL fallback...",
+                provider_name,
+                provider_exception,
+            )
+            if db is not None:
                 try:
-                    discovery_run_record.status = "failed"
-                    discovery_run_record.error = str(provider_exception)
-                    db.commit()
-                except Exception:
-                    pass
-            raise provider_exception
+                    fallback_candidates = find_candidates_in_db(
+                        queries=request.queries,
+                        db=db,
+                        max_candidates=request.max_candidates,
+                    )
+                    if fallback_candidates:
+                        logger.info(
+                            "Discovery pipeline successfully recovered %d database candidates for run %s",
+                            len(fallback_candidates),
+                            run_id,
+                        )
+                        if discovery_run_record:
+                            discovery_run_record.status = "fallback"
+                            discovery_run_record.candidate_count = len(fallback_candidates)
+                            discovery_run_record.completed_at = datetime.now(timezone.utc)
+                            if provider_exception:
+                                discovery_run_record.error = f"Fallback due to {type(provider_exception).__name__}: {str(provider_exception)}"
+                            db.commit()
+
+                        return TikTokDiscoveryResponse(
+                            discovery_run_id=run_id,
+                            status="fallback",
+                            candidate_count=len(fallback_candidates),
+                            candidates=fallback_candidates,
+                        )
+                except Exception as fb_err:
+                    logger.error("DB discovery fallback failed: %s", fb_err)
+
+            if provider_exception is not None:
+                if discovery_run_record and db:
+                    try:
+                        discovery_run_record.status = "failed"
+                        discovery_run_record.error = str(provider_exception)
+                        db.commit()
+                    except Exception:
+                        pass
+                raise provider_exception
 
         # Step 2: Normalize into TikTokVideo instances
         now_iso = datetime.now(timezone.utc).isoformat()
@@ -590,3 +775,6 @@ class TikTokDiscoveryService:
 
 
 tiktok_discovery_service = TikTokDiscoveryService()
+
+
+

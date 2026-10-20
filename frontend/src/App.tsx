@@ -15,6 +15,10 @@ import {
   createMatchingRun,
   getMatchingRunStatus,
   getMatchingRunResults,
+  fetchShortlist,
+  upsertShortlistItem,
+  updateShortlistItem,
+  deleteShortlistItem,
 } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardView } from './pages/DashboardView';
@@ -73,7 +77,7 @@ export const App: React.FC = () => {
   const [health, setHealth] = useState<HealthData | null>(null);
   const [providerHealth, setProviderHealth] = useState<ProviderHealthResponse | null>(null);
 
-  // Fetch API Health & Provider Status on mount
+  // Fetch API Health, Provider Status & Persisted Shortlist on mount
   useEffect(() => {
     getHealthStatus()
       .then(setHealth)
@@ -82,6 +86,21 @@ export const App: React.FC = () => {
     getProvidersHealth()
       .then(setProviderHealth)
       .catch(() => console.warn('Provider health status endpoint unavailable'));
+
+    // Fetch persisted shortlist from PostgreSQL and merge
+    fetchShortlist()
+      .then((items) => {
+        if (items && items.length > 0) {
+          setShortlist((prev) => {
+            const merged = { ...prev };
+            for (const it of items) {
+              merged[it.username] = it;
+            }
+            return merged;
+          });
+        }
+      })
+      .catch((err) => console.warn('Database shortlist sync notice:', err));
   }, []);
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -249,20 +268,27 @@ export const App: React.FC = () => {
     );
   };
 
-  // Shortlist Handlers
+  // Shortlist Handlers (Persisted to PostgreSQL with Offline LocalStorage Fallback)
   const handleToggleShortlist = (creator: KOLRecommendation) => {
     setShortlist((prev) => {
       const next = { ...prev };
       if (next[creator.username]) {
         delete next[creator.username];
+        deleteShortlistItem(creator.username).catch((e) =>
+          console.warn('DB delete notice for @' + creator.username, e)
+        );
       } else {
-        next[creator.username] = {
+        const newItem: ShortlistItem = {
           username: creator.username,
           creator,
           status: 'shortlisted',
           addedAt: new Date().toISOString(),
           notes: '',
         };
+        next[creator.username] = newItem;
+        upsertShortlistItem(newItem).catch((e) =>
+          console.warn('DB upsert notice for @' + creator.username, e)
+        );
       }
       return next;
     });
@@ -271,6 +297,9 @@ export const App: React.FC = () => {
   const handleUpdateShortlistStatus = (username: string, status: OutreachStatus) => {
     setShortlist((prev) => {
       if (!prev[username]) return prev;
+      updateShortlistItem(username, { status }).catch((e) =>
+        console.warn('DB status update notice for @' + username, e)
+      );
       return {
         ...prev,
         [username]: {
@@ -284,6 +313,9 @@ export const App: React.FC = () => {
   const handleUpdateShortlistNotes = (username: string, notes: string) => {
     setShortlist((prev) => {
       if (!prev[username]) return prev;
+      updateShortlistItem(username, { notes }).catch((e) =>
+        console.warn('DB notes update notice for @' + username, e)
+      );
       return {
         ...prev,
         [username]: {
@@ -297,6 +329,9 @@ export const App: React.FC = () => {
   const handleUpdateShortlistItem = (username: string, updates: Partial<ShortlistItem>) => {
     setShortlist((prev) => {
       if (!prev[username]) return prev;
+      updateShortlistItem(username, updates).catch((e) =>
+        console.warn('DB item update notice for @' + username, e)
+      );
       return {
         ...prev,
         [username]: {
@@ -308,6 +343,9 @@ export const App: React.FC = () => {
   };
 
   const handleRemoveFromShortlist = (username: string) => {
+    deleteShortlistItem(username).catch((e) =>
+      console.warn('DB delete notice for @' + username, e)
+    );
     setShortlist((prev) => {
       const next = { ...prev };
       delete next[username];

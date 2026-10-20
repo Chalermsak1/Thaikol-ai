@@ -9,6 +9,7 @@ from .kol import (
 from .matching import KOLSemanticMatchModel
 from .recommendation import KOLRecommendationModel
 from .matching_run import MatchingRunModel
+from .shortlist import KOLShortlistItemModel
 
 __all__ = [
     "BrandModel",
@@ -20,5 +21,6 @@ __all__ = [
     "KOLSemanticMatchModel",
     "KOLRecommendationModel",
     "MatchingRunModel",
+    "KOLShortlistItemModel",
 ]
 

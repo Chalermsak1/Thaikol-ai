@@ -122,3 +122,27 @@ def test_extract_matching_topics_deterministic():
     assert len(topics) > 0
     # Overlapping topics should contain key domain matches
     assert any(t in topics for t in ["แชมพูสมุนไพร", "ผมร่วง", "ลดผมร่วง", "hair care", "สมุนไพร"])
+
+
+def test_unpack_thai_hashtag_segmentation():
+    from services.text_representation import unpack_thai_hashtag
+
+    # 1. Compound Thai hashtags
+    tokens1 = unpack_thai_hashtag("#สมุนไพรไทยเพื่อสุขภาพ")
+    assert "สมุนไพรไทยเพื่อสุขภาพ" in tokens1 or "สมุนไพรไทย" in tokens1
+    assert "สมุนไพร" in tokens1
+    assert "เพื่อสุขภาพ" in tokens1 or "สุขภาพ" in tokens1
+
+    tokens2 = unpack_thai_hashtag("#แชมพูลดผมร่วง")
+    assert "แชมพู" in tokens2
+    assert "ลดผมร่วง" in tokens2
+    assert "ผมร่วง" in tokens2
+
+    tokens3 = unpack_thai_hashtag("#รีวิวบิวตี้")
+    assert "รีวิว" in tokens3
+    assert "บิวตี้" in tokens3
+
+    # 2. Bilingual camelCase or snake_case
+    tokens4 = unpack_thai_hashtag("#ThaiSkincare")
+    assert any("skincare" in t.lower() for t in tokens4)
+

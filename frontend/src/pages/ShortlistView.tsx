@@ -118,6 +118,7 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
   const [pitchCreator, setPitchCreator] = useState<KOLRecommendation | null>(null);
   const [pitchCopied, setPitchCopied] = useState(false);
   const [pitchAngle, setPitchAngle] = useState('รีวิวสินค้าจริง 1 คลิป ความยาว 45-60 วินาที พร้อมปักตะกร้า');
+  const [editingLivePostUsername, setEditingLivePostUsername] = useState<string | null>(null);
 
   const allItems = Object.values(shortlist);
 
@@ -449,6 +450,11 @@ ${listText}
             <BarChart3 className="w-4 h-4" />
             <span>ผลลัพธ์จริงหลังปล่อยคลิป (Post-Campaign ROI)</span>
           </button>
+
+          <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>PostgreSQL Synced</span>
+          </span>
         </div>
 
         {/* Global Export Button */}
@@ -950,6 +956,90 @@ ${listText}
                       />
                     </div>
                   </div>
+
+                  {/* Live TikTok Video & Actual ROI Strip */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-2xl bg-gradient-to-r from-orange-50/60 via-amber-50/40 to-emerald-50/40 border border-orange-100 text-xs">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-slate-700 flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                        <span>ผลตอบรับจริง:</span>
+                      </span>
+
+                      {item.livePostUrl ? (
+                        <a
+                          href={item.livePostUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-1 cursor-pointer transition shadow-2xs"
+                          title="เปิดดูคลิปจริงบน TikTok"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>🚀 เปิดดูคลิปจริง</span>
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic">ยังไม่มีลิงก์คลิปจริง</span>
+                      )}
+
+                      {item.actualViews ? (
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-mono font-bold flex items-center gap-1">
+                          <Eye className="w-3 h-3 text-emerald-600" />
+                          <span>{formatCompactNumber(item.actualViews)} วิว</span>
+                          {item.creator.average_views && (
+                            <span className="text-[10px] text-emerald-700 font-normal">
+                              ({Math.round((item.actualViews / item.creator.average_views) * 100)}% ของเป้า)
+                            </span>
+                          )}
+                        </span>
+                      ) : null}
+
+                      {item.actualViews && (item.actualCostTHB || item.agreedRateTHB) ? (
+                        <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-mono font-bold">
+                          CPV จริง: ฿{((item.actualCostTHB || item.agreedRateTHB || 0) / item.actualViews).toFixed(2)}/วิว
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Quick input toggle for live clip & views */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingLivePostUsername(
+                          editingLivePostUsername === item.username ? null : item.username
+                        );
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      <span>{editingLivePostUsername === item.username ? 'ปิดฟอร์ม' : '✏️ อัปเดตคลิป & ยอดวิว'}</span>
+                    </button>
+                  </div>
+
+                  {/* Inline Quick Editor if toggled */}
+                  {editingLivePostUsername === item.username && (
+                    <div className="p-3 rounded-2xl bg-white border border-orange-200 shadow-xs space-y-2 animate-in fade-in">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="sm:col-span-2 space-y-1">
+                          <label className="text-[11px] font-bold text-slate-600">ลิงก์คลิป TikTok ที่ลงจริง</label>
+                          <input
+                            type="text"
+                            placeholder="https://www.tiktok.com/@.../video/..."
+                            defaultValue={item.livePostUrl || ''}
+                            onBlur={(e) => onUpdateItem?.(item.username, { livePostUrl: e.target.value.trim() })}
+                            className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:border-[#FF5A1F] focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-bold text-slate-600">ยอดวิวได้จริง (Views)</label>
+                          <input
+                            type="number"
+                            placeholder="เช่น 45000"
+                            defaultValue={item.actualViews || ''}
+                            onBlur={(e) => onUpdateItem?.(item.username, { actualViews: Number(e.target.value) })}
+                            className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:border-[#FF5A1F] focus:outline-none font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

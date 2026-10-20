@@ -19,7 +19,11 @@ from schemas.kol import (
     CreatorIngestRequest,
     CreatorIngestResponse,
 )
-from services.tiktok_discovery_service import tiktok_discovery_service
+from services.tiktok_discovery_service import (
+    tiktok_discovery_service,
+    build_candidate_from_model,
+    find_candidates_in_db,
+)
 from services.kol_scorer import multi_factor_kol_scorer
 from services.semantic_matcher import semantic_kol_matcher
 from services.tiktok_signals import (
@@ -33,6 +37,7 @@ from services.tiktok_signals import (
     detect_content_formats_and_shop,
 )
 from services.provider_exceptions import (
+    ProviderAuthenticationError,
     ProviderConfigurationError,
     ProviderRateLimitError,
     ProviderTimeoutError,
@@ -84,46 +89,30 @@ def discover_tiktok_creators(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"TikTok live data provider is not configured: {e.message}",
         )
-    except (ProviderRateLimitError, ProviderTimeoutError, ProviderError) as e:
-        logger.warning("TikTok provider error (%s: %s). Checking local database candidate pool...", type(e).__name__, e)
+    except (
+        ProviderAuthenticationError,
+        ProviderRateLimitError,
+        ProviderTimeoutError,
+        ProviderError,
+    ) as e:
+        logger.warning(
+            "TikTok provider error (%s: %s). Checking local database candidate pool...",
+            type(e).__name__,
+            e,
+        )
         if db is not None:
             try:
-                db_candidates: List[KOLCandidate] = []
-                for q in request.queries:
-                    term = f"%{q.strip().lower()}%"
-                    matched = (
-                        db.query(KOLCandidateModel)
-                        .filter(
-                            (KOLCandidateModel.username.ilike(term))
-                            | (KOLCandidateModel.display_name.ilike(term))
-                            | (KOLCandidateModel.bio.ilike(term))
-                        )
-                        .limit(request.max_candidates)
-                        .all()
-                    )
-                    for m in matched:
-                        if m.normalized_username not in [c.normalized_username for c in db_candidates]:
-                            db_candidates.append(build_candidate_from_model(m))
-
-                if len(db_candidates) < request.max_candidates:
-                    more = (
-                        db.query(KOLCandidateModel)
-                        .order_by(KOLCandidateModel.follower_count.desc())
-                        .limit(request.max_candidates)
-                        .all()
-                    )
-                    for m in more:
-                        if m.normalized_username not in [c.normalized_username for c in db_candidates]:
-                            db_candidates.append(build_candidate_from_model(m))
-
+                db_candidates = find_candidates_in_db(
+                    queries=request.queries,
+                    db=db,
+                    max_candidates=request.max_candidates,
+                )
                 if db_candidates:
                     return TikTokDiscoveryResponse(
-                        run_id=str(uuid.uuid4()),
-                        queries=request.queries,
-                        total_candidates=len(db_candidates[:request.max_candidates]),
-                        candidates=db_candidates[:request.max_candidates],
-                        provider="PostgreSQL (Cached Fallback)",
-                        data_freshness="cached",
+                        discovery_run_id=str(uuid.uuid4()),
+                        status="fallback",
+                        candidate_count=len(db_candidates),
+                        candidates=db_candidates,
                     )
             except Exception as db_err:
                 logger.error("DB discovery fallback failed: %s", db_err)
@@ -197,63 +186,6 @@ def extract_username_from_input(val: str) -> str:
     return cleaned.lstrip("@").split("?")[0].split("/")[0].strip().lower()
 
 
-def build_candidate_from_model(r: KOLCandidateModel) -> KOLCandidate:
-    return KOLCandidate(
-        username=r.username,
-        normalized_username=r.normalized_username,
-        display_name=r.display_name,
-        profile_url=r.profile_url,
-        is_profile_verified=bool(r.is_profile_verified if r.is_profile_verified is not None else (r.profile_url and "tiktok.com/@" in r.profile_url)),
-        profile_status=r.profile_status or ("verified" if (r.is_profile_verified or (r.profile_url and "tiktok.com/@" in r.profile_url)) else "unavailable"),
-        bio=r.bio,
-        follower_count=r.follower_count,
-        sample_video_count=r.sample_video_count,
-        total_views=r.total_views,
-        total_likes=r.total_likes,
-        total_comments=r.total_comments,
-        total_shares=r.total_shares,
-        total_saves=r.total_saves,
-        average_views=r.average_views,
-        average_likes=r.average_likes,
-        average_comments=r.average_comments,
-        average_shares=r.average_shares,
-        average_saves=r.average_saves,
-        estimated_engagement_rate=r.estimated_engagement_rate,
-        hashtags=r.hashtags or [],
-        sample_captions=r.sample_captions or [],
-        matched_queries=r.matched_queries or [],
-        thai_language_ratio=r.thai_language_ratio or 0.0,
-        thailand_keyword_count=r.thailand_keyword_count or 0,
-        thailand_hashtag_count=r.thailand_hashtag_count or 0,
-        location_mentions=r.location_mentions or [],
-        local_signal_score=r.local_signal_score or 0.0,
-        contact_line_id=r.contact_line_id,
-        contact_email=r.contact_email,
-        contact_phone=r.contact_phone,
-        creator_tier=r.creator_tier or "Nano (1K-10K)",
-        rate_card_min=r.rate_card_min,
-        rate_card_max=r.rate_card_max,
-        last_posted_at=r.last_posted_at.isoformat() if r.last_posted_at else None,
-        has_tiktok_shop=bool(r.has_tiktok_shop),
-        content_formats=r.content_formats or [],
-        data_source=r.data_source or "live",
-        collected_at=r.collected_at.isoformat() if r.collected_at else "",
-        data_freshness="cached",
-        is_demo_fixture=r.is_demo_fixture or False,
-        provenance=r.provenance or "database",
-        sample_videos=[
-            KOLSampleVideo(
-                video_id=v.video_id,
-                video_url=v.video_url,
-                caption=v.caption,
-                views=v.views,
-                likes=v.likes,
-                comments=v.comments,
-                shares=v.shares,
-            )
-            for v in (r.sample_videos or [])
-        ],
-    )
 
 
 @router.get(
