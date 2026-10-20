@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { EvidenceItem } from '../../types';
 import { X, ExternalLink, Sparkles } from 'lucide-react';
 
@@ -17,11 +18,11 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-stretch sm:justify-end font-thai">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-stretch sm:justify-end font-thai">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
@@ -124,7 +125,8 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

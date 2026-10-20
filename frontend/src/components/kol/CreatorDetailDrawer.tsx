@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { KOLRecommendation } from '../../types';
 import { TikTokProfileCTA, getProfileLinkStatus } from './TikTokProfileCTA';
 import { ScoreBreakdown } from './ScoreBreakdown';
@@ -36,6 +37,21 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
   const [previewClip, setPreviewClip] = useState<{ caption: string; index: number } | null>(null);
   const [pitchCopied, setPitchCopied] = useState(false);
 
+  // Close drawer on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !previewClip) onClose();
+    };
+    if (creator) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [creator, previewClip, onClose]);
+
   if (!creator) return null;
 
   const handleCopyOutreach = () => {
@@ -57,17 +73,17 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
     });
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-stretch sm:justify-end">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-stretch sm:justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Slide-over panel / Mobile Bottom Sheet */}
-      <div className="relative z-10 w-full sm:max-w-xl bg-white h-[92vh] sm:h-full shadow-2xl flex flex-col rounded-t-3xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-slate-200 overflow-hidden">
+      <div className="relative z-10 w-full sm:max-w-xl bg-white h-[92vh] sm:h-full shadow-2xl flex flex-col rounded-t-3xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-slate-200 overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
         {/* Mobile Drag Handle Indicator */}
         <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-white">
           <div className="w-12 h-1.5 rounded-full bg-slate-300" />
@@ -310,44 +326,68 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
             </div>
 
             {/* Section 1c: Video Content & Portfolio Showcase */}
-            {creator.sample_captions && creator.sample_captions.length > 0 && (
-              <div className="space-y-2.5 pt-2">
-                <div className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span className="text-[#FF5A1F]">🎬</span>
-                    <span>ตัวอย่างวิดีโอคอนเทนต์ (Sampled TikTok Videos)</span>
-                  </span>
-                  <span className="text-xs text-slate-400 font-mono">
-                    {creator.sample_video_count ?? creator.sample_captions.length} คลิปตัวอย่าง
-                  </span>
-                </div>
-                <div className="space-y-2">
+            <div className="space-y-2.5 pt-2">
+              <div className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[#FF5A1F]">🎬</span>
+                  <span>ตัวอย่างวิดีโอคอนเทนต์ (Sampled TikTok Videos)</span>
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  {creator.sample_video_count ?? (creator.sample_captions?.length || 0)} คลิปตัวอย่าง
+                </span>
+              </div>
+
+              {creator.sample_captions && creator.sample_captions.length > 0 ? (
+                <div className="space-y-2.5">
                   {creator.sample_captions.slice(0, 4).map((cap, idx) => (
                     <div
                       key={idx}
-                      onClick={() => setPreviewClip({ caption: cap, index: idx + 1 })}
-                      className="p-3 rounded-2xl bg-orange-50/30 border border-orange-100/70 text-xs sm:text-sm text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-100/40 hover:border-orange-300 transition flex gap-3 items-start cursor-pointer shadow-2xs"
+                      className="p-3 rounded-2xl bg-orange-50/40 border border-orange-100/90 text-xs sm:text-sm text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-100/40 hover:border-orange-300 transition flex gap-3 items-start shadow-2xs"
                     >
-                      <div className="w-12 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-orange-200/60 mt-0.5 group-hover:scale-105 transition-transform">
+                      <div
+                        onClick={() => setPreviewClip({ caption: cap, index: idx + 1 })}
+                        className="w-14 h-20 rounded-xl overflow-hidden bg-slate-900 shrink-0 relative shadow-2xs border border-orange-200/80 mt-0.5 group-hover:scale-105 transition-transform cursor-pointer"
+                        title="แตะเพื่อเปิดเครื่องเล่นวิดีโอ"
+                      >
                         <img
                           src={getCreatorCover(creator)}
                           alt="ตัวอย่างคลิป"
                           loading="lazy"
                           decoding="async"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover opacity-90"
                         />
-                        <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 flex items-center justify-center transition">
-                          <div className="w-5 h-5 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-xs group-hover:scale-110 transition">
-                            <Play className="w-2.5 h-2.5 fill-slate-900 ml-0.5" />
+                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 flex items-center justify-center transition">
+                          <div className="w-6 h-6 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-xs group-hover:scale-110 transition">
+                            <Play className="w-3 h-3 fill-slate-900 ml-0.5" />
                           </div>
                         </div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
                           <span className="text-[11px] sm:text-xs font-bold text-[#FF5A1F] uppercase font-mono tracking-wider flex items-center gap-1">
-                            <span>▶ Clip #{idx + 1}</span>
+                            <span>▶ คลิปตัวอย่าง #{idx + 1}</span>
                           </span>
-                          <span className="text-[10px] sm:text-[11px] text-[#FF5A1F] font-semibold bg-orange-100/60 px-2 py-0.5 rounded">แตะเพื่อเล่นคลิป</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewClip({ caption: cap, index: idx + 1 })}
+                              className="text-[10px] sm:text-[11px] text-[#FF5A1F] font-bold bg-orange-100/80 hover:bg-orange-200 text-[#C93B07] px-2.5 py-1 rounded-lg transition cursor-pointer flex items-center gap-1 active:scale-95"
+                            >
+                              <Play className="w-2.5 h-2.5 fill-[#C93B07]" />
+                              <span>เล่นคลิปตัวอย่าง</span>
+                            </button>
+                            {creator.profile_url && (
+                              <a
+                                href={creator.profile_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[10px] sm:text-[11px] text-slate-600 hover:text-slate-900 font-bold bg-white border border-slate-200/90 px-2 py-1 rounded-lg transition inline-flex items-center gap-1 active:scale-95 shadow-2xs"
+                              >
+                                <span>ดูบน TikTok</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                         <p className="text-slate-800 line-clamp-3 leading-relaxed">
                           "{cap}"
@@ -356,8 +396,27 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="p-4 rounded-2xl bg-orange-50/40 border border-orange-200/80 text-center space-y-2">
+                  <div className="text-2xl">🎬</div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900">ดูวิดีโอทั้งหมดบน TikTok</div>
+                  <p className="text-xs text-slate-600">
+                    สามารถเปิดดูคลิปจริงทั้งหมดของ @{creator.username} ได้โดยตรงบนแพลตฟอร์ม TikTok
+                  </p>
+                  {creator.profile_url && (
+                    <a
+                      href={creator.profile_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition"
+                    >
+                      <span>เปิดดูคลิปบน TikTok @{creator.username}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Section 2: Key Score Metrics Strip */}
@@ -531,7 +590,8 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
         caption={previewClip?.caption}
         clipIndex={previewClip?.index}
       />
-    </div>
+    </div>,
+    document.body
   );
 };
 export default CreatorDetailDrawer;

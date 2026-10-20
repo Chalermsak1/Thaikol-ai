@@ -184,13 +184,20 @@ class MultiFactorKOLScorer(KOLScorer):
 
             matching_topics = sem_res.matching_topics if sem_res else []
 
+            is_verified = bool(
+                cand.is_profile_verified
+                if getattr(cand, "is_profile_verified", None) is not None
+                else (cand.profile_url and "tiktok.com/@" in cand.profile_url and not getattr(cand, "is_demo_fixture", False))
+            )
+            prof_status = getattr(cand, "profile_status", None) or ("verified" if is_verified else "unavailable")
+
             rec = KOLRecommendation(
                 rank=1,  # temporary placeholder before sorting
                 username=cand.username,
                 display_name=cand.display_name,
                 profile_url=cand.profile_url,
-                is_profile_verified=getattr(cand, "is_profile_verified", False),
-                profile_status=getattr(cand, "profile_status", "unavailable"),
+                is_profile_verified=is_verified,
+                profile_status=prof_status,
                 final_score=final_score,
                 semantic_relevance_score=sem_score,
                 engagement_quality_score=eng_score,

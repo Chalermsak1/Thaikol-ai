@@ -202,6 +202,8 @@ def build_candidate_from_model(r: KOLCandidateModel) -> KOLCandidate:
         normalized_username=r.normalized_username,
         display_name=r.display_name,
         profile_url=r.profile_url,
+        is_profile_verified=bool(r.is_profile_verified if r.is_profile_verified is not None else (r.profile_url and "tiktok.com/@" in r.profile_url)),
+        profile_status=r.profile_status or ("verified" if (r.is_profile_verified or (r.profile_url and "tiktok.com/@" in r.profile_url)) else "unavailable"),
         bio=r.bio,
         follower_count=r.follower_count,
         sample_video_count=r.sample_video_count,

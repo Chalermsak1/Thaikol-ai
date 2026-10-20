@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { KOLRecommendation } from '../../types';
 import { getCreatorAvatar, getCreatorCover, isSamplePortrait } from '../../lib/creatorMedia';
 import { TikTokProfileCTA } from './TikTokProfileCTA';
@@ -70,8 +71,8 @@ export const VideoPreviewModal: React.FC<VideoPreviewModalProps> = ({
 
   const isSample = isSamplePortrait(creator);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       {/* Backdrop Click */}
       <div className="absolute inset-0" onClick={onClose} />
 
@@ -219,6 +220,7 @@ export const VideoPreviewModal: React.FC<VideoPreviewModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

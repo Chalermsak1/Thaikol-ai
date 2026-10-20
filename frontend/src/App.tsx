@@ -316,7 +316,8 @@ export const App: React.FC = () => {
   };
 
   return (
-    <AppShell
+    <>
+      <AppShell
       activePage={activePage}
       onSelectPage={setActivePage}
       hasAnalyzedBrand={!!result}
@@ -455,7 +456,9 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Slide-over Drawers */}
+    </AppShell>
+
+      {/* Slide-over Drawers rendered as root siblings */}
       {result?.brand_profile && (
         <EvidenceDrawer
           isOpen={isEvidenceDrawerOpen}
@@ -469,7 +472,7 @@ export const App: React.FC = () => {
         creator={selectedCreatorForDrawer}
         onClose={() => setSelectedCreatorForDrawer(null)}
       />
-    </AppShell>
+    </>
   );
 };
 
