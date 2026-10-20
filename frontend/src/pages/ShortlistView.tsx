@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KOLRecommendation, ShortlistItem, OutreachStatus } from '../types';
 import { estimateCreatorRateCard, formatTHBCurrency } from '../lib/rateCardCalculator';
+import { formatCompactNumber } from '../lib/format';
 import { TikTokProfileCTA } from '../components/kol/TikTokProfileCTA';
 import { EmptyState } from '../components/common/EmptyState';
 import {
@@ -63,7 +64,18 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
 
   // Aggregate Campaign Metrics
   const totalFollowers = items.reduce(
-    (sum, item) => sum + (item.creator.audience_fit_proxy ? item.creator.audience_fit_proxy * 1000 : 45000),
+    (sum, item) =>
+      sum +
+      (item.creator.follower_count ??
+        (item.creator.audience_fit_proxy ? item.creator.audience_fit_proxy * 1000 : 45000)),
+    0
+  );
+
+  const totalProjectedViews = items.reduce(
+    (sum, item) =>
+      sum +
+      (item.creator.average_views ??
+        Math.round((item.creator.follower_count ?? 45000) * 0.25)),
     0
   );
 
@@ -81,19 +93,24 @@ export const ShortlistView: React.FC<ShortlistViewProps> = ({
 
   const confirmedCount = items.filter((i) => i.status === 'confirmed').length;
 
-  // Copy Shortlist Summary
+  // Copy Shortlist Summary / Agency Media Plan Proposal
   const handleCopyRoster = () => {
     const listText = items
       .map((item, idx) => {
         const rate = estimateCreatorRateCard(item.creator.follower_count, item.creator.average_views);
-        return `${idx + 1}. ${item.creator.display_name} (@${item.creator.username})\n   สถานะ: ${STATUS_CONFIG[item.status].thaiLabel} (${STATUS_CONFIG[item.status].label}) | แมตช์: ${item.creator.final_score.toFixed(1)}/100\n   ประเมินค่าจ้าง/คลิป: ${formatTHBCurrency(rate.minRateTHB)} - ${formatTHBCurrency(rate.maxRateTHB)}\n   บันทึก: ${item.notes || '-'}`;
+        return `${idx + 1}. ${item.creator.display_name} (@${item.creator.username})\n   ระดับ: ${rate.tierLabel} | แมตช์: ${item.creator.final_score.toFixed(1)}/100\n   สถานะ: ${STATUS_CONFIG[item.status].thaiLabel} (${STATUS_CONFIG[item.status].label})\n   ผู้ติดตาม: ${formatCompactNumber(item.creator.follower_count ?? 0)} | วิวเฉลี่ย: ${formatCompactNumber(item.creator.average_views ?? 0)}\n   ประเมินค่าจ้าง/คลิป: ${formatTHBCurrency(rate.minRateTHB)} - ${formatTHBCurrency(rate.maxRateTHB)} (เฉลี่ย ${formatTHBCurrency(rate.avgRateTHB)})\n   บันทึก: ${item.notes || '-'}`;
       })
       .join('\n\n');
 
-    const text = `🎯 THAIKOL AI · CAMPAIGN ROSTER & BUDGET PLANNER
+    const estimatedCPV = (budgetMetrics.avg / Math.max(totalProjectedViews, 1)).toFixed(2);
+
+    const text = `🎯 THAIKOL AI · CAMPAIGN MEDIA PLAN PROPOSAL
 แบรนด์/แคมเปญ: ${brandName}
-จำนวนครีเอเตอร์: ${items.length} คน (ยืนยันแล้ว: ${confirmedCount} คน)
+จำนวนครีเอเตอร์ในแผน: ${items.length} คน (ยืนยันแล้ว: ${confirmedCount} คน)
+รวมยอดผู้ติดตามเป้าหมาย: ${formatCompactNumber(totalFollowers)} บัญชี
+ประมาณการยอดวิวรวม: ~${formatCompactNumber(totalProjectedViews)} วิว
 ประมาณการงบประมาณรวม: ${formatTHBCurrency(budgetMetrics.min)} - ${formatTHBCurrency(budgetMetrics.max)} (เฉลี่ย: ${formatTHBCurrency(budgetMetrics.avg)})
+ประมาณการต้นทุนต่อวิว (CPV): ~฿${estimatedCPV} บาท/วิว
 =====================================================
 
 ${listText}

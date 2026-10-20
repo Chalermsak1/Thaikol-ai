@@ -9,6 +9,7 @@ import {
   DEFAULT_SCORING_WEIGHTS,
 } from '../components/kol/ScoringWeightsTuner';
 import { getProfileLinkStatus } from '../components/kol/TikTokProfileCTA';
+import { estimateCreatorRateCard } from '../lib/rateCardCalculator';
 import {
   Award,
   Copy,
@@ -20,6 +21,8 @@ import {
   Clock,
   Sparkles,
   SlidersHorizontal,
+  DollarSign,
+  Users,
 } from 'lucide-react';
 
 interface RecommendationsViewProps {
@@ -47,8 +50,13 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
   onGoToAnalyze,
   onGoToShortlist,
 }) => {
+  type FollowerTier = 'all' | 'nano' | 'micro' | 'mid' | 'macro' | 'mega';
+  type BudgetTier = 'all' | '15k' | '35k' | '60k' | '100k';
+
   const [sortBy, setSortBy] = useState<SortField>('match');
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
+  const [selectedTier, setSelectedTier] = useState<FollowerTier>('all');
+  const [selectedBudget, setSelectedBudget] = useState<BudgetTier>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [limit, setLimit] = useState<5 | 10>(10);
   const [copied, setCopied] = useState(false);
@@ -117,6 +125,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
   const processedRecommendations = useMemo(() => {
     let list = [...rawRecommendations];
 
+    // Text & Topic filter
     if (query) {
       list = list.filter(
         (r) =>
@@ -130,6 +139,35 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
       list = list.filter((r) => r.matching_topics.includes(selectedTopic));
     }
 
+    // Follower Tier Filter
+    if (selectedTier !== 'all') {
+      list = list.filter((r) => {
+        const rate = estimateCreatorRateCard(r.follower_count, r.average_views);
+        if (selectedTier === 'nano') return rate.tier === 'Nano';
+        if (selectedTier === 'micro') return rate.tier === 'Micro';
+        if (selectedTier === 'mid') return rate.tier === 'Mid-Tier';
+        if (selectedTier === 'macro') return rate.tier === 'Macro';
+        if (selectedTier === 'mega') return rate.tier === 'Mega';
+        return true;
+      });
+    }
+
+    // Budget Cap Filter
+    if (selectedBudget !== 'all') {
+      const cap =
+        selectedBudget === '15k'
+          ? 15000
+          : selectedBudget === '35k'
+          ? 35000
+          : selectedBudget === '60k'
+          ? 60000
+          : 100000;
+      list = list.filter((r) => {
+        const rate = estimateCreatorRateCard(r.follower_count, r.average_views);
+        return rate.avgRateTHB <= cap;
+      });
+    }
+
     list.sort((a, b) => {
       if (sortBy === 'match') return b.final_score - a.final_score;
       if (sortBy === 'relevance') return b.semantic_relevance_score - a.semantic_relevance_score;
@@ -139,7 +177,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
     });
 
     return list.slice(0, limit);
-  }, [rawRecommendations, query, selectedTopic, sortBy, limit]);
+  }, [rawRecommendations, query, selectedTopic, selectedTier, selectedBudget, sortBy, limit]);
 
   if (!result || !result.recommendations || result.recommendations.length === 0) {
     return (
@@ -416,6 +454,62 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
                 }`}
               >
                 Top {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sub-bar: Follower Tier & Budget Filter Chips */}
+        <div className="w-full pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          {/* Follower Tier Chips */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+              <Users className="w-3 h-3 text-slate-400" />
+              <span>ขนาดผู้ติดตาม:</span>
+            </span>
+            {[
+              { id: 'all' as const, label: 'ทั้งหมด' },
+              { id: 'nano' as const, label: 'Nano (<10k)' },
+              { id: 'micro' as const, label: 'Micro (10k-50k)' },
+              { id: 'mid' as const, label: 'Mid-Tier (50k-500k)' },
+              { id: 'macro' as const, label: 'Macro (>500k)' },
+            ].map((tier) => (
+              <button
+                key={tier.id}
+                onClick={() => setSelectedTier(tier.id)}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer min-h-[30px] ${
+                  selectedTier === tier.id
+                    ? 'bg-slate-900 text-white shadow-2xs'
+                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80'
+                }`}
+              >
+                {tier.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Budget Filter Chips */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+              <DollarSign className="w-3 h-3 text-[#FF5A1F]" />
+              <span>เพดานงบ/คลิป:</span>
+            </span>
+            {[
+              { id: 'all' as const, label: 'ทั้งหมด' },
+              { id: '15k' as const, label: '≤ ฿15k' },
+              { id: '35k' as const, label: '≤ ฿35k' },
+              { id: '60k' as const, label: '≤ ฿60k' },
+            ].map((b) => (
+              <button
+                key={b.id}
+                onClick={() => setSelectedBudget(b.id)}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer min-h-[30px] ${
+                  selectedBudget === b.id
+                    ? 'bg-[#FF5A1F] text-white shadow-2xs'
+                    : 'bg-orange-50 text-orange-800 border border-orange-200/60 hover:bg-orange-100'
+                }`}
+              >
+                {b.label}
               </button>
             ))}
           </div>

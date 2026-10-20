@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { KOLRecommendation } from '../../types';
 import { TikTokProfileCTA, getProfileLinkStatus } from './TikTokProfileCTA';
 import { ScoreBreakdown } from './ScoreBreakdown';
+import { VideoPreviewModal } from './VideoPreviewModal';
 import {
   X,
   ExternalLink,
@@ -26,6 +27,8 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
   creator,
   onClose,
 }) => {
+  const [previewClip, setPreviewClip] = useState<{ caption: string; index: number } | null>(null);
+
   if (!creator) return null;
 
   return (
@@ -180,9 +183,10 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                   {creator.sample_captions.slice(0, 4).map((cap, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-2xl bg-orange-50/30 border border-orange-100/70 text-xs text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-50/50 transition flex gap-3 items-start"
+                      onClick={() => setPreviewClip({ caption: cap, index: idx + 1 })}
+                      className="p-3 rounded-2xl bg-orange-50/30 border border-orange-100/70 text-xs text-slate-700 leading-relaxed font-thai relative group hover:bg-orange-100/40 hover:border-orange-300 transition flex gap-3 items-start cursor-pointer shadow-2xs"
                     >
-                      <div className="w-12 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-orange-200/60 mt-0.5">
+                      <div className="w-12 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-orange-200/60 mt-0.5 group-hover:scale-105 transition-transform">
                         <img
                           src={getCreatorCover(creator)}
                           alt="ตัวอย่างคลิป"
@@ -190,9 +194,9 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                           decoding="async"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                          <div className="w-4 h-4 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-xs">
-                            <Play className="w-2 h-2 fill-slate-900 ml-0.5" />
+                        <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 flex items-center justify-center transition">
+                          <div className="w-5 h-5 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-xs group-hover:scale-110 transition">
+                            <Play className="w-2.5 h-2.5 fill-slate-900 ml-0.5" />
                           </div>
                         </div>
                       </div>
@@ -201,7 +205,7 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                           <span className="text-[10px] font-bold text-[#FF5A1F] uppercase font-mono tracking-wider flex items-center gap-1">
                             <span>▶ Clip #{idx + 1}</span>
                           </span>
-                          <span className="text-[9px] text-slate-400 font-medium">TikTok Feed</span>
+                          <span className="text-[9px] text-[#FF5A1F] font-semibold bg-orange-100/60 px-1.5 py-0.5 rounded">แตะเพื่อเล่นคลิป</span>
                         </div>
                         <p className="text-slate-800 line-clamp-3 leading-relaxed">
                           "{cap}"
@@ -376,6 +380,15 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
           <TikTokProfileCTA creator={creator} variant="hero" />
         </div>
       </div>
+
+      {/* Video Preview Modal */}
+      <VideoPreviewModal
+        isOpen={!!previewClip}
+        onClose={() => setPreviewClip(null)}
+        creator={creator}
+        caption={previewClip?.caption}
+        clipIndex={previewClip?.index}
+      />
     </div>
   );
 };
