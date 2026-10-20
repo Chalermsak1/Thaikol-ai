@@ -133,3 +133,30 @@ def test_detect_content_formats_and_shop():
     assert "รีวิว / พลีชีพ" in formats or "แกะกล่อง / Unboxing" in formats
     assert has_shop is True
 
+
+def test_detect_competitor_mentions():
+    from services.tiktok_signals import detect_competitor_mentions
+
+    captions = ["ใช้ Sunsilk สูตรใหม่แล้วผมนุ่มมาก กลิ่นหอมสุดๆ #ผมสวย"]
+    competitors = detect_competitor_mentions(captions, industry="haircare", brand_name="Khaokho Talaypu")
+    assert "sunsilk" in competitors
+
+    # Ignore self-brand
+    self_captions = ["รีวิว Khaokho Talaypu แชมพูอัญชันตัวดัง"]
+    assert detect_competitor_mentions(self_captions, brand_name="Khaokho Talaypu") == []
+
+
+def test_check_creator_activity_warning():
+    from services.tiktok_signals import check_creator_activity_warning
+    from datetime import datetime, timezone, timedelta
+
+    # Recent post: no warning
+    recent = (datetime.now(timezone.utc) - timedelta(days=5)).isoformat()
+    assert check_creator_activity_warning(recent) is None
+
+    # Stale post (>60 days): warning
+    stale = (datetime.now(timezone.utc) - timedelta(days=70)).isoformat()
+    warning = check_creator_activity_warning(stale)
+    assert warning is not None
+    assert "ไม่ได้ลงคลิปใหม่" in warning
+

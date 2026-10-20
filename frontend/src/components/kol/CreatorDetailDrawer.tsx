@@ -18,6 +18,8 @@ import {
   Mail,
   Phone,
   ShoppingBag,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { formatCompactNumber, formatPercent } from '../../lib/format';
 import { CreatorAvatar, getCreatorCover, isSamplePortrait } from '../../lib/creatorMedia';
@@ -32,8 +34,28 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
   onClose,
 }) => {
   const [previewClip, setPreviewClip] = useState<{ caption: string; index: number } | null>(null);
+  const [pitchCopied, setPitchCopied] = useState(false);
 
   if (!creator) return null;
+
+  const handleCopyOutreach = () => {
+    const formatStr = creator.content_formats?.[0] || 'รีวิว/ป้ายยา';
+    const rateMin = creator.rate_card_min ? formatCompactNumber(creator.rate_card_min) : '3K';
+    const rateMax = creator.rate_card_max ? formatCompactNumber(creator.rate_card_max) : '8K';
+    const text = `สวัสดีครับ/ค่ะคุณ ${creator.display_name} (@${creator.username}) 🌸
+ติดต่อจากทีมการตลาดแบรนด์ครับ
+
+ทางทีมได้ติดตามคลิป TikTok สไตล์ "${formatStr}" ของคุณแล้ว ชื่นชอบและมองว่าสอดคล้องกับภาพลักษณ์ของแบรนด์เราเป็นอย่างยิ่ง จึงอยากขอเรียนเชิญร่วมงานทำคลิปสปอนเซอร์ (Sponsored Video) ความยาว 45-60 วินาที
+
+💰 ประมาณการเรทการ์ด: ~${rateMin} - ${rateMax} บาท (ตามตกลง)
+
+หากคุณ ${creator.display_name} สะดวกรับงาน รบกวนขอทราบเงื่อนไขและคิวงานเพิ่มเติมได้เลยนะครับ ขอบพระคุณมากครับ 🙏✨`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      setPitchCopied(true);
+      setTimeout(() => setPitchCopied(false), 2000);
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-stretch sm:justify-end">
@@ -271,6 +293,18 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                       ไม่พบ LINE/Email ใน Bio สาธารณะ (แนะนำติดต่อผ่าน TikTok Direct Message)
                     </span>
                   )}
+                </div>
+
+                {/* 1-Click Copy Outreach DM Template */}
+                <div className="pt-1.5">
+                  <button
+                    type="button"
+                    onClick={handleCopyOutreach}
+                    className="w-full py-2 px-3 rounded-xl bg-orange-100/70 hover:bg-orange-100 text-[#C93B07] text-xs font-bold border border-orange-200/80 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-98"
+                  >
+                    {pitchCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-[#FF5A1F]" />}
+                    <span>{pitchCopied ? 'คัดลอกข้อความแล้ว!' : '📋 คัดลอกข้อความทักบรีฟงาน (Outreach DM Template)'}</span>
+                  </button>
                 </div>
               </div>
             </div>

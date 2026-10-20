@@ -278,3 +278,53 @@ def extract_last_posted_at(videos: List[Any]) -> Optional[str]:
     # Return latest timestamp
     return sorted(timestamps, reverse=True)[0]
 
+
+KNOWN_COMPETITOR_MAP = {
+    "haircare": ["sunsilk", "pantene", "rejoice", "head & shoulders", "clear", "loreal", "tresemme", "ซันซิล", "แพนทีน", "รีจอยส์", "เคลียร์", "ลอรีอัล", "havilah", "ฮาวิล่าห์"],
+    "skincare": ["cetaphil", "cerave", "la roche", "eucerin", "bioderma", "garnier", "เซตาฟิล", "เซราวี", "ยูเซอริน", "การ์นิเย่", "ลาโรช"],
+    "beverage": ["ชาพะยอม", "เต่าบิน", "โออิชิ", "อิชิตัน", "ตรามือ", "กาแฟพันธุ์ไทย", "เนสกาแฟ", "อเมซอน"],
+    "cosmetics": ["maybelline", "4u2", "merrezca", "srichand", "ศรีจันทร์", "เมลินดา", "meilinda", "kathy"],
+}
+
+
+def detect_competitor_mentions(
+    sample_captions: List[str],
+    industry: Optional[str] = None,
+    brand_name: Optional[str] = None,
+) -> List[str]:
+    """Detects mentions of competing brands in recent sample video captions."""
+    if not sample_captions:
+        return []
+
+    text_corpus = " ".join([c.lower() for c in sample_captions])
+    cleaned_brand = (brand_name or "").lower().strip()
+
+    detected_competitors: List[str] = []
+
+    # Check industry-specific competitor lists
+    for comp_list in KNOWN_COMPETITOR_MAP.values():
+        for comp in comp_list:
+            if comp in text_corpus and comp != cleaned_brand and comp not in detected_competitors:
+                detected_competitors.append(comp)
+
+    return detected_competitors[:3]
+
+
+def check_creator_activity_warning(last_posted_at: Optional[str]) -> Optional[str]:
+    """Checks whether the creator has not posted in the last 45+ days."""
+    if not last_posted_at:
+        return None
+    try:
+        from datetime import datetime, timezone
+        dt_str = last_posted_at.replace("Z", "+00:00")
+        posted_dt = datetime.fromisoformat(dt_str)
+        now = datetime.now(timezone.utc)
+        diff_days = (now - posted_dt).days
+        if diff_days > 60:
+            return f"ไม่ได้ลงคลิปใหม่มาแล้ว {diff_days} วัน (ควรเช็กสถานะแอคทีฟล่าสุด)"
+        elif diff_days > 35:
+            return f"คลิปล่าสุดเมื่อ {diff_days} วันก่อน"
+    except Exception:
+        pass
+    return None
+

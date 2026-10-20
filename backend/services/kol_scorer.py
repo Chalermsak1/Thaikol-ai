@@ -21,6 +21,8 @@ from services.tiktok_signals import (
     classify_creator_tier,
     estimate_rate_card_range,
     detect_content_formats_and_shop,
+    detect_competitor_mentions,
+    check_creator_activity_warning,
 )
 
 
@@ -162,6 +164,24 @@ class MultiFactorKOLScorer(KOLScorer):
                 data_quality_score=data_score,
             )
 
+            cautions = list(explanations.get("cautions", []))
+            # Competitor brand mention check
+            comp_mentions = detect_competitor_mentions(
+                list(cand.sample_captions or []),
+                getattr(brand_profile, "industry", None),
+                getattr(brand_profile, "brand_name", None),
+            )
+            if comp_mentions:
+                cautions.append(
+                    f"พบการกล่าวถึงแบรนด์กลุ่มเดียวกันในคลิปตัวอย่าง ({', '.join(comp_mentions)}) — ควรตรวจสอบข้อตกลง Exclusivity"
+                )
+
+            # Inactivity warning check
+            last_posted = getattr(cand, "last_posted_at", None)
+            act_warning = check_creator_activity_warning(last_posted)
+            if act_warning:
+                cautions.append(act_warning)
+
             matching_topics = sem_res.matching_topics if sem_res else []
 
             rec = KOLRecommendation(
@@ -181,7 +201,7 @@ class MultiFactorKOLScorer(KOLScorer):
                 data_quality_score=data_score,
                 score_breakdown=breakdown,
                 reasons=explanations["reasons"],
-                cautions=explanations["cautions"],
+                cautions=cautions,
                 matching_topics=matching_topics,
                 bio=cand.bio,
                 follower_count=cand.follower_count,

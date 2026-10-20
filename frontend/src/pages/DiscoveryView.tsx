@@ -60,6 +60,9 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
   const [isThaiOnly, setIsThaiOnly] = useState<boolean>(false);
   const [selectedTier, setSelectedTier] = useState<FollowerTier>('all');
   const [selectedBudget, setSelectedBudget] = useState<BudgetTier>('all');
+  const [hasContactOnly, setHasContactOnly] = useState<boolean>(false);
+  const [hasShopOnly, setHasShopOnly] = useState<boolean>(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>('all');
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const [previewCreator, setPreviewCreator] = useState<KOLRecommendation | null>(null);
 
@@ -123,6 +126,15 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
           estimated_engagement_rate: c.estimated_engagement_rate,
           sample_captions: c.sample_captions || [],
           hashtags: c.hashtags || [],
+          contact_line_id: c.contact_line_id,
+          contact_email: c.contact_email,
+          contact_phone: c.contact_phone,
+          creator_tier: c.creator_tier,
+          rate_card_min: c.rate_card_min,
+          rate_card_max: c.rate_card_max,
+          last_posted_at: c.last_posted_at,
+          has_tiktok_shop: c.has_tiktok_shop,
+          content_formats: c.content_formats,
           data_source: c.data_source || 'live',
           collected_at: c.collected_at || new Date().toISOString(),
           data_freshness: c.data_freshness || 'fresh',
@@ -175,6 +187,15 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
             estimated_engagement_rate: c.estimated_engagement_rate,
             sample_captions: c.sample_captions || [],
             hashtags: c.hashtags || [],
+            contact_line_id: c.contact_line_id,
+            contact_email: c.contact_email,
+            contact_phone: c.contact_phone,
+            creator_tier: c.creator_tier,
+            rate_card_min: c.rate_card_min,
+            rate_card_max: c.rate_card_max,
+            last_posted_at: c.last_posted_at,
+            has_tiktok_shop: c.has_tiktok_shop,
+            content_formats: c.content_formats,
             data_source: c.data_source || 'live',
             collected_at: c.collected_at || new Date().toISOString(),
             data_freshness: 'cached',
@@ -248,6 +269,19 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
       if (rate.avgRateTHB > cap) return false;
     }
 
+    // Commercial Readiness Filters
+    if (hasContactOnly && !c.contact_line_id && !c.contact_email && !c.contact_phone) {
+      return false;
+    }
+    if (hasShopOnly && !c.has_tiktok_shop) {
+      return false;
+    }
+    if (selectedFormat !== 'all') {
+      if (!c.content_formats || !c.content_formats.some((f) => f.toLowerCase().includes(selectedFormat.toLowerCase()))) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -278,6 +312,9 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
     setIsThaiOnly(false);
     setSelectedTier('all');
     setSelectedBudget('all');
+    setHasContactOnly(false);
+    setHasShopOnly(false);
+    setSelectedFormat('all');
     setSearchQuery('');
     setActiveCategory('all');
     setDirectCandidates([]);
@@ -290,6 +327,9 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
     isThaiOnly ||
     selectedTier !== 'all' ||
     selectedBudget !== 'all' ||
+    hasContactOnly ||
+    hasShopOnly ||
+    selectedFormat !== 'all' ||
     !!searchQuery;
 
   return (
@@ -460,6 +500,71 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
                 }`}
               >
                 {budget.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Commercial Readiness & Content Format Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs sm:text-sm">
+          {/* Quick Commercial Status Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none flex-wrap">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
+              สถานะพร้อมจ้างงาน:
+            </span>
+
+            {/* LINE / Contact Filter */}
+            <button
+              type="button"
+              onClick={() => setHasContactOnly(!hasContactOnly)}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 min-h-[32px] flex items-center gap-1.5 ${
+                hasContactOnly
+                  ? 'bg-[#06C755] text-white shadow-2xs'
+                  : 'bg-[#06C755]/10 text-[#05963f] hover:bg-[#06C755]/20 border border-[#06C755]/30'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${hasContactOnly ? 'bg-white' : 'bg-[#06C755]'}`} />
+              <span>💬 LINE/ติดต่อพร้อม</span>
+            </button>
+
+            {/* TikTok Shop Filter */}
+            <button
+              type="button"
+              onClick={() => setHasShopOnly(!hasShopOnly)}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 min-h-[32px] flex items-center gap-1.5 ${
+                hasShopOnly
+                  ? 'bg-amber-600 text-white shadow-2xs'
+                  : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+              }`}
+            >
+              <span>🛒</span>
+              <span>มี TikTok Shop</span>
+            </button>
+          </div>
+
+          {/* Content Format Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 shrink-0">
+              สไตล์คลิป:
+            </span>
+            {[
+              { id: 'all', label: 'ทั้งหมด' },
+              { id: 'รีวิว', label: '🎬 รีวิว' },
+              { id: 'how-to', label: '💡 How-to' },
+              { id: 'แกะกล่อง', label: '📦 แกะกล่อง' },
+              { id: 'vlog', label: '✨ Vlog' },
+            ].map((fmt) => (
+              <button
+                key={fmt.id}
+                type="button"
+                onClick={() => setSelectedFormat(fmt.id)}
+                className={`px-2.5 py-1 rounded-xl text-xs font-semibold transition cursor-pointer shrink-0 min-h-[32px] ${
+                  selectedFormat === fmt.id
+                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                    : 'bg-indigo-50/70 text-indigo-900 hover:bg-indigo-100 border border-indigo-200/60'
+                }`}
+              >
+                {fmt.label}
               </button>
             ))}
           </div>
