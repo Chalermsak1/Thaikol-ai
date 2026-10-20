@@ -43,7 +43,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       aria-label="Mobile Navigation"
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]"
     >
-      <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
+      <div className="flex items-center justify-around h-15 sm:h-16 px-1.5 max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -55,7 +55,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <button
               key={item.id}
               onClick={() => onSelectPage(item.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-1.5 min-h-[48px] touch-manipulation transition-all duration-150 select-none cursor-pointer relative ${
+              className={`flex-1 flex flex-col items-center justify-center py-1 min-h-[46px] touch-manipulation transition-all duration-150 select-none cursor-pointer relative ${
                 isActive
                   ? 'text-[#FF5A1F] font-bold'
                   : 'text-slate-400 hover:text-slate-700 font-medium'
@@ -68,13 +68,13 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   }`}
                 />
                 {item.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-3 min-w-[20px] h-[20px] px-1 bg-[#FF5A1F] text-white text-xs font-black rounded-full flex items-center justify-center leading-none shadow-xs font-mono">
+                  <span className="absolute -top-1.5 -right-3 min-w-[18px] h-[18px] px-1 bg-[#FF5A1F] text-white text-[10px] font-black rounded-full flex items-center justify-center leading-none shadow-xs font-mono">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
               </div>
               <span
-                className={`text-xs mt-1 tracking-tight font-thai leading-tight ${
+                className={`text-[10.5px] sm:text-xs mt-0.5 tracking-tight font-thai leading-tight ${
                   isActive ? 'font-bold text-slate-950' : 'text-slate-500 font-medium'
                 }`}
               >

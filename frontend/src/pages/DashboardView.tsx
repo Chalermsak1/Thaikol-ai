@@ -198,7 +198,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   return (
-    <div className="space-y-5 max-w-[1240px] mx-auto overflow-x-hidden pb-8 font-thai">
+    <div className="space-y-4 sm:space-y-5 max-w-[1240px] mx-auto overflow-x-hidden pb-8 font-thai">
       {/* ─── 1. Brand Spotlight Hero Card (Mobile-First Touch Ergonomics) ── */}
       <section className="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-4 sm:p-6 space-y-4">
         {/* Brand Header */}
@@ -269,24 +269,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ─── 2. Prominent Mobile Search Bar & Category Chips ────────── */}
       <section className="space-y-3">
         <form onSubmit={handleQuickSearchSubmit} className="relative flex items-center">
-          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={quickSearchInput}
             onChange={(e) => setQuickSearchInput(e.target.value)}
-            placeholder="ค้นหาชื่อครีเอเตอร์ TikTok, @username หรือคีย์เวิร์ด..."
-            className="w-full pl-11 pr-24 sm:pr-28 py-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all placeholder:text-slate-400 font-sans"
+            placeholder="ค้นหาชื่อครีเอเตอร์, @username..."
+            className="w-full pl-10 pr-22 sm:pr-26 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#FF5A1F] transition-all placeholder:text-slate-400 font-sans"
           />
           <button
             type="submit"
-            className="btn-orange absolute right-2 top-1/2 -translate-y-1/2 py-2 px-4 text-xs sm:text-sm font-bold shadow-xs cursor-pointer min-h-[36px] touch-manipulation"
+            className="btn-orange absolute right-1.5 top-1/2 -translate-y-1/2 py-2 px-3.5 text-xs sm:text-sm font-bold shadow-xs cursor-pointer min-h-[34px] touch-manipulation"
           >
             ค้นหา
           </button>
         </form>
 
         {/* Quick Horizontal Categories with Active State */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
           {QUICK_CATEGORIES.map((cat, idx) => {
             const isSelected = activeCategory === cat.query;
             return (
@@ -301,7 +301,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     onSelectPage('discovery');
                   }
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition cursor-pointer shrink-0 min-h-[38px] touch-manipulation active:scale-95 ${
+                className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition cursor-pointer shrink-0 min-h-[36px] touch-manipulation active:scale-95 ${
                   isSelected
                     ? 'bg-[#FF5A1F] text-white border border-[#FF5A1F] shadow-xs'
                     : 'bg-white hover:bg-orange-50 hover:border-orange-200 hover:text-[#FF5A1F] border border-slate-200/90 text-slate-700'
@@ -320,16 +320,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="lg:col-span-7 space-y-4 min-w-0">
           <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-4 sm:p-6 space-y-4 overflow-hidden">
             {/* Section Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/70 text-[#FF5A1F] flex items-center justify-center font-bold text-sm shadow-2xs">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/70 text-[#FF5A1F] flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
                   <Star className="w-4 h-4 fill-[#FF5A1F]" />
                 </div>
-                <div>
-                  <h2 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
-                    ครีเอเตอร์ที่เหมาะสมสูงสุด (Top Matches)
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h2 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                      ครีเอเตอร์ที่เหมาะสมสูงสุด
+                    </h2>
+                    <span className="text-[10px] font-bold text-[#FF5A1F] bg-orange-50 border border-orange-200/80 px-1.5 py-0.5 rounded-md leading-none">
+                      Top Matches
+                    </span>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate mt-0.5">
                     คัดเลือกจากสัญญาณคอนเทนต์และแบบจำลองความเข้ากันได้
                   </p>
                 </div>
@@ -338,7 +343,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectPage('discovery')}
-                className="text-xs sm:text-sm font-bold text-[#FF5A1F] hover:text-[#E24A12] flex items-center gap-1 cursor-pointer shrink-0 min-h-[40px] px-2 touch-manipulation"
+                className="text-xs sm:text-sm font-bold text-[#FF5A1F] hover:text-[#E24A12] flex items-center gap-1 cursor-pointer shrink-0 min-h-[36px] px-1 touch-manipulation whitespace-nowrap"
               >
                 <span>ดูทั้งหมด</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -348,17 +353,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* ── FEATURE 1: Swipeable Hero Creator Carousel (iPhone 390px Optimized) ── */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#FF5A1F]" />
-                  <span>ไฮไลท์ครีเอเตอร์ยอดนิยม (Swipe to Explore)</span>
+                  <span>ไฮไลท์ครีเอเตอร์ยอดนิยม</span>
+                  <span className="text-[10px] text-slate-400 font-normal hidden xs:inline">(เลื่อนดู)</span>
                 </span>
-                <span className="text-xs font-mono font-semibold text-slate-400">
+                <span className="text-[11px] font-mono font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
                   {displayCreators.length} รายการ
                 </span>
               </div>
 
               {/* Horizontal Scroll Deck */}
-              <div className="flex gap-3.5 overflow-x-auto pb-3 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+              <div className="flex gap-3 overflow-x-auto pb-3 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
                 {displayCreators.map((creator: any, idx: number) => {
                   const coverUrl = getCreatorCover(creator);
                   const isTop = idx === 0;
@@ -370,7 +376,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <article
                       key={creator.username || idx}
                       onClick={() => handleCreatorClick(creator)}
-                      className="w-[230px] sm:w-[250px] h-[350px] sm:h-[370px] shrink-0 snap-start relative rounded-3xl overflow-hidden group cursor-pointer border border-slate-200/90 shadow-sm hover:shadow-card-hover transition-all duration-300 select-none bg-slate-900"
+                      className="w-[230px] sm:w-[250px] h-[345px] sm:h-[370px] shrink-0 snap-start relative rounded-3xl overflow-hidden group cursor-pointer border border-slate-200/90 shadow-sm hover:shadow-card-hover transition-all duration-300 select-none bg-slate-900"
                     >
                       {/* Full-bleed Portrait Cover Image */}
                       <img
@@ -385,11 +391,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20 pointer-events-none" />
 
                       {/* Top Bar: Badges & Shortlist Toggle */}
-                      <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10">
+                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1.5 z-10">
                         {/* Rank Badge + Disclosure */}
                         <div className="flex flex-col gap-1 items-start">
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm ${
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-black uppercase tracking-wider shadow-sm ${
                               isTop
                                 ? 'bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white ring-2 ring-white/30'
                                 : idx === 1
@@ -405,7 +411,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                           {/* Sample Portrait Disclosure Badge (100% Ethical & Truthful) */}
                           {samplePortrait && (
-                            <span className="text-[11px] font-bold text-white/90 bg-black/50 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/15">
+                            <span className="text-[10px] font-bold text-white/90 bg-black/50 backdrop-blur-xs px-1.5 py-0.5 rounded-md border border-white/15">
                               รูปตัวอย่างจำลอง
                             </span>
                           )}
@@ -413,7 +419,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                         {/* Right: Fit Score + Shortlist Button */}
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[#FF7A3D] border border-orange-400/40 font-mono font-black text-xs sm:text-sm shadow-sm">
+                          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[#FF7A3D] border border-orange-400/40 font-mono font-black text-xs shadow-sm">
                             {Number(creator.final_score).toFixed(1)} Fit
                           </span>
 
@@ -425,16 +431,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                                 onToggleShortlist(creator);
                               }}
                               aria-label="บันทึกครีเอเตอร์"
-                              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md cursor-pointer ${
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all backdrop-blur-md cursor-pointer ${
                                 isBookmarked
                                   ? 'bg-[#FF5A1F] text-white shadow-md shadow-orange-500/30'
                                   : 'bg-black/50 text-white/90 hover:bg-black/70 border border-white/20'
                               }`}
                             >
                               {isBookmarked ? (
-                                <BookmarkCheck className="w-4 h-4 fill-white" />
+                                <BookmarkCheck className="w-3.5 h-3.5 fill-white" />
                               ) : (
-                                <Bookmark className="w-4 h-4" />
+                                <Bookmark className="w-3.5 h-3.5" />
                               )}
                             </button>
                           )}
@@ -442,34 +448,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </div>
 
                       {/* Bottom Overlay: Identity, Stats & CTA */}
-                      <div className="absolute bottom-3 left-3 right-3 z-10 space-y-2.5">
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 space-y-1.5">
                         {/* Creator Mini Identity */}
                         <div className="flex items-center gap-2">
-                          <CreatorAvatar creator={creator} size="sm" showVerified={false} />
+                          <CreatorAvatar creator={creator} size="xs" showVerified={false} />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1">
-                              <h3 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
+                              <h3 className="text-xs sm:text-sm font-black text-white truncate drop-shadow-sm">
                                 {creator.display_name}
                               </h3>
                               {creator.is_profile_verified && (
-                                <div className="w-3.5 h-3.5 rounded-full bg-[#FF5A1F] text-white flex items-center justify-center shrink-0">
-                                  <Check className="w-2 h-2 stroke-[3]" />
+                                <div className="w-3 h-3 rounded-full bg-[#FF5A1F] text-white flex items-center justify-center shrink-0">
+                                  <Check className="w-1.5 h-1.5 stroke-[3]" />
                                 </div>
                               )}
                             </div>
-                            <div className="text-xs font-mono text-white/80 truncate">
+                            <div className="text-[10.5px] font-mono text-white/80 truncate">
                               @{creator.username}
                             </div>
                           </div>
                         </div>
 
                         {/* Quick Metrics Bar with Rate Card */}
-                        <div className="grid grid-cols-3 gap-1 text-xs bg-white/10 backdrop-blur-md rounded-xl px-2 py-1.5 border border-white/15 text-white/90 text-center">
+                        <div className="grid grid-cols-3 gap-1 bg-white/10 backdrop-blur-md rounded-xl px-1.5 py-1 border border-white/15 text-white/90 text-center">
                           <div>
-                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
+                            <span className="text-[9.5px] uppercase text-white/70 block font-semibold leading-tight">
                               ผู้ติดตาม
                             </span>
-                            <span className="font-mono font-black text-xs sm:text-sm">
+                            <span className="font-mono font-black text-[11px] sm:text-xs">
                               {creator.follower_count
                                 ? formatCompactNumber(creator.follower_count)
                                 : '100K+'}
@@ -477,19 +483,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           </div>
 
                           <div className="border-x border-white/15">
-                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
+                            <span className="text-[9.5px] uppercase text-white/70 block font-semibold leading-tight">
                               เรทการ์ด
                             </span>
-                            <span className="font-mono font-black text-xs sm:text-sm text-emerald-300">
+                            <span className="font-mono font-black text-[11px] sm:text-xs text-emerald-300">
                               ~{formatCompactNumber(rateCard.avgRateTHB)}฿
                             </span>
                           </div>
 
                           <div>
-                            <span className="text-[11px] uppercase text-white/70 block font-semibold leading-tight">
+                            <span className="text-[9.5px] uppercase text-white/70 block font-semibold leading-tight">
                               Engagement
                             </span>
-                            <span className="font-mono font-black text-xs sm:text-sm text-[#FF9E66]">
+                            <span className="font-mono font-black text-[11px] sm:text-xs text-[#FF9E66]">
                               {creator.estimated_engagement_rate
                                 ? formatPercent(creator.estimated_engagement_rate)
                                 : '4.5%'}
@@ -503,7 +509,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             {creator.matching_topics.slice(0, 2).map((t: string, i: number) => (
                               <span
                                 key={i}
-                                className="px-2 py-0.5 rounded-md bg-white/15 text-white text-[11px] font-medium truncate backdrop-blur-xs"
+                                className="px-1.5 py-0.5 rounded-md bg-white/15 text-white text-[10px] font-medium truncate backdrop-blur-xs"
                               >
                                 #{t}
                               </span>
@@ -514,7 +520,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {/* Action CTA Button */}
                         <button
                           type="button"
-                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white text-xs sm:text-sm font-black shadow-md shadow-orange-500/25 flex items-center justify-center gap-1.5 group-hover:brightness-110 active:scale-95 transition-all touch-manipulation cursor-pointer"
+                          className="w-full py-2 rounded-xl bg-gradient-to-r from-[#FF5A1F] to-[#E24A12] text-white text-xs font-black shadow-md shadow-orange-500/25 flex items-center justify-center gap-1.5 group-hover:brightness-110 active:scale-95 transition-all touch-manipulation cursor-pointer"
                         >
                           <span>ดูโปรไฟล์เชิงลึก</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
