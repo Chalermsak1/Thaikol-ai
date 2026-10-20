@@ -16,6 +16,7 @@ from schemas.kol import (
     TikTokDiscoveryResponse,
     TikTokVideo,
     KOLCandidate,
+    KOLSampleVideo,
 )
 from services.freshness import calculate_data_freshness
 from services.interfaces import TikTokProvider
@@ -374,6 +375,19 @@ class TikTokDiscoveryService:
                 thailand_hashtag_count=hashtag_count,
                 location_mentions=locations,
                 local_signal_score=local_score,
+                sample_videos=[
+                    KOLSampleVideo(
+                        video_id=v.video_id,
+                        video_url=v.video_url,
+                        caption=v.caption,
+                        views=v.views,
+                        likes=v.likes,
+                        comments=v.comments,
+                        shares=v.shares,
+                        cover_image_url=v.video_thumbnail_url,
+                    )
+                    for v in videos_list
+                ],
                 data_source=data["data_source"],
                 collected_at=data["collected_at"],
                 data_freshness=calculate_data_freshness(data["collected_at"]),

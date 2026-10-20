@@ -53,6 +53,20 @@ class TikTokVideo(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class KOLSampleVideo(BaseModel):
+    """Sampled public TikTok video attached to a creator candidate."""
+    video_id: str = Field(..., description="Unique video identifier")
+    video_url: str = Field(..., description="Public video URL")
+    caption: Optional[str] = Field(None, description="Video caption text")
+    views: Optional[int] = Field(None, ge=0)
+    likes: Optional[int] = Field(None, ge=0)
+    comments: Optional[int] = Field(None, ge=0)
+    shares: Optional[int] = Field(None, ge=0)
+    cover_image_url: Optional[str] = Field(None, description="Video cover thumbnail if available")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class KOLCandidate(BaseModel):
     """Normalized, deduplicated creator candidate with aggregated metrics and local signals."""
     username: str = Field(..., description="Creator TikTok username")
@@ -66,6 +80,7 @@ class KOLCandidate(BaseModel):
     avatar_url: Optional[str] = Field(None, description="Creator profile avatar URL if available")
     video_thumbnail_url: Optional[str] = Field(None, description="Featured sample video thumbnail URL if available")
     sample_video_count: int = Field(default=0, ge=0, description="Number of sampled videos aggregated")
+    sample_videos: List[KOLSampleVideo] = Field(default_factory=list, description="Sampled TikTok video objects with URLs and IDs")
 
     # Aggregated metrics across sampled videos (Derived)
     total_views: Optional[int] = Field(None, ge=0)

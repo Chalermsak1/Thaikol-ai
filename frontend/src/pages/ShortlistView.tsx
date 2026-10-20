@@ -737,7 +737,11 @@ ${listText}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     {/* Identity */}
                     <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-slate-100 border border-slate-200/90 text-slate-900 flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
+                      <div
+                        onClick={() => onOpenCreatorDetail(item.creator)}
+                        className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-slate-100 border border-slate-200/90 hover:border-[#FF5A1F] text-slate-900 flex items-center justify-center font-black text-sm shrink-0 shadow-2xs cursor-pointer transition"
+                        title="แตะเพื่อดูข้อมูลเชิงลึก & คลิป"
+                      >
                         {item.creator.display_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -809,6 +813,17 @@ ${listText}
                       </div>
 
                       <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* View Creator Detail & Clips Button */}
+                        <button
+                          type="button"
+                          onClick={() => onOpenCreatorDetail(item.creator)}
+                          className="px-3 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 hover:text-[#FF5A1F] hover:border-[#FF5A1F] border border-slate-200/90 transition flex items-center gap-1.5 cursor-pointer min-h-[44px] shadow-2xs"
+                          title="ดูข้อมูลเชิงลึก & คลิป"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-[#FF5A1F]" />
+                          <span>ดูข้อมูล & คลิป</span>
+                        </button>
+
                         {/* 1-Click Pitch Button */}
                         <button
                           type="button"

@@ -376,17 +376,21 @@ export const CreatorDetailDrawer: React.FC<CreatorDetailDrawerProps> = ({
                               <Play className="w-2.5 h-2.5 fill-[#C93B07]" />
                               <span>เล่นคลิปตัวอย่าง</span>
                             </button>
-                            {creator.profile_url && (
-                              <a
-                                href={creator.profile_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[10px] sm:text-[11px] text-slate-600 hover:text-slate-900 font-bold bg-white border border-slate-200/90 px-2 py-1 rounded-lg transition inline-flex items-center gap-1 active:scale-95 shadow-2xs"
-                              >
-                                <span>ดูบน TikTok</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
-                            )}
+                            {(() => {
+                              const directClipUrl = creator.sample_videos?.[idx]?.video_url || creator.profile_url;
+                              if (!directClipUrl) return null;
+                              return (
+                                <a
+                                  href={directClipUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-[10px] sm:text-[11px] text-slate-600 hover:text-slate-900 font-bold bg-white border border-slate-200/90 px-2 py-1 rounded-lg transition inline-flex items-center gap-1 active:scale-95 shadow-2xs"
+                                >
+                                  <span>ดูบน TikTok</span>
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
+                              );
+                            })()}
                           </div>
                         </div>
                         <p className="text-slate-800 line-clamp-3 leading-relaxed">

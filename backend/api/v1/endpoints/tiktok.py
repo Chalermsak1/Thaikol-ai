@@ -14,6 +14,7 @@ from schemas.kol import (
     TikTokDiscoveryRequest,
     TikTokDiscoveryResponse,
     KOLCandidate,
+    KOLSampleVideo,
     KOLDiscoveryRunResponse,
     CreatorIngestRequest,
     CreatorIngestResponse,
@@ -240,6 +241,18 @@ def build_candidate_from_model(r: KOLCandidateModel) -> KOLCandidate:
         data_freshness="cached",
         is_demo_fixture=r.is_demo_fixture or False,
         provenance=r.provenance or "database",
+        sample_videos=[
+            KOLSampleVideo(
+                video_id=v.video_id,
+                video_url=v.video_url,
+                caption=v.caption,
+                views=v.views,
+                likes=v.likes,
+                comments=v.comments,
+                shares=v.shares,
+            )
+            for v in (r.sample_videos or [])
+        ],
     )
 
 

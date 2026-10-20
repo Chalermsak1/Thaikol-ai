@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Any, Literal
 from pydantic import BaseModel, Field, ConfigDict
 
 from schemas.brand import BrandProfile
-from schemas.kol import KOLCandidate
+from schemas.kol import KOLCandidate, KOLSampleVideo
 
 
 class ScoreBreakdownItem(BaseModel):
@@ -84,6 +84,7 @@ class KOLRecommendation(BaseModel):
     hashtags: List[str] = Field(default_factory=list, description="Aggregated public hashtags (OBSERVED)")
     avatar_url: Optional[str] = Field(None, description="Creator profile avatar URL if available")
     video_thumbnail_url: Optional[str] = Field(None, description="Featured sample video thumbnail URL if available")
+    sample_videos: List[KOLSampleVideo] = Field(default_factory=list, description="Sampled TikTok video objects with URLs and IDs")
 
     # Commercial & Contact Channels
     contact_line_id: Optional[str] = Field(None, description="Direct LINE ID extracted from bio")

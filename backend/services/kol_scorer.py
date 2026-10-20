@@ -222,6 +222,7 @@ class MultiFactorKOLScorer(KOLScorer):
                 hashtags=list(cand.hashtags[:15]),
                 avatar_url=getattr(cand, "avatar_url", None),
                 video_thumbnail_url=getattr(cand, "video_thumbnail_url", None),
+                sample_videos=list(getattr(cand, "sample_videos", []) or []),
                 contact_line_id=(
                     getattr(cand, "contact_line_id", None)
                     or extract_bio_contacts(cand.bio or "").get("contact_line_id")

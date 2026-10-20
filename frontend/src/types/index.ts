@@ -39,6 +39,17 @@ export interface ScoreBreakdown {
   final_score: number;
 }
 
+export interface KOLSampleVideo {
+  video_id: string;
+  video_url: string;
+  caption?: string;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  cover_image_url?: string;
+}
+
 export interface KOLCandidate {
   username: string;
   normalized_username?: string;
@@ -49,6 +60,7 @@ export interface KOLCandidate {
   bio?: string | null;
   follower_count?: number | null;
   sample_video_count?: number;
+  sample_videos?: KOLSampleVideo[];
   total_views?: number | null;
   total_likes?: number | null;
   total_comments?: number | null;
@@ -127,6 +139,7 @@ export interface KOLRecommendation {
   hashtags?: string[];
   avatar_url?: string | null;
   video_thumbnail_url?: string | null;
+  sample_videos?: KOLSampleVideo[];
   contact_line_id?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
