@@ -5,6 +5,7 @@ import { TikTokProfileCTA, getProfileLinkStatus } from './TikTokProfileCTA';
 import { WhyThisCreator } from './WhyThisCreator';
 import { ExternalLink, ChevronDown, ChevronUp, Check, Plus, ShieldCheck } from 'lucide-react';
 import { CreatorAvatar } from '../../lib/creatorMedia';
+import { estimateCreatorRateCard, formatTHBCurrency } from '../../lib/rateCardCalculator';
 
 interface CreatorCardProps {
   recommendation: KOLRecommendation;
@@ -21,6 +22,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(recommendation.rank === 1);
   const isTopRank = recommendation.rank === 1;
+  const rateCard = estimateCreatorRateCard(recommendation.follower_count, recommendation.average_views);
 
   return (
     <article
@@ -82,8 +84,17 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
                 )}
               </div>
 
-              {/* Tags row */}
+              {/* Tags row & Rate Card */}
               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                <span
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200/70"
+                  title={`เรทการ์ดประมาณการ ${rateCard.tierLabel}`}
+                >
+                  <span>💰</span>
+                  <span>~{formatTHBCurrency(rateCard.avgRateTHB)} / คลิป</span>
+                  <span className="text-[10px] text-emerald-600 font-normal">({rateCard.tier})</span>
+                </span>
+
                 {recommendation.matching_topics.slice(0, 3).map((topic, i) => (
                   <span
                     key={i}

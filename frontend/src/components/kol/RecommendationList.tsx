@@ -14,6 +14,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { CreatorAvatar } from '../../lib/creatorMedia';
+import { estimateCreatorRateCard, formatTHBCurrency } from '../../lib/rateCardCalculator';
 
 interface RecommendationListProps {
   creators: KOLRecommendation[];
@@ -41,6 +42,7 @@ export const RecommendationList: React.FC<RecommendationListProps> = ({
       {creators.map((creator) => {
         const isCompared = comparisonList.includes(creator.username);
         const isShortlisted = Boolean(shortlist[creator.username]);
+        const rateCard = estimateCreatorRateCard(creator.follower_count, creator.average_views);
 
         // Rank styling
         let rankBadgeClass = 'bg-slate-100 border-slate-200 text-slate-700';
@@ -133,10 +135,19 @@ export const RecommendationList: React.FC<RecommendationListProps> = ({
                     </span>
                   </div>
 
-                  {/* Topics Pills */}
+                  {/* Topics & Rate Card Pills */}
                   <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                    <span
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200/80"
+                      title={`เรทการ์ดประมาณการ ${rateCard.tierLabel}`}
+                    >
+                      <span>💰</span>
+                      <span>~{formatTHBCurrency(rateCard.avgRateTHB)} / คลิป</span>
+                      <span className="text-[10px] text-emerald-600 font-normal">({rateCard.tier})</span>
+                    </span>
+
                     {creator.matching_topics && creator.matching_topics.length > 0 ? (
-                      creator.matching_topics.slice(0, 4).map((t, idx) => (
+                      creator.matching_topics.slice(0, 3).map((t, idx) => (
                         <span
                           key={idx}
                           className="px-2.5 py-0.5 rounded-lg bg-orange-50/70 text-[#C93B07] text-[11px] font-bold border border-orange-200/60"

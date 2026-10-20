@@ -11,12 +11,14 @@ import {
   Play,
 } from 'lucide-react';
 import { CreatorAvatar, getCreatorCover, isSamplePortrait } from '../../lib/creatorMedia';
+import { estimateCreatorRateCard, formatTHBCurrency } from '../../lib/rateCardCalculator';
 
 interface MobileCreatorCardProps {
   creator: KOLRecommendation;
   isShortlisted?: boolean;
   onToggleShortlist?: () => void;
   onOpenDetail?: () => void;
+  onOpenVideoModal?: (creator: KOLRecommendation) => void;
   showScore?: boolean;
 }
 
@@ -25,10 +27,12 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
   isShortlisted = false,
   onToggleShortlist,
   onOpenDetail,
+  onOpenVideoModal,
   showScore = true,
 }) => {
   const [justBookmarked, setJustBookmarked] = useState(false);
   const linkStatus = getProfileLinkStatus(creator);
+  const rateCard = estimateCreatorRateCard(creator.follower_count, creator.average_views);
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -174,7 +178,18 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
 
       {/* Content Context with Video Thumbnail Preview */}
       <div className="flex gap-2.5 items-center bg-slate-50/70 p-2.5 rounded-2xl border border-slate-100">
-        <div className="w-10 h-13 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-slate-200/90 group-hover:border-orange-300 transition">
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onOpenVideoModal) {
+              onOpenVideoModal(creator);
+            } else if (onOpenDetail) {
+              onOpenDetail();
+            }
+          }}
+          title="แตะเพื่อเปิดพรีวิววิดีโอ 9:16"
+          className="w-10 h-13 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative shadow-2xs border border-slate-200/90 group-hover:border-orange-400 group-hover:scale-105 transition cursor-pointer"
+        >
           <img
             src={getCreatorCover(creator)}
             alt="ตัวอย่างคอนเทนต์"
@@ -188,7 +203,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
             </div>
           </div>
         </div>
-        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-thai min-w-0">
+        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-thai min-w-0 flex-1">
           <span className="font-bold text-slate-500">
             {creator.sample_captions && creator.sample_captions.length > 0 ? 'คลิปตัวอย่าง: ' : 'คอนเทนต์: '}
           </span>
@@ -196,13 +211,23 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
         </p>
       </div>
 
-      {/* Tags Row: Locality, Hashtags, Data Source */}
+      {/* Tags Row: Locality, Rate Card, Hashtags, Data Source */}
       <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+        {/* Estimated Commercial Rate Card */}
+        <span
+          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-bold"
+          title={`ประมาณการเรทการ์ดระดับ ${rateCard.tierLabel} (${formatTHBCurrency(rateCard.minRateTHB)} - ${formatTHBCurrency(rateCard.maxRateTHB)})`}
+        >
+          <span>💰</span>
+          <span>~{formatTHBCurrency(rateCard.avgRateTHB)}/คลิป</span>
+          <span className="text-[10px] text-emerald-600 font-semibold font-mono">({rateCard.tier})</span>
+        </span>
+
         {/* Thai Content Signal */}
         {creator.local_content_relevance_score >= 40 && (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-800 border border-orange-200/70 font-semibold">
             <span>🇹🇭</span>
-            <span>สัญญาณคอนเทนต์ไทย</span>
+            <span>ไทย</span>
           </span>
         )}
 
@@ -220,7 +245,7 @@ export const MobileCreatorCard: React.FC<MobileCreatorCardProps> = ({
 
         {/* Hashtags */}
         {creator.hashtags &&
-          creator.hashtags.slice(0, 2).map((tag, i) => (
+          creator.hashtags.slice(0, 1).map((tag, i) => (
             <span
               key={i}
               className="px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 font-mono text-[10px] border border-slate-100"

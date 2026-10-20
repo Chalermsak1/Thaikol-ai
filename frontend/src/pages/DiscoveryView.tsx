@@ -3,6 +3,8 @@ import { RecommendationResponse, KOLRecommendation } from '../types';
 import { MobileCreatorCard } from '../components/kol/MobileCreatorCard';
 import { DiscoveryTable } from '../components/kol/DiscoveryTable';
 import { SearchStrategy } from '../components/brand/SearchStrategy';
+import { VideoPreviewModal } from '../components/kol/VideoPreviewModal';
+import { estimateCreatorRateCard } from '../lib/rateCardCalculator';
 import { discoverTikTokCreators, listTikTokCandidates } from '../lib/api';
 import {
   Search,
@@ -49,11 +51,17 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   // Filters
+  type FollowerTier = 'all' | 'nano' | 'micro' | 'mid' | 'macro' | 'mega';
+  type BudgetTier = 'all' | '15k' | '35k' | '60k' | '100k';
+
   const [minSemantic, setMinSemantic] = useState<number>(0);
   const [minEngagement, setMinEngagement] = useState<number>(0);
   const [minScore, setMinScore] = useState<number>(0);
   const [isThaiOnly, setIsThaiOnly] = useState<boolean>(false);
+  const [selectedTier, setSelectedTier] = useState<FollowerTier>('all');
+  const [selectedBudget, setSelectedBudget] = useState<BudgetTier>('all');
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const [previewCreator, setPreviewCreator] = useState<KOLRecommendation | null>(null);
 
   // Standalone TikTok discovery state (when exploring without brand or custom search)
   const [directCandidates, setDirectCandidates] = useState<KOLRecommendation[]>([]);
@@ -215,6 +223,31 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
     if (minEngagement > 0 && c.engagement_quality_score < minEngagement) return false;
     if (minScore > 0 && c.final_score < minScore) return false;
     if (isThaiOnly && c.local_content_relevance_score < 60) return false;
+
+    // Follower Tier Filter
+    if (selectedTier !== 'all') {
+      const rate = estimateCreatorRateCard(c.follower_count, c.average_views);
+      if (selectedTier === 'nano' && rate.tier !== 'Nano') return false;
+      if (selectedTier === 'micro' && rate.tier !== 'Micro') return false;
+      if (selectedTier === 'mid' && rate.tier !== 'Mid-Tier') return false;
+      if (selectedTier === 'macro' && rate.tier !== 'Macro') return false;
+      if (selectedTier === 'mega' && rate.tier !== 'Mega') return false;
+    }
+
+    // Budget Cap Filter
+    if (selectedBudget !== 'all') {
+      const cap =
+        selectedBudget === '15k'
+          ? 15000
+          : selectedBudget === '35k'
+          ? 35000
+          : selectedBudget === '60k'
+          ? 60000
+          : 100000;
+      const rate = estimateCreatorRateCard(c.follower_count, c.average_views);
+      if (rate.avgRateTHB > cap) return false;
+    }
+
     return true;
   });
 
@@ -243,13 +276,21 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
     setMinEngagement(0);
     setMinScore(0);
     setIsThaiOnly(false);
+    setSelectedTier('all');
+    setSelectedBudget('all');
     setSearchQuery('');
     setActiveCategory('all');
     setDirectCandidates([]);
   };
 
   const hasActiveFilters =
-    minSemantic > 0 || minEngagement > 0 || minScore > 0 || isThaiOnly || !!searchQuery;
+    minSemantic > 0 ||
+    minEngagement > 0 ||
+    minScore > 0 ||
+    isThaiOnly ||
+    selectedTier !== 'all' ||
+    selectedBudget !== 'all' ||
+    !!searchQuery;
 
   return (
     <div className="space-y-4 max-w-6xl mx-auto">
@@ -366,6 +407,62 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
               </button>
             );
           })}
+        </div>
+
+        {/* Tier & Budget Quick Filter Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-100 text-xs">
+          {/* Follower Tier Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+              ขนาดผู้ติดตาม:
+            </span>
+            {[
+              { id: 'all' as const, label: 'ทั้งหมด' },
+              { id: 'nano' as const, label: 'Nano (<10k)' },
+              { id: 'micro' as const, label: 'Micro (10k-50k)' },
+              { id: 'mid' as const, label: 'Mid-Tier (50k-500k)' },
+              { id: 'macro' as const, label: 'Macro (>500k)' },
+            ].map((tier) => (
+              <button
+                key={tier.id}
+                type="button"
+                onClick={() => setSelectedTier(tier.id)}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer shrink-0 min-h-[30px] ${
+                  selectedTier === tier.id
+                    ? 'bg-slate-900 text-white shadow-2xs'
+                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80'
+                }`}
+              >
+                {tier.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Budget Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+              งบ/คลิป:
+            </span>
+            {[
+              { id: 'all' as const, label: 'ทั้งหมด' },
+              { id: '15k' as const, label: '≤ ฿15k' },
+              { id: '35k' as const, label: '≤ ฿35k' },
+              { id: '60k' as const, label: '≤ ฿60k' },
+            ].map((budget) => (
+              <button
+                key={budget.id}
+                type="button"
+                onClick={() => setSelectedBudget(budget.id)}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer shrink-0 min-h-[30px] ${
+                  selectedBudget === budget.id
+                    ? 'bg-[#FF5A1F] text-white shadow-2xs font-bold'
+                    : 'bg-orange-50/70 text-orange-900 hover:bg-orange-100 border border-orange-200/60'
+                }`}
+              >
+                {budget.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -501,6 +598,7 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
                   isShortlisted={!!shortlist[creator.username]}
                   onToggleShortlist={() => onToggleShortlist?.(creator)}
                   onOpenDetail={() => onSelectCreator(creator)}
+                  onOpenVideoModal={(c) => setPreviewCreator(c)}
                   showScore={creator.final_score > 0}
                 />
               ))}
@@ -567,6 +665,15 @@ export const DiscoveryView: React.FC<DiscoveryViewProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* 9:16 Vertical Video Preview Modal */}
+      {previewCreator && (
+        <VideoPreviewModal
+          creator={previewCreator}
+          isOpen={Boolean(previewCreator)}
+          onClose={() => setPreviewCreator(null)}
+        />
       )}
     </div>
   );

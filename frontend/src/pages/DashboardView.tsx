@@ -20,6 +20,8 @@ import {
   isSamplePortrait,
   CreatorAvatar,
 } from '../lib/creatorMedia';
+import { VideoPreviewModal } from '../components/kol/VideoPreviewModal';
+import { estimateCreatorRateCard, formatTHBCurrency } from '../lib/rateCardCalculator';
 
 interface DashboardViewProps {
   result: RecommendationResponse | null;
@@ -152,6 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const [quickSearchInput, setQuickSearchInput] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const [previewCreator, setPreviewCreator] = useState<KOLRecommendation | null>(null);
 
   const brand = result?.brand_profile;
   const brandName = brand?.brand_name || 'เขาค้อทะเลภู (Khaokho Talaypu)';
@@ -361,6 +364,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   const isTop = idx === 0;
                   const isBookmarked = Boolean(shortlist[creator.username]);
                   const samplePortrait = isSamplePortrait(creator);
+                  const rateCard = estimateCreatorRateCard(creator.follower_count, creator.average_views);
 
                   return (
                     <article
@@ -459,24 +463,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           </div>
                         </div>
 
-                        {/* Quick Metrics Bar */}
-                        <div className="flex items-center justify-between text-[11px] bg-white/10 backdrop-blur-md rounded-xl px-2.5 py-1.5 border border-white/15 text-white/90">
+                        {/* Quick Metrics Bar with Rate Card */}
+                        <div className="grid grid-cols-3 gap-1 text-[11px] bg-white/10 backdrop-blur-md rounded-xl px-2 py-1.5 border border-white/15 text-white/90 text-center">
                           <div>
                             <span className="text-[9px] uppercase text-white/60 block leading-none">
                               ผู้ติดตาม
                             </span>
-                            <span className="font-mono font-bold">
+                            <span className="font-mono font-bold text-xs">
                               {creator.follower_count
                                 ? formatCompactNumber(creator.follower_count)
                                 : '100K+'}
                             </span>
                           </div>
 
-                          <div className="text-right">
+                          <div className="border-x border-white/15">
+                            <span className="text-[9px] uppercase text-white/60 block leading-none">
+                              เรทการ์ด
+                            </span>
+                            <span className="font-mono font-bold text-xs text-emerald-300">
+                              ~{formatCompactNumber(rateCard.avgRateTHB)}฿
+                            </span>
+                          </div>
+
+                          <div>
                             <span className="text-[9px] uppercase text-white/60 block leading-none">
                               Engagement
                             </span>
-                            <span className="font-mono font-bold text-[#FF9E66]">
+                            <span className="font-mono font-bold text-xs text-[#FF9E66]">
                               {creator.estimated_engagement_rate
                                 ? formatPercent(creator.estimated_engagement_rate)
                                 : '4.5%'}
@@ -526,6 +539,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {displayCreators.map((creator: any, idx: number) => {
                   const coverUrl = getCreatorCover(creator);
                   const isBookmarked = Boolean(shortlist[creator.username]);
+                  const rateCard = estimateCreatorRateCard(creator.follower_count, creator.average_views);
 
                   return (
                     <div
@@ -538,10 +552,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {/* High-Resolution Portrait Photo */}
                         <CreatorAvatar creator={creator} size="md" showVerified={true} />
 
-                        {/* Mini Video Preview Thumbnail Badge (Hidden on very narrow screens) */}
+                        {/* Mini Video Preview Thumbnail Badge */}
                         <div
-                          className="w-10 h-13 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/90 shrink-0 relative hidden xs:block shadow-2xs group-hover:border-orange-300 transition"
-                          title="ตัวอย่างเนื้อหาวิดีโอ"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewCreator(creator);
+                          }}
+                          className="w-10 h-13 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/90 shrink-0 relative hidden xs:block shadow-2xs group-hover:border-[#FF5A1F] hover:scale-105 transition cursor-pointer"
+                          title="แตะเพื่อเปิดพรีวิวคลิปตัวอย่าง 9:16"
                         >
                           <img
                             src={coverUrl}
@@ -582,19 +600,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             )}
                           </div>
 
-                          {/* Content Theme Chips */}
-                          {creator.matching_topics && creator.matching_topics.length > 0 && (
-                            <div className="flex items-center gap-1 mt-1 overflow-hidden">
-                              {creator.matching_topics.slice(0, 2).map((t: string, i: number) => (
+                          {/* Content Theme & Rate Card Chips */}
+                          <div className="flex items-center gap-1.5 mt-1 overflow-hidden flex-wrap">
+                            <span
+                              className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-md font-bold"
+                              title={`เรทการ์ดประมาณการ ${rateCard.tierLabel}`}
+                            >
+                              💰 ~{formatTHBCurrency(rateCard.avgRateTHB)} ({rateCard.tier})
+                            </span>
+                            {creator.matching_topics && creator.matching_topics.length > 0 && (
+                              creator.matching_topics.slice(0, 1).map((t: string, i: number) => (
                                 <span
                                   key={i}
                                   className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-md font-medium"
                                 >
                                   #{t}
                                 </span>
-                              ))}
-                            </div>
-                          )}
+                              ))
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -770,6 +794,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 9:16 Vertical Video Preview Modal */}
+      {previewCreator && (
+        <VideoPreviewModal
+          creator={previewCreator}
+          isOpen={Boolean(previewCreator)}
+          onClose={() => setPreviewCreator(null)}
+        />
+      )}
     </div>
   );
 };
